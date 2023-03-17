@@ -41,6 +41,10 @@
       <HintPath>Libraries\com.rlabrecque.steamworks.net.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="MySql.Data, Version=8.0.30.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libraries\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\Newtonsoft.Json.dll</HintPath>
@@ -65,6 +69,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\Pathfinding.Poly2Tri.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="RL-I18N, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libraries\RL-I18N.dll</HintPath>
+    </Reference>
+    <Reference Include="RL-I18N.West, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libraries\RL-I18N.West.dll</HintPath>
     </Reference>
     <Reference Include="RL-RestSharp, Version=106.6.9.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -180,11 +192,14 @@
   <ItemGroup>
     <Content Include="Libraries\Assembly-CSharp.dll" />
     <Content Include="Libraries\com.rlabrecque.steamworks.net.dll" />
+    <Content Include="Libraries\MySql.Data.dll" />
     <Content Include="Libraries\Newtonsoft.Json.dll" />
     <Content Include="Libraries\Pathfinding.ClipperLib.dll" />
     <Content Include="Libraries\Pathfinding.Ionic.Zip.Reduced.dll" />
     <Content Include="Libraries\Pathfinding.JsonFx.dll" />
     <Content Include="Libraries\Pathfinding.Poly2Tri.dll" />
+    <Content Include="Libraries\RL-I18N.dll" />
+    <Content Include="Libraries\RL-I18N.West.dll" />
     <Content Include="Libraries\RL-RestSharp.dll" />
     <Content Include="Libraries\Rocket.API.dll" />
     <Content Include="Libraries\Rocket.Core.dll" />
