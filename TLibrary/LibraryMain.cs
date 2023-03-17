@@ -8,11 +8,11 @@ using Logger = Tavstal.TLibrary.Helpers.LoggerHelper;
 using Tavstal.TLibrary.Managers;
 using Tavstal.TLibrary.Helpers;
 using Tavstal.TLibrary.Compatibility;
-using Tavstal.TLibrary.Compatibility.Hooks;
 using System.Net;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SDG.Unturned;
 
 namespace Tavstal.TLibrary
 {
@@ -50,6 +50,8 @@ namespace Tavstal.TLibrary
                 {
                     var jsonData = reader.ReadToEnd();
                     var jsonObj = JObject.Parse(jsonData);
+                    var body = jsonObj.GetValue("body")?.ToString() ?? "";
+                    var assets = jsonObj.GetValue("assets").Children<JObject>();
                     Version latestVersion = Version.Parse(jsonObj.GetValue("tag_name").ToString());
 
                     if (latestVersion == null)
@@ -65,7 +67,8 @@ namespace Tavstal.TLibrary
                         Logger.LogWarning($"# Latest Version: {Version}");
                         Logger.Log($"# Current Version: {Version}");
                         Logger.Log($"# Current Build Date: {BuildDate}");
-                        Logger.LogWarning("# Download it from https://github.com/TavstalDev/TLibrary/releases");
+                        Logger.LogWarning("# Downloading latest version...");
+                        DownloadUpdate(assets.First().GetValue("browser_download_url")?.ToString() ?? string.Empty, Rocket.Core.Environment.LibrariesDirectory + "/Updates");
                         return;
                     }
                 }
@@ -81,8 +84,44 @@ namespace Tavstal.TLibrary
                 Logger.LogWarning($"Error: {ex.Message}");
                 Logger.LogWarning("Try downloading manually from https://github.com/TavstalDev/TLibrary/releases");
             }
-
             #endregion
+        }
+
+        private static void DownloadUpdate(string downloadUrl, string path)
+        {
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            var filePath = $"{path}/{downloadUrl.Substring(downloadUrl.LastIndexOf('/') + 1)}";
+
+            if (File.Exists(filePath))
+            {
+                Logger.Log("# Latest release is already downloaded. Check 'YourServer/Rocket/Libraries/Updates/' folder.");
+                return;
+            }
+
+            if (downloadUrl.IsNullOrEmpty())
+            {
+                Logger.LogWarning("# Failed to download the latest release.");
+                return;
+            }
+
+            Logger.Log("# Downloading latest release...");
+            using (var client = new WebClient())
+            {
+                client.DownloadFileCompleted += (sender, e) =>
+                {
+                    Logger.Log("# Download finished. Check 'YourServer/Rocket/Libraries/Updates/' folder.");
+                };
+
+                client.DownloadProgressChanged += (sender, e) =>
+                {
+                    Logger.Log(
+                        $"# Downloading {e.BytesReceived} of {e.TotalBytesToReceive} bytes. ({e.ProgressPercentage} %)");
+                };
+
+                client.DownloadFileAsync(new Uri(downloadUrl), filePath);
+            }
         }
 
         public static void OnUnload()
