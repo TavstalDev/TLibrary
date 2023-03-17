@@ -62,8 +62,10 @@ namespace Tavstal.TLibrary
                     {
                         Logger.Log("# TLibrary has been successfully loaded.");
                         Logger.Log("# Outdated version was detected.");
-                        Logger.Log($"# Version: {Version}");
-                        Logger.Log($"# Build Date: {BuildDate}");
+                        Logger.LogWarning($"# Latest Version: {Version}");
+                        Logger.Log($"# Current Version: {Version}");
+                        Logger.Log($"# Current Build Date: {BuildDate}");
+                        Logger.LogWarning("# Download it from https://github.com/TavstalDev/TLibrary/releases");
                         return;
                     }
                 }

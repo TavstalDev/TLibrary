@@ -148,7 +148,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Compatibility\Classes\DatabaseData.cs" />
+    <Compile Include="Compatibility\Classes\DatabaseSettingsBase.cs" />
     <Compile Include="Compatibility\Classes\Economy\Transaction.cs" />
     <Compile Include="Compatibility\Classes\Economy\BankCardDetails.cs" />
     <Compile Include="Compatibility\Classes\Economy\BankCard.cs" />
@@ -163,8 +163,6 @@
     <Compile Include="Compatibility\Enumerators\ETransaction.cs" />
     <Compile Include="Compatibility\Enumerators\EPaymentMethod.cs" />
     <Compile Include="Compatibility\Enumerators\ECurrency.cs" />
-    <Compile Include="Compatibility\Hooks\Hook_TEconomy.cs" />
-    <Compile Include="Compatibility\Hooks\Hook_Uconomy.cs" />
     <Compile Include="Compatibility\Interfaces\HookInterfaces\IEconomyProvider.cs" />
     <Compile Include="Compatibility\Interfaces\HookInterfaces\IPluginProvider.cs" />
     <Compile Include="Helpers\FormatHelper.cs" />
