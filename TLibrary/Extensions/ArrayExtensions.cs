@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tavstal.TLibrary.Compatibility
+namespace Tavstal.TLibrary.Extensions
 {
     public static class ArrayExtensions
     {

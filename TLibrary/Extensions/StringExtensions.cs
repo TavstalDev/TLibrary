@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tavstal.TLibrary.Helpers;
 
-namespace Tavstal.TLibrary.Compatibility
+namespace Tavstal.TLibrary.Extensions
 {
     public static class StringExtensions
     {
