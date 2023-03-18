@@ -252,7 +252,7 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
-        // It's for removing formaters from the text. Mostly used for the console.
+        // It's for removing formaters from the text. Mostly used in the console.
         public static string ClearFormaters(string text)
         {
             string formated = string.Empty;

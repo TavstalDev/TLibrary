@@ -123,7 +123,6 @@ namespace Tavstal.TLibrary.Managers
             return false;
         }
 
-
         public T GetHook<T>()
         {
             foreach (var hook in _hooks)
