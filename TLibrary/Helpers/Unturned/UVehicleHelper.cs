@@ -1,0 +1,38 @@
+﻿using RestSharp.Extensions;
+using Rocket.Core.Plugins;
+using Rocket.Unturned.Player;
+using SDG.Unturned;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
+
+namespace Tavstal.TLibrary.Helpers
+{
+    public static class UVehicleHelper
+    {
+        public static List<InteractableVehicle> GetVehiclesInRadius(Vector3 center, float sqrRadius)
+        {
+            List<InteractableVehicle> result = new List<InteractableVehicle>();
+            try
+            {
+                if (VehicleManager.vehicles == null) return result;
+                var rayResult = Physics.SphereCastAll(center, sqrRadius, Vector3.forward, RayMasks.VEHICLE);
+                foreach (RaycastHit ray in rayResult)
+                {
+                    var vehicle = ray.transform.GetComponent<InteractableVehicle>();
+                    if (vehicle != null)
+                        result.Add(vehicle);
+                }
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogError("Error in getVehiclesInRadius():" + ex);
+            }
+            return result;
+        }
+    }
+}
