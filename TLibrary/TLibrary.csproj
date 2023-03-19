@@ -166,6 +166,7 @@
     <Compile Include="Compatibility\Classes\Economy\BankCard.cs" />
     <Compile Include="Compatibility\Classes\FormatHelper\ConsoleFormat.cs" />
     <Compile Include="Compatibility\Classes\FormatHelper\TextFormat.cs" />
+    <Compile Include="Compatibility\Structs\SerializableVector3.cs" />
     <Compile Include="Extensions\Rocket\PluginExtensions.cs" />
     <Compile Include="Extensions\Unturned\PlayerExtensions.cs" />
     <Compile Include="Extensions\MySqlExtensions.cs" />
@@ -191,9 +192,7 @@
     <Compile Include="LibraryMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Compatibility\Structures\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="Libraries\Assembly-CSharp.dll" />
     <Content Include="Libraries\com.rlabrecque.steamworks.net.dll" />

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Tavstal.TLibrary.Helpers
 {
-    internal static class MathHelper
+    public static class MathHelper
     {
         private static System.Random _random;
         private static object syncObj = new object();
