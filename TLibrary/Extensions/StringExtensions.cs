@@ -34,6 +34,8 @@ namespace Tavstal.TLibrary.Extensions
             return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLowerInvariant());
         }
 
+
+
         public static bool IsLink(this string str)
         {
             return Uri.TryCreate(str, UriKind.Absolute, out Uri uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
@@ -64,6 +66,27 @@ namespace Tavstal.TLibrary.Extensions
             }
 
             return key;
+        }
+
+        public static char GetRandomChar()
+        {
+            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return chars.ElementAt(MathHelper.Next(chars.Length - 1));
+        }
+
+        public static string Shuffle(this string str)
+        {
+            char[] array = str.ToCharArray();
+            int n = array.Length;
+            while (n > 1)
+            {
+                n--;
+                int k = MathHelper.Next(n + 1);
+                var value = array[k];
+                array[k] = array[n];
+                array[n] = value;
+            }
+            return new string(array);
         }
     }
 }
