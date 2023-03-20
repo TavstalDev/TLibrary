@@ -24,6 +24,19 @@ namespace Tavstal.TLibrary.Extensions
             return Provider.clients.Any(x => x.playerID.steamID == player.CSteamID);
         }
 
+        public static List<UnturnedPlayer> GetNearbyPlayers(this UnturnedPlayer uplayer, float distance)
+        {
+            List<UnturnedPlayer> players = new List<UnturnedPlayer>();
+
+            foreach (var player in Provider.clients)
+            {
+                if (Vector3.Distance(player.player.transform.position, uplayer.Position) < distance)
+                    players.Add(UnturnedPlayer.FromSteamPlayer(player));
+            }
+
+            return players;
+        }
+
         public static List<InventorySearch> Search(this PlayerInventory inventory, EItemType type, bool findEmpty = false) => UPlayerHelper.Search(inventory, type, findEmpty);
 
         public static List<InventorySearch> Search(this PlayerInventory inventory, ushort itemID, bool findEmpty = false) => UPlayerHelper.Search(inventory, itemID, findEmpty);
