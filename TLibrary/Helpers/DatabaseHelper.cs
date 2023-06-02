@@ -251,7 +251,7 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
-        public static void UpdateTableRow<T>(this MySqlConnection connection, T newvalue)
+        public static void UpdateTableRow<T>(this MySqlConnection connection, T newvalue, Predicate<T> predicate)
         {
             try
             {
@@ -286,7 +286,7 @@ namespace Tavstal.TLibrary.Helpers
                 paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
                 keyString = keyString.Remove(keyString.LastIndexOf(','), 1);
 
-                MySQLCommand.CommandText = $"INSERT INTO {tableAttribute.Name} ({keyString}) VALUES ({paramString})";
+                MySQLCommand.CommandText = $"UPDATE {tableAttribute.Name} SET WHERE";
                 MySQLCommand.ExecuteNonQuery();
             }
             catch (Exception ex)
@@ -296,7 +296,7 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
-        public static T GetTableRow<T>(this MySqlConnection connection)
+        public static T GetTableRow<T>(this MySqlConnection connection, Predicate<T> predicate)
         {
             try
             {
@@ -318,6 +318,40 @@ namespace Tavstal.TLibrary.Helpers
                 {
                     val = Reader.ConvertToObject<T>();
                     break;
+                }
+                Reader.Close();
+                MySQLCommand.ExecuteNonQuery();
+                return val;
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                return default;
+            }
+        }
+
+        public static List<T> GetTableRowList<T>(this MySqlConnection connection, Predicate<T> predicate = null)
+        {
+            try
+            {
+                var schemaType = typeof(T);
+                var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
+                if (tableAttribute == null)
+                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
+
+                MySqlCommand MySQLCommand = connection.CreateCommand();
+
+                MySQLCommand.CommandText = $"SELECT * FROM {tableAttribute.Name} WHERE itemID=@ID;";
+                MySqlDataReader Reader = MySQLCommand.ExecuteReader();
+
+                if (Reader == null)
+                    return default;
+
+                List<T> val = new List<T>();
+                while (Reader.Read())
+                {
+                    val.Add(Reader.ConvertToObject<T>());
                 }
                 Reader.Close();
                 MySQLCommand.ExecuteNonQuery();
