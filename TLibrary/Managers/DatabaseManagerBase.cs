@@ -14,7 +14,7 @@ namespace Tavstal.TLibrary.Managers
 {
     public abstract class DatabaseManagerBase
     {
-        private IRocketPluginConfiguration _configuration;
+        public readonly IRocketPluginConfiguration _configuration;
 
         public DatabaseManagerBase(IRocketPluginConfiguration configuration)
         {
@@ -23,7 +23,7 @@ namespace Tavstal.TLibrary.Managers
             CheckSchema();
         }
 
-        private MySqlConnection CreateConnection()
+        public MySqlConnection CreateConnection()
         {
             MySqlConnection mySqlConnection = null;
             try

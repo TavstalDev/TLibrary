@@ -188,5 +188,18 @@ namespace Tavstal.TLibrary.Helpers
                 inventory.removeItem(2, 0);
             }
         }
+
+        public static List<UnturnedPlayer> GetNearbyPlayers(Vector3 position, float distance)
+        {
+            List<UnturnedPlayer> players = new List<UnturnedPlayer>();
+
+            foreach (var player in Provider.clients)
+            {
+                if (Vector3.Distance(player.player.transform.position, position) < distance)
+                    players.Add(UnturnedPlayer.FromSteamPlayer(player));
+            }
+
+            return players;
+        }
     }
 }

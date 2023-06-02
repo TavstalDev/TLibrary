@@ -161,6 +161,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compatibility\Classes\DatabaseSettingsBase.cs" />
+    <Compile Include="Compatibility\Classes\Database\SqlNameAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\SqlForeignKeyAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\SqlUniqueKeyAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\SqlPrimaryKeyAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\SqlNonNullableAttribute.cs" />
     <Compile Include="Compatibility\Classes\Economy\Transaction.cs" />
     <Compile Include="Compatibility\Classes\Economy\BankCardDetails.cs" />
     <Compile Include="Compatibility\Classes\Economy\BankCard.cs" />
@@ -179,6 +184,7 @@
     <Compile Include="Compatibility\Enumerators\ECurrency.cs" />
     <Compile Include="Compatibility\Interfaces\HookInterfaces\IEconomyProvider.cs" />
     <Compile Include="Compatibility\Interfaces\HookInterfaces\IPluginProvider.cs" />
+    <Compile Include="Helpers\DatabaseHelper.cs" />
     <Compile Include="Helpers\FormatHelper.cs" />
     <Compile Include="Helpers\Unturned\UAssetHelper.cs" />
     <Compile Include="Helpers\Unturned\UPlayerHelper.cs" />

@@ -92,5 +92,30 @@ namespace Tavstal.TLibrary.Helpers
         {
             return maxValue < value ? maxValue : (value < minValue ? minValue : value);
         }
+
+        public static float Next(float min, float max)
+        {
+            lock (syncObj)
+            {
+                if (_random == null)
+                    _random = new System.Random(); // Or exception...
+                return ((float)_random.NextDouble() * Math.Abs(max - min)) + min;
+            }
+        }
+
+        public static float Next(float max)
+        {
+            lock (syncObj)
+            {
+                if (_random == null)
+                    _random = new System.Random(); // Or exception...
+                return ((float)_random.NextDouble() * Math.Abs(max));
+            }
+        }
+
+        public static float Clamp(float value, float minValue, float maxValue)
+        {
+            return maxValue < value ? maxValue : (value < minValue ? minValue : value);
+        }
     }
 }
