@@ -13,5 +13,15 @@ namespace Tavstal.TLibrary.Extensions
         {
             return MathHelper.Clamp(value, minValue, maxValue);
         }
+
+        public static double Clamp(this double value, double minValue, double maxValue)
+        {
+            return MathHelper.Clamp(value, minValue, maxValue);
+        }
+
+        public static float Clamp(this float value, float minValue, float maxValue)
+        {
+            return MathHelper.Clamp(value, minValue, maxValue);
+        }
     }
 }
