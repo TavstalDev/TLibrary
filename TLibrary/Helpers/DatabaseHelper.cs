@@ -12,7 +12,6 @@ using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using System.Data;
 using Tavstal.TLibrary.Compatibility.Classes.Database;
-using System.Data;
 
 namespace Tavstal.TLibrary.Helpers
 {
@@ -207,7 +206,7 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
-        public static void AddTableRow<T>(this MySqlConnection connection, T value)
+        /*public static void AddTableRow<T>(this MySqlConnection connection, T value)
         {
             try
             {
@@ -391,6 +390,6 @@ namespace Tavstal.TLibrary.Helpers
                 LoggerHelper.LogError(ex);
                 return default;
             }
-        }
+        }*/
     }
 }
