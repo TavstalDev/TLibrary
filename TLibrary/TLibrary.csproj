@@ -186,6 +186,7 @@
     <Compile Include="Compatibility\Interfaces\HookInterfaces\IPluginProvider.cs" />
     <Compile Include="Helpers\DatabaseHelper.cs" />
     <Compile Include="Helpers\FormatHelper.cs" />
+    <Compile Include="Helpers\LinqHelper.cs" />
     <Compile Include="Helpers\Unturned\UAssetHelper.cs" />
     <Compile Include="Helpers\Unturned\UPlayerHelper.cs" />
     <Compile Include="Helpers\Unturned\UVehicleHelper.cs" />

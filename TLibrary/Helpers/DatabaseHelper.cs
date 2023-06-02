@@ -12,6 +12,7 @@ using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using System.Data;
 using Tavstal.TLibrary.Compatibility.Classes.Database;
+using System.Data;
 
 namespace Tavstal.TLibrary.Helpers
 {
@@ -251,7 +252,7 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
-        public static void UpdateTableRow<T>(this MySqlConnection connection, T newvalue, Predicate<T> predicate)
+        public static void UpdateTableRow<T>(this MySqlConnection connection, T newvalue, Expression<Func<T, object>> predicate)
         {
             try
             {
@@ -296,7 +297,7 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
-        public static T GetTableRow<T>(this MySqlConnection connection, Predicate<T> predicate)
+        public static T GetTableRow<T>(this MySqlConnection connection, Expression<Func<T, object>> predicate)
         {
             try
             {
@@ -305,9 +306,22 @@ namespace Tavstal.TLibrary.Helpers
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
 
+                if (predicate == null)
+                    throw new ArgumentNullException("The given predicate was null.");
+
                 MySqlCommand MySQLCommand = connection.CreateCommand();
 
-                MySQLCommand.CommandText = $"SELECT * FROM {tableAttribute.Name} WHERE itemID=@ID;";
+                var expressions = LinqHelper.GetExpressions((BinaryExpression)predicate.Body);
+                string searchString = string.Empty;
+                foreach (var expression in expressions)
+                {
+                    var memberName = LinqHelper.GetMemberName(expression);
+                    var value = Expression.Lambda(expression).Compile().DynamicInvoke();
+                    searchString += $"{memberName}=`{value}`, ";
+                }
+                searchString = searchString.Remove(searchString.LastIndexOf(','), 1);
+
+                MySQLCommand.CommandText = $"SELECT * FROM {tableAttribute.Name} WHERE {searchString};";
                 MySqlDataReader Reader = MySQLCommand.ExecuteReader();
 
                 if (Reader == null)
@@ -331,7 +345,7 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
-        public static List<T> GetTableRowList<T>(this MySqlConnection connection, Predicate<T> predicate = null)
+        public static List<T> GetTableRowList<T>(this MySqlConnection connection, Expression<Func<T, object>> predicate = null)
         {
             try
             {
@@ -342,7 +356,21 @@ namespace Tavstal.TLibrary.Helpers
 
                 MySqlCommand MySQLCommand = connection.CreateCommand();
 
-                MySQLCommand.CommandText = $"SELECT * FROM {tableAttribute.Name} WHERE itemID=@ID;";
+                string searchString = string.Empty;
+                if (predicate != null)
+                {
+                    var expressions = LinqHelper.GetExpressions((BinaryExpression)predicate.Body);
+                    
+                    foreach (var expression in expressions)
+                    {
+                        var memberName = LinqHelper.GetMemberName(expression);
+                        var value = Expression.Lambda(expression).Compile().DynamicInvoke();
+                        searchString += $"{memberName}=`{value}`, ";
+                    }
+                    searchString = " WHERE " + searchString.Remove(searchString.LastIndexOf(','), 1);
+                }
+
+                MySQLCommand.CommandText = $"SELECT * FROM {tableAttribute.Name}{searchString};";
                 MySqlDataReader Reader = MySQLCommand.ExecuteReader();
 
                 if (Reader == null)
