@@ -348,6 +348,7 @@ namespace Tavstal.TLibrary.Helpers
         {
             try
             {
+
                 var schemaType = typeof(T);
                 var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
                 if (tableAttribute == null)
