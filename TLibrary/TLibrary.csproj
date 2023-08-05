@@ -163,6 +163,8 @@
     <Compile Include="Compatibility\Classes\DatabaseSettingsBase.cs" />
     <Compile Include="Compatibility\Classes\Database\SqlNameAttribute.cs" />
     <Compile Include="Compatibility\Classes\Database\SqlForeignKeyAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\SqlFieldTypeAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\SqlIgnoreAttribute.cs" />
     <Compile Include="Compatibility\Classes\Database\SqlUniqueKeyAttribute.cs" />
     <Compile Include="Compatibility\Classes\Database\SqlPrimaryKeyAttribute.cs" />
     <Compile Include="Compatibility\Classes\Database\SqlNonNullableAttribute.cs" />

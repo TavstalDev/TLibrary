@@ -16,11 +16,21 @@ namespace Tavstal.TLibrary.Helpers
 {
     public static class UPlayerHelper
     {
-        public static bool RefillMagazine(UnturnedPlayer player, int max = -1)
+        /// <summary>
+        /// Refills the magazine of the specified player with the given magazine ID and maximum amount to refill.<br/>
+        /// If the magazine ID is not provided, every magazine will be refilled.<br/>
+        /// If the maximum amount is not provided, it will be assumed as -1 (unlimited).
+        /// </summary>
+        /// <param name="player">The UnturnedPlayer to refill the magazine for.</param>
+        /// <param name="magazineId">The ID of the magazine to refill. (Default is 0)</param>
+        /// <param name="maxAmount">The maximum amount of magazine to refill. (Default is -1 for unlimited)</param>
+        /// <returns>Returns true if the magazine is successfully refilled, otherwise false.</returns>
+
+        public static bool RefillMagazine(UnturnedPlayer player, ushort magazineId = 0, int maxAmount = -1)
         {
             bool success = false;
 
-            int maxlocal = max > 0 ? max : int.MaxValue;
+            int maxlocal = maxAmount > 0 ? maxAmount : int.MaxValue;
             try
             {
                 PlayerInventory inventory = player.Inventory;
@@ -52,6 +62,13 @@ namespace Tavstal.TLibrary.Helpers
             return success;
         }
 
+        /// <summary>
+        /// Searches for inventory items of the specified type in the player's inventory.
+        /// </summary>
+        /// <param name="inventory">The PlayerInventory to search.</param>
+        /// <param name="type">The EItemType representing the type of items to search for.</param>
+        /// <param name="findEmpty">Flag indicating whether to include empty amount in the search. (Default is false)</param>
+        /// <returns>A List of InventorySearch containing the search results.</returns>
         public static List<InventorySearch> Search(PlayerInventory inventory, EItemType type, bool findEmpty = false)
         {
             List<InventorySearch> search = new List<InventorySearch>();
@@ -90,6 +107,13 @@ namespace Tavstal.TLibrary.Helpers
             return search;
         }
 
+        /// <summary>
+        /// Searches for inventory items with the specified item ID in the player's inventory.
+        /// </summary>
+        /// <param name="inventory">The PlayerInventory to search.</param>
+        /// <param name="itemID">The item ID to search for.</param>
+        /// <param name="findEmpty">Flag indicating whether to include empty amount in the search. (Default is false)</param>
+        /// <returns>A List of InventorySearch containing the search results.</returns>
         public static List<InventorySearch> Search(PlayerInventory inventory, ushort itemID, bool findEmpty = false)
         {
             List<InventorySearch> search = new List<InventorySearch>();
@@ -122,12 +146,22 @@ namespace Tavstal.TLibrary.Helpers
             return search;
         }
 
+        /// <summary>
+        /// Forces the player to teleport to the specified location within a given radius.
+        /// </summary>
+        /// <param name="player">The player to teleport.</param>
+        /// <param name="location">The destination location for the teleportation.</param>
+        /// <param name="radious">The maximum distance from the destination location where the player can teleport. (Default is 3.0f)</param>
         public static void ForceTeleport(Player player, Vector3 location, float radious = 3f)
         {
             if (!player.teleportToLocation(location + UnityEngine.Random.insideUnitSphere * radious, player.transform.rotation.y))
                 ForceTeleport(player, location, radious);
         }
 
+        /// <summary>
+        /// Destroys all barricades belonging to the specified player.
+        /// </summary>
+        /// <param name="player">The player whose barricades will be destroyed.</param>
         public static void DestroyPlayerBarricades(UnturnedPlayer player)
         {
             foreach (var region in BarricadeManager.regions)
@@ -141,6 +175,10 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Clears the entire inventory of the specified player.
+        /// </summary>
+        /// <param name="player">The player whose inventory will be cleared.</param>
         public static void ClearInvventory(UnturnedPlayer player)
         {
             PlayerInventory playerInv = player.Inventory;
@@ -181,6 +219,10 @@ namespace Tavstal.TLibrary.Helpers
             RemoveUnequipped(playerInv);
         }
 
+        /// <summary>
+        /// Removes all unequipped items from the player's inventory.
+        /// </summary>
+        /// <param name="inventory">The inventory to remove unequipped items from.</param>
         private static void RemoveUnequipped(PlayerInventory inventory)
         {
             for (byte i = 0; i < inventory.getItemCount(2); i++)
@@ -189,6 +231,12 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Gets a list of Unturned players who are nearby a given position within a specified distance.
+        /// </summary>
+        /// <param name="position">The position to check for nearby players.</param>
+        /// <param name="distance">The maximum distance within which players are considered nearby.</param>
+        /// <returns>A list of Unturned players who are nearby the given position.</returns>
         public static List<UnturnedPlayer> GetNearbyPlayers(Vector3 position, float distance)
         {
             List<UnturnedPlayer> players = new List<UnturnedPlayer>();

@@ -131,7 +131,7 @@ namespace Tavstal.TLibrary.Helpers
             return obj;
         }
 
-        public static void CreateTable<T>(this MySqlConnection connection)
+        public static bool CreateTable<T>(this MySqlConnection connection)
         {
             try
             {
@@ -146,7 +146,7 @@ namespace Tavstal.TLibrary.Helpers
 
                 object result = command.ExecuteScalar();
                 if (result != null)
-                    return;
+                    return false;
 
                 string schemaParams = string.Empty;
                 string keyParams = string.Empty;
@@ -155,6 +155,14 @@ namespace Tavstal.TLibrary.Helpers
                 {
                     var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
                     string propName = propAttribute == null ? prop.Name : propAttribute.Name;
+                    string typeName = ConvertToSqlDataType(prop.PropertyType);
+
+                    var sqlFieldType = prop.GetCustomAttribute<SqlFieldTypeAttribute>();
+                    if (sqlFieldType != null)
+                        typeName = sqlFieldType.Type;
+
+                    if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                        continue;
 
                     string nullableString = string.Empty;
                     if (prop.GetCustomAttribute<SqlNonNullableAttribute>() != null)
@@ -170,13 +178,21 @@ namespace Tavstal.TLibrary.Helpers
                     if (foreignKey != null)
                         keyParams += $"FOREIGN KEY ({propName}) REFERENCES {foreignKey.TableName}({foreignKey.TableColumn}),";
 
-                    schemaParams += $"{propName} {ConvertToSqlDataType(prop.PropertyType)}{nullableString},";
+                    schemaParams += $"{propName} {typeName}{nullableString},";
                 }
 
                 foreach (var prop in schemaType.GetFields())
                 {
                     var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
                     string propName = propAttribute == null ? prop.Name : propAttribute.Name;
+                    string typeName = ConvertToSqlDataType(prop.FieldType);
+
+                    var sqlFieldType = prop.GetCustomAttribute<SqlFieldTypeAttribute>();
+                    if (sqlFieldType != null)
+                        typeName = sqlFieldType.Type;
+
+                    if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                        continue;
 
                     string nullableString = string.Empty;
                     if (prop.GetCustomAttribute<SqlNonNullableAttribute>() != null)
@@ -192,18 +208,36 @@ namespace Tavstal.TLibrary.Helpers
                     if (foreignKey != null)
                         keyParams += $"FOREIGN KEY ({propName}) REFERENCES {foreignKey.TableName}({foreignKey.TableColumn}),";
 
-                    schemaParams += $"{propName} {ConvertToSqlDataType(prop.FieldType)}{nullableString},";
+                    schemaParams += $"{propName} {typeName}{nullableString},";
                 }
 
                 command.CommandText = $"CREATE TABLE {attribute.Name} ({schemaParams}{keyParams})";
                 command.CommandText = command.CommandText.Remove(command.CommandText.LastIndexOf(','), 1);
                 command.ExecuteNonQuery();
+                return true;
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
+                return false;
             }
+        }
+
+        public static bool CompareTable<T>(this MySqlConnection connection)
+        {
+            var schemaType = typeof(T);
+            var attribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
+            if (attribute == null)
+                throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
+
+            var command = connection.CreateCommand();
+            command.CommandText = $"SHOW TABLES LIKE {attribute.Name}";
+            connection.Open();
+
+            object result = command.ExecuteScalar();
+            if (result == null)
+                return false;
         }
 
         /*public static void AddTableRow<T>(this MySqlConnection connection, T value)
