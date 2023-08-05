@@ -20,6 +20,12 @@ namespace Tavstal.TLibrary.Helpers
 {
     public static class DatabaseHelper
     {
+        /// <summary>
+        /// Converts a C# data type to its corresponding SQL data type.
+        /// </summary>
+        /// <param name="type">The C# data type to be converted.</param>
+        /// <param name="length">Optional. The length or size of the data type if applicable.</param>
+        /// <returns>The corresponding SQL data type as a string.</returns>
         public static string ConvertToSqlDataType(Type type, int? length = null)
         {
             switch (Type.GetTypeCode(type))
@@ -67,6 +73,11 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Converts an SQL data type to its corresponding C# data type.
+        /// </summary>
+        /// <param name="sqlDataType">The SQL data type to be converted.</param>
+        /// <returns>The corresponding C# data type as a Type object.</returns>
         public static Type ConvertSqlToCSharpDataType(string sqlDataType)
         {
             if (sqlDataType.Contains('('))
@@ -104,6 +115,12 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Converts the current row in the MySqlDataReader to an object of the specified type.
+        /// </summary>
+        /// <typeparam name="T">The type of object to be converted.</typeparam>
+        /// <param name="reader">The MySqlDataReader to read data from.</param>
+        /// <returns>An object of the specified type representing the current row data, or default(T) if the conversion fails.</returns>
         public static T ConvertToObject<T>(this MySqlDataReader reader) where T : class
         {
             if (!reader.HasRows)
@@ -134,6 +151,13 @@ namespace Tavstal.TLibrary.Helpers
             return obj;
         }
 
+        /// <summary>
+        /// Creates a new database table for the specified type T in the MySQL database.
+        /// </summary>
+        /// <typeparam name="T">The type of object for which the table is created.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="tableName">The name of the table to be created.</param>
+        /// <returns>True if the table creation is successful, otherwise false.</returns>
         public static bool CreateTable<T>(this MySqlConnection connection, string tableName) where T : class
         {
             if (connection == null)
@@ -234,6 +258,12 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Creates a new database table for the specified type T in the MySQL database.
+        /// </summary>
+        /// <typeparam name="T">The type of object for which the table is created.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <returns>True if the table creation is successful, otherwise false.</returns>
         public static bool CreateTable<T>(this MySqlConnection connection) where T : class
         {
             if (connection == null)
@@ -258,6 +288,15 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Checks the structure of the database table for the specified type T in the MySQL database.
+        /// If the table has missing columns, it adds or updates them.
+        /// If the table has extra columns, it removes them.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="tableName">The name of the table to check and update.</param>
+        /// <returns>True if the table structure was successfully checked and updated, otherwise false.</returns>
         public static bool CheckTable<T>(this MySqlConnection connection, string tableName) where T : class
         {
             if (connection == null)
@@ -451,6 +490,14 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Checks the structure of the database table for the specified type T in the MySQL database.
+        /// If the table has missing columns, it adds or updates them.
+        /// If the table has extra columns, it removes them.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <returns>True if the table structure was successfully checked and updated, otherwise false.</returns>
         public static bool CheckTable<T>(this MySqlConnection connection) where T : class
         {
             if (connection == null)
@@ -475,6 +522,17 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Retrieves a list of objects of type T from the MySQL database table with the specified name.
+        /// The retrieved rows are filtered using the provided WHERE clause and parameters.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="tableName">The name of the table from which to retrieve rows.</param>
+        /// <param name="whereClause">The WHERE clause used to filter the rows (e.g., "Column1 = @param1 AND Column2 > @param2").</param>
+        /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
+        /// <param name="limit">The maximum number of rows to retrieve (default is -1, which means no limit).</param>
+        /// <returns>A list of objects of type T containing the retrieved rows from the table.</returns>
         public static List<T> GetTableRows<T>(this MySqlConnection connection, string tableName, string whereClause, List<MySqlParameter> parameters, int limit = -1) where T : class
         {
             if (connection == null)
@@ -519,6 +577,16 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Retrieves a list of objects of type T from the MySQL database table with the specified name.
+        /// The retrieved rows are filtered using the provided WHERE clause and parameters.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="whereClause">The WHERE clause used to filter the rows (e.g., "Column1 = @param1 AND Column2 > @param2").</param>
+        /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
+        /// <param name="limit">The maximum number of rows to retrieve (default is -1, which means no limit).</param>
+        /// <returns>A list of objects of type T containing the retrieved rows from the table.</returns>
         public static List<T> GetTableRows<T>(this MySqlConnection connection, string whereClause, List<MySqlParameter> parameters, int limit = -1) where T : class
         {
             if (connection == null)
@@ -542,6 +610,16 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Retrieves a single object of type T from the MySQL database table with the specified name.
+        /// The retrieved row is filtered using the provided WHERE clause and parameters.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="tableName">The name of the table from which to retrieve the row.</param>
+        /// <param name="whereClause">The WHERE clause used to filter the row (e.g., "Column1 = @param1 AND Column2 > @param2").</param>
+        /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
+        /// <returns>An object of type T representing the retrieved row from the table.</returns>
         public static T GetTableRow<T>(this MySqlConnection connection, string tableName, string whereClause, List<MySqlParameter> parameters) where T : class
         {
             if (connection == null)
@@ -568,6 +646,15 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Retrieves a single object of type T from the MySQL database table with the specified name.
+        /// The retrieved row is filtered using the provided WHERE clause and parameters.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="whereClause">The WHERE clause used to filter the row (e.g., "Column1 = @param1 AND Column2 > @param2").</param>
+        /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
+        /// <returns>An object of type T representing the retrieved row from the table.</returns>
         public static T GetTableRow<T>(this MySqlConnection connection, string whereClause, List<MySqlParameter> parameters) where T : class
         {
             if (connection == null)
@@ -598,22 +685,31 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
-        /*public static void AddTableRow<T>(this MySqlConnection connection, T value)
+        /// <summary>
+        /// Adds a new row to the MySQL database table with the specified name.
+        /// The row data is provided as an object of type T.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="tableName">The name of the table to which the row will be added.</param>
+        /// <param name="value">The object representing the row data to be added.</param>
+        /// <returns>True if the row was successfully added; otherwise, false.</returns>
+        public static bool AddTableRow<T>(this MySqlConnection connection, string tableName, T value)
         {
+            if (connection == null)
+                return false;
+
             try
             {
                 var schemaType = typeof(T);
-                var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
-                if (tableAttribute == null)
-                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-
-                MySqlCommand MySQLCommand = connection.CreateCommand();
-
                 string paramString = string.Empty;
                 string keyString = string.Empty;
 
                 foreach (var prop in schemaType.GetProperties())
                 {
+                    if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                        continue;
+
                     var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
                     string propName = propAttribute == null ? prop.Name : propAttribute.Name;
 
@@ -623,6 +719,9 @@ namespace Tavstal.TLibrary.Helpers
 
                 foreach (var prop in schemaType.GetFields())
                 {
+                    if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                        continue;
+
                     var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
                     string propName = propAttribute == null ? prop.Name : propAttribute.Name;
 
@@ -633,18 +732,37 @@ namespace Tavstal.TLibrary.Helpers
                 paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
                 keyString = keyString.Remove(keyString.LastIndexOf(','), 1);
 
-                MySQLCommand.CommandText = $"INSERT INTO {tableAttribute.Name} ({keyString}) VALUES ({paramString})";
-                MySQLCommand.ExecuteNonQuery();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = $"INSERT INTO {tableName} ({keyString}) VALUES ({paramString})";
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+                return true;
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
             }
         }
 
-        public static void UpdateTableRow<T>(this MySqlConnection connection, T newvalue, Expression<Func<T, object>> predicate)
+        /// <summary>
+        /// Adds a new row to the MySQL database table associated with the type T.
+        /// The row data is provided as an object of type T.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="value">The object representing the row data to be added.</param>
+        /// <returns>True if the row was successfully added; otherwise, false.</returns>
+        public static bool AddTableRow<T>(this MySqlConnection connection, T value)
         {
+            if (connection == null)
+                return false;
+
             try
             {
                 var schemaType = typeof(T);
@@ -652,44 +770,98 @@ namespace Tavstal.TLibrary.Helpers
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
 
-                MySqlCommand MySQLCommand = connection.CreateCommand();
+                return AddTableRow<T>(connection, tableAttribute.Name, value);
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
+            }
+        }
 
-                string paramString = string.Empty;
-                string keyString = string.Empty;
+        /// <summary>
+        /// Updates an existing row in the MySQL database table associated with the type T.
+        /// The row data is provided as an object of type T, and the update is performed based on the provided WHERE clause and parameters.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="tableName">The name of the table to update the row in.</param>
+        /// <param name="newValue">The object representing the updated row data.</param>
+        /// <param name="whereClause">The WHERE clause used to locate the row to update.</param>
+        /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
+        /// <returns>True if the row was successfully updated; otherwise, false.</returns>
+        public static bool UpdateTableRow<T>(this MySqlConnection connection, string tableName, T newValue, string whereClause, List<MySqlParameter> parameters)
+        {
+            if (connection == null)
+                return false;
+
+            try
+            {
+                var schemaType = typeof(T);
+                string setClause = string.Empty;
 
                 foreach (var prop in schemaType.GetProperties())
                 {
+                    if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                        continue;
+
                     var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
                     string propName = propAttribute == null ? prop.Name : propAttribute.Name;
 
-                    keyString += $"{propName},";
-                    paramString += $"`{prop.GetValue(newvalue)}`,";
+                    setClause += $"{propName}={prop.GetValue(newValue)},";
                 }
 
                 foreach (var prop in schemaType.GetFields())
                 {
+                    if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                        continue;
+
                     var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
                     string propName = propAttribute == null ? prop.Name : propAttribute.Name;
 
-                    keyString += $"{propName},";
-                    paramString += $"`{prop.GetValue(newvalue)}`,";
+                    setClause += $"{propName}={prop.GetValue(newValue)},";
                 }
 
-                paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
-                keyString = keyString.Remove(keyString.LastIndexOf(','), 1);
-
-                MySQLCommand.CommandText = $"UPDATE {tableAttribute.Name} SET WHERE";
-                MySQLCommand.ExecuteNonQuery();
+                setClause = setClause.Remove(setClause.LastIndexOf(','), 1);
+                using (var command = connection.CreateCommand())
+                {
+                    if (parameters != null)
+                        foreach (var parameter in parameters)
+                            command.Parameters.Add(parameter);
+                    command.CommandText = $"UPDATE {tableName} SET {setClause} WHERE {whereClause}";
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+                return true;
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
             }
         }
 
-        public static T GetTableRow<T>(this MySqlConnection connection, Expression<Func<T, object>> predicate)
+        /// <summary>
+        /// Updates an existing row in the MySQL database table associated with the type T.
+        /// The row data is provided as an object of type T, and the update is performed based on the provided WHERE clause and parameters.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="newValue">The object representing the updated row data.</param>
+        /// <param name="whereClause">The WHERE clause used to locate the row to update.</param>
+        /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
+        /// <returns>True if the row was successfully updated; otherwise, false.</returns>
+        public static bool UpdateTableRow<T>(this MySqlConnection connection, T newValue, string whereClause, List<MySqlParameter> parameters)
         {
+            if (connection == null)
+                return false;
+
             try
             {
                 var schemaType = typeof(T);
@@ -697,92 +869,88 @@ namespace Tavstal.TLibrary.Helpers
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
 
-                if (predicate == null)
-                    throw new ArgumentNullException("The given predicate was null.");
-
-                MySqlCommand MySQLCommand = connection.CreateCommand();
-
-                var expressions = LinqHelper.GetExpressions((BinaryExpression)predicate.Body);
-                string searchString = string.Empty;
-                foreach (var expression in expressions)
-                {
-                    var memberName = LinqHelper.GetMemberName(expression);
-                    var value = Expression.Lambda(expression).Compile().DynamicInvoke();
-                    searchString += $"{memberName}=`{value}`, ";
-                }
-                searchString = searchString.Remove(searchString.LastIndexOf(','), 1);
-
-                MySQLCommand.CommandText = $"SELECT * FROM {tableAttribute.Name} WHERE {searchString};";
-                MySqlDataReader Reader = MySQLCommand.ExecuteReader();
-
-                if (Reader == null)
-                    return default;
-
-                T val = default;
-                while (Reader.Read())
-                {
-                    val = Reader.ConvertToObject<T>();
-                    break;
-                }
-                Reader.Close();
-                MySQLCommand.ExecuteNonQuery();
-                return val;
+                return UpdateTableRow<T>(connection, tableAttribute.Name, newValue, whereClause, parameters);
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
-                return default;
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
             }
         }
 
-        public static List<T> GetTableRowList<T>(this MySqlConnection connection, Expression<Func<T, object>> predicate = null)
+        /// <summary>
+        /// Removes a row from the MySQL database table associated with the type T.
+        /// The row to remove is specified using the provided WHERE clause and parameters.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="tableName">The name of the database table.</param>
+        /// <param name="whereClause">The WHERE clause used to locate the row to remove.</param>
+        /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
+        /// <returns>True if the row was successfully removed; otherwise, false.</returns>
+        public static bool RemoveTableRow<T>(this MySqlConnection connection, string tableName, string whereClause, List<MySqlParameter> parameters)
         {
+            if (connection == null)
+                return false;
+
             try
             {
+                var schemaType = typeof(T);
+                using (var command = connection.CreateCommand())
+                {
+                    if (parameters != null)
+                        foreach (var parameter in parameters)
+                            command.Parameters.Add(parameter);
+                    command.CommandText = $"DELETE FROM {tableName} WHERE {whereClause}";
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
+            }
+        }
 
+        /// <summary>
+        /// Removes a row from the MySQL database table associated with the type T.
+        /// The row to remove is specified using the provided WHERE clause and parameters.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="whereClause">The WHERE clause used to locate the row to remove.</param>
+        /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
+        /// <returns>True if the row was successfully removed; otherwise, false.</returns>
+        public static bool RemoveTableRow<T>(this MySqlConnection connection, string whereClause, List<MySqlParameter> parameters)
+        {
+            if (connection == null)
+                return false;
+
+            try
+            {
                 var schemaType = typeof(T);
                 var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
 
-                MySqlCommand MySQLCommand = connection.CreateCommand();
-
-                string searchString = string.Empty;
-                if (predicate != null)
-                {
-                    var expressions = LinqHelper.GetExpressions((BinaryExpression)predicate.Body);
-                    
-                    foreach (var expression in expressions)
-                    {
-                        var memberName = LinqHelper.GetMemberName(expression);
-                        var value = Expression.Lambda(expression).Compile().DynamicInvoke();
-                        searchString += $"{memberName}=`{value}`, ";
-                    }
-                    searchString = " WHERE " + searchString.Remove(searchString.LastIndexOf(','), 1);
-                }
-
-                MySQLCommand.CommandText = $"SELECT * FROM {tableAttribute.Name}{searchString};";
-                MySqlDataReader Reader = MySQLCommand.ExecuteReader();
-
-                if (Reader == null)
-                    return default;
-
-                List<T> val = new List<T>();
-                while (Reader.Read())
-                {
-                    val.Add(Reader.ConvertToObject<T>());
-                }
-                Reader.Close();
-                MySQLCommand.ExecuteNonQuery();
-                return val;
+                return RemoveTableRow<T>(connection, tableAttribute.Name, whereClause, parameters);
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
-                return default;
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
             }
-        }*/
+        }
     }
 }
