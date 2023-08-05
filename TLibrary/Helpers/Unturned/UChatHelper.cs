@@ -8,40 +8,44 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
+using System.Web.Util;
 using UnityEngine;
 
 namespace Tavstal.TLibrary.Helpers
 {
-    public static class UChatHelper
+    internal static class UChatHelper
     {
-        private static object _pluginClass = null;
-        private static MethodInfo _translateMethod = null;
-        private static string Translate(string key, params object[] args)
-        {
-            if (_translateMethod == null)
-            {
-                var assembly = Assembly.GetCallingAssembly();
-                Type plugin = null;
-                plugin = assembly.GetTypes().FirstOrDefault(x => x.IsSubclassOf(typeof(RocketPlugin)));
-                _pluginClass = plugin;
-                _translateMethod = plugin.GetMethod("Translate");
-            }
-            return (string)_translateMethod.Invoke(_pluginClass, new object[] { key, args });
-        }
+        //private static string Translate(bool addPrefix, string key, params object[] args) => TAdvancedHealthMain.Instance.Translate(addPrefix, key, args);
 
-        public static void SendChatMessage(string text, string icon = null, SteamPlayer fromPlayer = null, SteamPlayer toPlayer = null, EChatMode mode = EChatMode.GLOBAL)
-        => ChatManager.serverSendMessage(text.Replace("((", "<").Replace("))", ">"), Color.white, fromPlayer, toPlayer, mode, icon, true);
+        public static void ServerSendChatMessage(string text, string icon = null, SteamPlayer fromPlayer = null, SteamPlayer toPlayer = null, EChatMode mode = EChatMode.GLOBAL)
+        => ChatManager.serverSendMessage(text, Color.white, fromPlayer, toPlayer, mode, icon, true);
+
+        /*public static void SendCommandReply(object toPlayer, string translation, params object[] args)
+        {
+            string icon = "";
+            if (toPlayer is SteamPlayer steamPlayer)
+                ServerSendChatMessage(FormatHelper.FormatTextV2(Translate(true, translation, args)), icon, null, steamPlayer, EChatMode.GLOBAL);
+            else
+                LoggerHelper.LogRichCommand(Translate(false, translation, args));
+        }
 
         public static void SendChatMessage(SteamPlayer toPlayer, string translation, params object[] args)
         {
             string icon = "";
-            SendChatMessage(Translate(translation, args).Replace("((", "<").Replace("))", ">"), icon, null, toPlayer, EChatMode.GLOBAL);
+            ServerSendChatMessage(FormatHelper.FormatTextV2(Translate(true, translation, args)), icon, null, toPlayer, EChatMode.GLOBAL);
         }
 
         public static void SendChatMessage(string translation, params object[] args)
         {
             string icon = "";
-            SendChatMessage(Translate(translation, args).Replace("((", "<").Replace("))", ">"), icon, null, null, EChatMode.GLOBAL);
+            ServerSendChatMessage(Translate(true, translation, args), icon, null, null, EChatMode.GLOBAL);
+        }*/
+
+        public static void SendChatMessageUntranslated(SteamPlayer toPlayer, string text)
+        {
+            string icon = "";
+            ServerSendChatMessage(text, icon, null, toPlayer, EChatMode.GLOBAL);
         }
     }
 }

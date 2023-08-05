@@ -169,12 +169,14 @@
     <Compile Include="Compatibility\Classes\Database\Attributes\SqlUniqueKeyAttribute.cs" />
     <Compile Include="Compatibility\Classes\Database\Attributes\SqlPrimaryKeyAttribute.cs" />
     <Compile Include="Compatibility\Classes\Database\Attributes\SqlNonNullableAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\PlayerData.cs" />
     <Compile Include="Compatibility\Classes\Database\SqlColumn.cs" />
     <Compile Include="Compatibility\Classes\Economy\Transaction.cs" />
     <Compile Include="Compatibility\Classes\Economy\BankCardDetails.cs" />
     <Compile Include="Compatibility\Classes\Economy\BankCard.cs" />
     <Compile Include="Compatibility\Classes\FormatHelper\ConsoleFormat.cs" />
     <Compile Include="Compatibility\Classes\FormatHelper\TextFormat.cs" />
+    <Compile Include="Compatibility\Classes\Plugin\PluginBase.cs" />
     <Compile Include="Compatibility\Structs\SerializableVector3.cs" />
     <Compile Include="Extensions\Rocket\PluginExtensions.cs" />
     <Compile Include="Extensions\Unturned\PlayerExtensions.cs" />

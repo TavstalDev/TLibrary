@@ -151,6 +151,59 @@ namespace Tavstal.TLibrary.Helpers
             return obj;
         }
 
+        public static bool DoesTableExist<T>(this MySqlConnection connection, string tableName) where T : class
+        {
+            if (connection == null)
+                return false;
+
+            try
+            {
+                var schemaType = typeof(T);
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = $"SHOW TABLES LIKE {tableName}";
+
+                    object result = command.ExecuteScalar();
+                    if (result != null)
+                        return true;
+                }
+                connection.Close();
+                return false;
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
+            }
+        }
+
+        public static bool DoesTableExist<T>(this MySqlConnection connection) where T : class
+        {
+            if (connection == null)
+                return false;
+
+            try
+            {
+                var schemaType = typeof(T);
+                var attribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
+                if (attribute == null)
+                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
+                return DoesTableExist<T>(connection, attribute.Name);
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
+            }
+        }
+
         /// <summary>
         /// Creates a new database table for the specified type T in the MySQL database.
         /// </summary>

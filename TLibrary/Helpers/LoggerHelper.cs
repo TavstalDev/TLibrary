@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Tavstal.TLibrary.Compatibility;
 
 namespace Tavstal.TLibrary.Helpers
 {
-    public static class LoggerHelper
+    internal static class LoggerHelper
     {
-        private readonly static string Name = Assembly.GetCallingAssembly().GetName().Name;
+        private static string Name = Assembly.GetExecutingAssembly().GetName().Name;
 
         public static void LogRich(object message, string prefix = "&a[INFO] >&f")
         {
