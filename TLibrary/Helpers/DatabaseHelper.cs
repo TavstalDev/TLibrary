@@ -12,6 +12,9 @@ using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using System.Data;
 using Tavstal.TLibrary.Compatibility.Classes.Database;
+using Tavstal.TLibrary.Extensions;
+using SDG.Unturned;
+using UnityEngine;
 
 namespace Tavstal.TLibrary.Helpers
 {
@@ -101,10 +104,10 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
-        public static T ConvertToObject<T>(this MySqlDataReader reader)
+        public static T ConvertToObject<T>(this MySqlDataReader reader) where T : class
         {
             if (!reader.HasRows)
-                return default(T); // Return default value for the type T
+                return default(T);
 
             T obj = Activator.CreateInstance<T>();
             var properties = typeof(T).GetProperties();
@@ -131,22 +134,23 @@ namespace Tavstal.TLibrary.Helpers
             return obj;
         }
 
-        public static bool CreateTable<T>(this MySqlConnection connection)
+        public static bool CreateTable<T>(this MySqlConnection connection, string tableName) where T : class
         {
+            if (connection == null)
+                return false;
+
             try
             {
                 var schemaType = typeof(T);
-                var attribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
-                if (attribute == null)
-                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
 
-                var command = connection.CreateCommand();
-                command.CommandText = $"SHOW TABLES LIKE {attribute.Name}";
                 connection.Open();
-
-                object result = command.ExecuteScalar();
-                if (result != null)
-                    return false;
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = $"SHOW TABLES LIKE {tableName}";
+                    object result = command.ExecuteScalar();
+                    if (result != null)
+                        return false;
+                }
 
                 string schemaParams = string.Empty;
                 string keyParams = string.Empty;
@@ -211,33 +215,387 @@ namespace Tavstal.TLibrary.Helpers
                     schemaParams += $"{propName} {typeName}{nullableString},";
                 }
 
-                command.CommandText = $"CREATE TABLE {attribute.Name} ({schemaParams}{keyParams})";
-                command.CommandText = command.CommandText.Remove(command.CommandText.LastIndexOf(','), 1);
-                command.ExecuteNonQuery();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = $"CREATE TABLE {tableName} ({schemaParams}{keyParams})";
+                    command.CommandText = command.CommandText.Remove(command.CommandText.LastIndexOf(','), 1);
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
                 return true;
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
                 return false;
             }
         }
 
-        public static bool CompareTable<T>(this MySqlConnection connection)
+        public static bool CreateTable<T>(this MySqlConnection connection) where T : class
         {
-            var schemaType = typeof(T);
-            var attribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
-            if (attribute == null)
-                throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-
-            var command = connection.CreateCommand();
-            command.CommandText = $"SHOW TABLES LIKE {attribute.Name}";
-            connection.Open();
-
-            object result = command.ExecuteScalar();
-            if (result == null)
+            if (connection == null)
                 return false;
+
+            try
+            {
+                var schemaType = typeof(T);
+                var attribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
+                if (attribute == null)
+                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
+
+                return CreateTable<T>(connection, attribute.Name);
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
+            }
+        }
+
+        public static bool CheckTable<T>(this MySqlConnection connection, string tableName) where T : class
+        {
+            if (connection == null)
+                return false;
+
+            try
+            {
+                var schemaType = typeof(T);
+
+                List<SqlColumn> classColumns = new List<SqlColumn>();
+                #region Read T Fields and Properties
+                foreach (var prop in schemaType.GetProperties())
+                {
+                    if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                        continue;
+
+                    SqlColumn localColumn = new SqlColumn();
+                    // Column Name
+                    var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
+                    localColumn.ColumnName = propAttribute == null ? prop.Name : propAttribute.Name;
+
+                    // Column Type
+                    string typeName = ConvertToSqlDataType(prop.PropertyType);
+                    var sqlFieldType = prop.GetCustomAttribute<SqlFieldTypeAttribute>();
+                    if (sqlFieldType != null)
+                        typeName = sqlFieldType.Type;
+                    localColumn.ColumnType = typeName;
+
+                    // Column Is Nullable
+                    if (prop.GetCustomAttribute<SqlNonNullableAttribute>() != null)
+                        localColumn.IsNullable = false;
+                    else
+                        localColumn.IsNullable = true;
+
+                    // Colum Primary Key
+                    if (prop.GetCustomAttribute<SqlPrimaryKeyAttribute>() != null)
+                        localColumn.SetAsPrimaryKey();
+
+                    // Column Unique Key
+                    if (prop.GetCustomAttribute<SqlUniqueKeyAttribute>() != null)
+                        localColumn.SetAsUniqueKey();
+
+                    // Column Foreign Key
+                    var foreignKey = prop.GetCustomAttribute<SqlForeignKeyAttribute>();
+                    if (foreignKey != null)
+                        localColumn.SetForeignKey(foreignKey.TableName, foreignKey.TableColumn);
+
+                    classColumns.Add(localColumn);
+                }
+
+                foreach (var prop in schemaType.GetFields())
+                {
+                    if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                        continue;
+
+                    SqlColumn localColumn = new SqlColumn();
+                    // Column Name
+                    var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
+                    localColumn.ColumnName = propAttribute == null ? prop.Name : propAttribute.Name;
+
+                    // Column Type
+                    string typeName = ConvertToSqlDataType(prop.FieldType);
+                    var sqlFieldType = prop.GetCustomAttribute<SqlFieldTypeAttribute>();
+                    if (sqlFieldType != null)
+                        typeName = sqlFieldType.Type;
+                    localColumn.ColumnType = typeName;
+
+                    // Column Is Nullable
+                    if (prop.GetCustomAttribute<SqlNonNullableAttribute>() != null)
+                        localColumn.IsNullable = false;
+                    else
+                        localColumn.IsNullable = true;
+
+                    // Colum Primary Key
+                    if (prop.GetCustomAttribute<SqlPrimaryKeyAttribute>() != null)
+                        localColumn.SetAsPrimaryKey();
+
+                    // Column Unique Key
+                    if (prop.GetCustomAttribute<SqlUniqueKeyAttribute>() != null)
+                        localColumn.SetAsUniqueKey();
+
+                    // Column Foreign Key
+                    var foreignKey = prop.GetCustomAttribute<SqlForeignKeyAttribute>();
+                    if (foreignKey != null)
+                        localColumn.SetForeignKey(foreignKey.TableName, foreignKey.TableColumn);
+
+                    classColumns.Add(localColumn);
+
+                }
+                #endregion
+
+                connection.Open();
+                List<SqlColumn> liveColumns = new List<SqlColumn>();
+                List<SqlColumn> columnsToRemove = new List<SqlColumn>();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = $"SHOW TABLES LIKE {tableName}";
+
+                    object result = command.ExecuteScalar();
+                    if (result == null)
+                        return false;
+
+                    command.CommandText = $"SHOW COLUMNS FROM `{tableName}`;";
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string columnKey = reader.GetString("Key");
+                            string columnExtra = reader.GetString("Extra");
+
+                            var localColumn = new SqlColumn(
+                                columnName: reader.GetString("Field"),
+                                columnType: reader.GetString("Type"),
+                                isNullable: reader.GetBoolean("Null"),
+                                isPrimaryKey: columnKey == "PRI",
+                                isUnique: columnKey == "UNI",
+                                shouldAutoIncrement: columnExtra.Contains("auto_increment"),
+                                isForeignKey: false,
+                                foreignTable: null,
+                                foreignColumn: null);
+                            liveColumns.Add(localColumn);
+
+                            if (!classColumns.Any(x => x.ColumnName == localColumn.ColumnName))
+                                columnsToRemove.Add(localColumn);
+                        }
+                    }
+                }
+
+                List<SqlColumn> columnsToAdd = new List<SqlColumn>();
+                List<SqlColumn> columnsToUpdate = new List<SqlColumn>();
+                #region Fill column lists
+                foreach (var column in classColumns)
+                {
+                    if (!liveColumns.Any(x => x.ColumnName == column.ColumnName))
+                    {
+                        columnsToAdd.Add(column);
+                        continue;
+                    }
+
+                    if (liveColumns.Any(x => x.ColumnName == column.ColumnName && x != column))
+                    {
+                        columnsToUpdate.Add(column);
+                        continue;
+                    }
+                }
+                #endregion
+
+                #region Modify Table 
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = $"ALTER TABLE {tableName}";
+                    // ADD
+                    foreach (SqlColumn column in columnsToAdd)
+                    {
+                        string primaryKey = column.IsPrimaryKey ? " PRIMARY KEY" : "";
+                        string nullable = column.IsNullable ? "" : " NOT NULL";
+                        string uniqueKey = column.IsUnique ? " UNIQUE" : "";
+                        string autoIncrement = column.ShouldAutoIncrement ? " AUTO_INCREMENT" : "";
+                        command.CommandText += $" ADD {column.ColumnName}{nullable} {column.ColumnType}{uniqueKey}{primaryKey}{autoIncrement},";
+                    }
+                    // UPDATE
+                    foreach (SqlColumn column in columnsToUpdate)
+                    {
+                        string primaryKey = column.IsPrimaryKey ? " PRIMARY KEY" : "";
+                        string nullable = column.IsNullable ? "" : " NOT NULL";
+                        string uniqueKey = column.IsUnique ? " UNIQUE" : "";
+                        string autoIncrement = column.ShouldAutoIncrement ? " AUTO_INCREMENT" : "";
+                        command.CommandText += $" ALTER COLUMN {column.ColumnName}{nullable} {column.ColumnType}{uniqueKey}{primaryKey}{autoIncrement},";
+                    }
+                    // DROP
+                    foreach (SqlColumn column in columnsToRemove)
+                    {
+                        command.CommandText += $" DROP COLUMN {column.ColumnName},";
+                    }
+
+                    command.CommandText = command.CommandText.Remove(command.CommandText.LastIndexOf(','), 1);
+                    command.ExecuteNonQuery();
+                }
+                #endregion
+
+                connection.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
+            }
+        }
+
+        public static bool CheckTable<T>(this MySqlConnection connection) where T : class
+        {
+            if (connection == null)
+                return false;
+
+            try
+            {
+                var schemaType = typeof(T);
+                var attribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
+                if (attribute == null)
+                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
+
+                return CheckTable<T>(connection, attribute.Name);
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
+            }
+        }
+
+        public static List<T> GetTableRows<T>(this MySqlConnection connection, string tableName, string whereClause, List<MySqlParameter> parameters, int limit = -1) where T : class
+        {
+            if (connection == null)
+                return null;
+
+            try
+            {
+                List<T> localList = new List<T>();
+                connection.Open();
+                string limitClause = limit > 0 ? $" LIMIT: {limit}" : "";
+                string whereClauseExp = string.Empty;
+                if (!whereClause.IsNullOrEmpty())
+                {
+                    if (whereClause.StartsWith("WHERE"))
+                        whereClause = " " + whereClause;
+
+                    if (!whereClause.StartsWith(" WHERE"))
+                        whereClause = " WHERE" + whereClause;
+                }
+                using (var command = connection.CreateCommand())
+                {
+                    if (parameters != null)
+                        foreach (var param in parameters)
+                            command.Parameters.Add(param);
+                    command.CommandText = $"SELECT * FROM {tableName}{whereClause}{limitClause}";
+                    MySqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        localList.Add(ConvertToObject<T>(reader));
+                    }
+                }
+
+                return localList;
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return null;
+            }
+        }
+
+        public static List<T> GetTableRows<T>(this MySqlConnection connection, string whereClause, List<MySqlParameter> parameters, int limit = -1) where T : class
+        {
+            if (connection == null)
+                return null;
+
+            try
+            {
+                var attribute = typeof(T).GetCustomAttribute<SqlNameAttribute>();
+                if (attribute == null)
+                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
+
+                return connection.GetTableRows<T>(attribute.Name, whereClause, parameters, limit);
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return null;
+            }
+        }
+
+        public static T GetTableRow<T>(this MySqlConnection connection, string tableName, string whereClause, List<MySqlParameter> parameters) where T : class
+        {
+            if (connection == null)
+                return null;
+
+            try
+            {
+                var list = connection.GetTableRows<T>(tableName: tableName, whereClause: whereClause, parameters: parameters, limit: 1);
+                if (list == null)
+                    return null;
+
+                if (list.Count <= 0)
+                    return null;
+
+                return list.ElementAt(0);
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return null;
+            }
+        }
+
+        public static T GetTableRow<T>(this MySqlConnection connection, string whereClause, List<MySqlParameter> parameters) where T : class
+        {
+            if (connection == null)
+                return null;
+
+            try
+            { 
+                var attribute = typeof(T).GetCustomAttribute<SqlNameAttribute>();
+                if (attribute == null)
+                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
+
+                var list = connection.GetTableRows<T>(tableName: attribute.Name, whereClause: whereClause, parameters: parameters, limit: 1);
+                if (list == null)
+                    return null;
+
+                if (list.Count <= 0)
+                    return null;
+
+                return list.ElementAt(0);
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return null;
+            }
         }
 
         /*public static void AddTableRow<T>(this MySqlConnection connection, T value)

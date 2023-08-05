@@ -161,13 +161,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compatibility\Classes\DatabaseSettingsBase.cs" />
-    <Compile Include="Compatibility\Classes\Database\SqlNameAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\SqlForeignKeyAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\SqlFieldTypeAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\SqlIgnoreAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\SqlUniqueKeyAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\SqlPrimaryKeyAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\SqlNonNullableAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\Attributes\SqlNameAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\Attributes\SqlForeignKeyAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\Attributes\SqlFieldTypeAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\Attributes\SqlIgnoreAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\Attributes\SqlUniqueKeyAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\Attributes\SqlPrimaryKeyAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\Attributes\SqlNonNullableAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\SqlColumn.cs" />
     <Compile Include="Compatibility\Classes\Economy\Transaction.cs" />
     <Compile Include="Compatibility\Classes\Economy\BankCardDetails.cs" />
     <Compile Include="Compatibility\Classes\Economy\BankCard.cs" />
