@@ -25,7 +25,6 @@ namespace Tavstal.TLibrary.Helpers
         /// <param name="magazineId">The ID of the magazine to refill. (Default is 0)</param>
         /// <param name="maxAmount">The maximum amount of magazine to refill. (Default is -1 for unlimited)</param>
         /// <returns>Returns true if the magazine is successfully refilled, otherwise false.</returns>
-
         public static bool RefillMagazine(UnturnedPlayer player, ushort magazineId = 0, int maxAmount = -1)
         {
             bool success = false;
@@ -39,6 +38,9 @@ namespace Tavstal.TLibrary.Helpers
                 foreach (InventorySearch search in searchResult)
                 {
                     ItemMagazineAsset asset = (ItemMagazineAsset)Assets.find(EAssetType.ITEM, search.jar.item.id);
+                    if (magazineId > 0)
+                        if (asset.id != magazineId)
+                            continue;
                     if (asset.countMax > search.jar.item.amount || search.jar.item.amount == 0)
                     {
                         success = true;

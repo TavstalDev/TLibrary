@@ -14,6 +14,12 @@ namespace Tavstal.TLibrary.Helpers
 {
     public static class UVehicleHelper
     {
+        /// <summary>
+        /// Retrieves a list of <see cref="InteractableVehicle"/> objects within a specified radius from the given center point.
+        /// </summary>
+        /// <param name="center">The center point from which to search for vehicles.</param>
+        /// <param name="sqrRadius">The squared radius within which to search for vehicles.</param>
+        /// <returns>A list of <see cref="InteractableVehicle"/> objects found within the specified radius.</returns>
         public static List<InteractableVehicle> GetVehiclesInRadius(Vector3 center, float sqrRadius)
         {
             List<InteractableVehicle> result = new List<InteractableVehicle>();

@@ -34,8 +34,6 @@ namespace Tavstal.TLibrary.Extensions
             return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLowerInvariant());
         }
 
-
-
         public static bool IsLink(this string str)
         {
             return Uri.TryCreate(str, UriKind.Absolute, out Uri uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
