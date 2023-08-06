@@ -21,7 +21,7 @@ namespace PluginTest
             DownloadLocalePacks = true;
             Database = new DBSettings();
             Database.DatabaseName = "unturned";
-            Database.UserPassword = "Admin#123";
+            Database.UserPassword = "Admin123";
         }
     }
 }

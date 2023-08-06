@@ -32,11 +32,9 @@ namespace PluginTest
     [SqlName("test_table")]
     public class TestData
     {
-        [SqlPrimaryKey]
-        [SqlNonNullable]
+        [SqlMember(isPrimaryKey: true, shouldAutoIncrement: true)]
         public int Id { get; set; }
-        [SqlUniqueKey]
-        [SqlNonNullable]
+        [SqlMember(isUniqueKey: true, columnType: "VARCHAR(17)")]
         public ulong SteamId { get; set; }
     }
 }
