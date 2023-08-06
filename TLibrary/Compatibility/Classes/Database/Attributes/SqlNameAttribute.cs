@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Tavstal.TLibrary.Compatibility.Classes.Database
 {
-    [System.AttributeUsage(System.AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
+    [System.AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
     public class SqlNameAttribute : Attribute
     {
         public string Name { get; set; }
