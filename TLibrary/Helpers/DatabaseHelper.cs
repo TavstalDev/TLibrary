@@ -15,6 +15,7 @@ using Tavstal.TLibrary.Compatibility.Classes.Database;
 using Tavstal.TLibrary.Extensions;
 using SDG.Unturned;
 using UnityEngine;
+using YamlDotNet.Core.Tokens;
 
 namespace Tavstal.TLibrary.Helpers
 {
@@ -123,32 +124,65 @@ namespace Tavstal.TLibrary.Helpers
         /// <returns>An object of the specified type representing the current row data, or default(T) if the conversion fails.</returns>
         public static T ConvertToObject<T>(this MySqlDataReader reader) where T : class
         {
-            if (!reader.HasRows)
+            try
+            {
+                if (!reader.HasRows)
+                    return default;
+
+                T obj = Activator.CreateInstance<T>();
+
+                foreach (var prop in typeof(T).GetProperties())
+                {
+                    if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                        continue;
+
+                    string propName = prop.Name;
+                    var memberAtt = prop.GetCustomAttribute<SqlMemberAttribute>();
+                    if (memberAtt != null)
+                    {
+                        if (!memberAtt.ColumnName.IsNullOrEmpty())
+                            propName = memberAtt.ColumnName;
+                    }
+
+                    int ordinal = reader.GetOrdinal(propName);
+                    var value = reader.GetValue(ordinal);
+
+                    if (prop.PropertyType.Name == value.GetType().Name)
+                        prop.SetValue(obj, value);
+                    else
+                        prop.SetValue(obj, Convert.ChangeType(value, prop.PropertyType));
+                }
+
+                foreach (var prop in typeof(T).GetFields())
+                {
+                    if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                        continue;
+
+                    string propName = prop.Name;
+                    var memberAtt = prop.GetCustomAttribute<SqlMemberAttribute>();
+                    if (memberAtt != null)
+                    {
+                        if (!memberAtt.ColumnName.IsNullOrEmpty())
+                            propName = memberAtt.ColumnName;
+                    }
+
+                    int ordinal = reader.GetOrdinal(propName);
+                    var value = reader.GetValue(ordinal);
+
+                    if (prop.FieldType.Name == value.GetType().Name)
+                        prop.SetValue(obj, value);
+                    else
+                        prop.SetValue(obj, Convert.ChangeType(value, prop.FieldType));
+                }
+
+                return obj;
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
                 return default;
-
-            T obj = Activator.CreateInstance<T>();
-            var properties = typeof(T).GetProperties();
-
-            foreach (var property in properties)
-            {
-                if (reader[property.Name] != DBNull.Value)
-                {
-                    object value = reader[property.Name];
-                    property.SetValue(obj, value);
-                }
             }
-
-            var fields = typeof(T).GetFields();
-            foreach (var field in fields)
-            {
-                if (reader[field.Name] != DBNull.Value)
-                {
-                    object value = reader[field.Name];
-                    field.SetValue(obj, value);
-                }
-            }
-
-            return obj;
         }
 
         public static bool DoesTableExist<T>(this MySqlConnection connection, string tableName) where T : class
@@ -162,11 +196,15 @@ namespace Tavstal.TLibrary.Helpers
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = $"SHOW TABLES LIKE {tableName}";
+                    command.Parameters.AddWithValue("@TableName", tableName);
+                    command.CommandText = $"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE @TableName;";
 
                     object result = command.ExecuteScalar();
                     if (result != null)
+                    {
+                        connection.Close();
                         return true;
+                    }
                 }
                 connection.Close();
                 return false;
@@ -223,7 +261,8 @@ namespace Tavstal.TLibrary.Helpers
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = $"SHOW TABLES LIKE {tableName}";
+                    command.Parameters.AddWithValue("@TableName", tableName);
+                    command.CommandText = $"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE @TableName;";
                     object result = command.ExecuteScalar();
                     if (result != null)
                         return false;
@@ -234,62 +273,74 @@ namespace Tavstal.TLibrary.Helpers
 
                 foreach (var prop in schemaType.GetProperties())
                 {
-                    var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
-                    string propName = propAttribute == null ? prop.Name : propAttribute.Name;
-                    string typeName = ConvertToSqlDataType(prop.PropertyType);
-
-                    var sqlFieldType = prop.GetCustomAttribute<SqlFieldTypeAttribute>();
-                    if (sqlFieldType != null)
-                        typeName = sqlFieldType.Type;
-
                     if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
                         continue;
 
+                    string propName = prop.Name;
+                    string typeName = ConvertToSqlDataType(prop.PropertyType);
                     string nullableString = string.Empty;
-                    if (prop.GetCustomAttribute<SqlNonNullableAttribute>() != null)
-                        nullableString = $" NOT NULL";
+                    string autoincrementString = string.Empty;
+                    var sqlMember = prop.GetCustomAttribute<SqlMemberAttribute>();
 
-                    if (prop.GetCustomAttribute<SqlPrimaryKeyAttribute>() != null)
-                        keyParams += $"PRIMARY KEY({propName}),";
+                    if (sqlMember != null)
+                    {
+                        if (!sqlMember.ColumnName.IsNullOrEmpty())
+                            propName = sqlMember.ColumnName;
 
-                    if (prop.GetCustomAttribute<SqlUniqueKeyAttribute>() != null)
-                        keyParams += $"UNIQUE ({propName}),";
+                        if (!sqlMember.ColumnType.IsNullOrEmpty())
+                            typeName = sqlMember.ColumnType;
 
-                    var foreignKey = prop.GetCustomAttribute<SqlForeignKeyAttribute>();
-                    if (foreignKey != null)
-                        keyParams += $"FOREIGN KEY ({propName}) REFERENCES {foreignKey.TableName}({foreignKey.TableColumn}),";
+                        if (sqlMember.ShouldAutoIncrement)
+                            autoincrementString = $" AUTO_INCREMENT";
 
-                    schemaParams += $"{propName} {typeName}{nullableString},";
+                        if (!sqlMember.IsNullable)
+                            nullableString = $" NOT NULL";
+
+                        if (sqlMember.IsPrimaryKey)
+                            keyParams += $"PRIMARY KEY({propName}),";
+                        else if (sqlMember.IsUnique)
+                            keyParams += $"UNIQUE ({propName}),";
+
+                        if (sqlMember.IsForeignKey)
+                            keyParams += $"FOREIGN KEY ({propName}) REFERENCES {sqlMember.ForeignTable}({sqlMember.ForeignColumn}),";
+                    }
+                    schemaParams += $"{propName} {typeName}{nullableString}{autoincrementString},";
                 }
 
                 foreach (var prop in schemaType.GetFields())
                 {
-                    var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
-                    string propName = propAttribute == null ? prop.Name : propAttribute.Name;
-                    string typeName = ConvertToSqlDataType(prop.FieldType);
-
-                    var sqlFieldType = prop.GetCustomAttribute<SqlFieldTypeAttribute>();
-                    if (sqlFieldType != null)
-                        typeName = sqlFieldType.Type;
-
                     if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
                         continue;
 
+                    string propName = prop.Name;
+                    string typeName = ConvertToSqlDataType(prop.FieldType);
                     string nullableString = string.Empty;
-                    if (prop.GetCustomAttribute<SqlNonNullableAttribute>() != null)
-                        nullableString = $" NOT NULL";
+                    string autoincrementString = string.Empty;
+                    var sqlMember = prop.GetCustomAttribute<SqlMemberAttribute>();
 
-                    if (prop.GetCustomAttribute<SqlPrimaryKeyAttribute>() != null)
-                        keyParams += $"PRIMARY KEY({propName}),";
+                    if (sqlMember != null)
+                    {
+                        if (!sqlMember.ColumnName.IsNullOrEmpty())
+                            propName = sqlMember.ColumnName;
 
-                    if (prop.GetCustomAttribute<SqlUniqueKeyAttribute>() != null)
-                        keyParams += $"UNIQUE ({propName}),";
+                        if (!sqlMember.ColumnType.IsNullOrEmpty())
+                            typeName = sqlMember.ColumnType;
 
-                    var foreignKey = prop.GetCustomAttribute<SqlForeignKeyAttribute>();
-                    if (foreignKey != null)
-                        keyParams += $"FOREIGN KEY ({propName}) REFERENCES {foreignKey.TableName}({foreignKey.TableColumn}),";
+                        if (sqlMember.ShouldAutoIncrement)
+                            autoincrementString = $" AUTO_INCREMENT";
 
-                    schemaParams += $"{propName} {typeName}{nullableString},";
+                        if (!sqlMember.IsNullable)
+                            nullableString = $" NOT NULL";
+
+                        if (sqlMember.IsPrimaryKey)
+                            keyParams += $"PRIMARY KEY({propName}),";
+                        else if (sqlMember.IsUnique)
+                            keyParams += $"UNIQUE ({propName}),";
+
+                        if (sqlMember.IsForeignKey)
+                            keyParams += $"FOREIGN KEY ({propName}) REFERENCES {sqlMember.ForeignTable}({sqlMember.ForeignColumn}),";
+                    }
+                    schemaParams += $"{propName} {typeName}{nullableString}{autoincrementString},";
                 }
 
                 using (var command = connection.CreateCommand())
@@ -366,37 +417,21 @@ namespace Tavstal.TLibrary.Helpers
                     if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
                         continue;
 
+                    var sqlMember = prop.GetCustomAttribute<SqlMemberAttribute>();
                     SqlColumn localColumn = new SqlColumn();
-                    // Column Name
-                    var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
-                    localColumn.ColumnName = propAttribute == null ? prop.Name : propAttribute.Name;
+                    localColumn.ColumnName = prop.Name;
+                    localColumn.ColumnType = ConvertToSqlDataType(prop.PropertyType);
 
-                    // Column Type
-                    string typeName = ConvertToSqlDataType(prop.PropertyType);
-                    var sqlFieldType = prop.GetCustomAttribute<SqlFieldTypeAttribute>();
-                    if (sqlFieldType != null)
-                        typeName = sqlFieldType.Type;
-                    localColumn.ColumnType = typeName;
+                    if (sqlMember != null)
+                    {
+                        localColumn = sqlMember.ToColumn();
 
-                    // Column Is Nullable
-                    if (prop.GetCustomAttribute<SqlNonNullableAttribute>() != null)
-                        localColumn.IsNullable = false;
-                    else
-                        localColumn.IsNullable = true;
+                        if (localColumn.ColumnName.IsNullOrEmpty())
+                            localColumn.ColumnName = prop.Name;
 
-                    // Colum Primary Key
-                    if (prop.GetCustomAttribute<SqlPrimaryKeyAttribute>() != null)
-                        localColumn.SetAsPrimaryKey();
-
-                    // Column Unique Key
-                    if (prop.GetCustomAttribute<SqlUniqueKeyAttribute>() != null)
-                        localColumn.SetAsUniqueKey();
-
-                    // Column Foreign Key
-                    var foreignKey = prop.GetCustomAttribute<SqlForeignKeyAttribute>();
-                    if (foreignKey != null)
-                        localColumn.SetForeignKey(foreignKey.TableName, foreignKey.TableColumn);
-
+                        if (localColumn.ColumnType.IsNullOrEmpty())
+                            localColumn.ColumnType = ConvertToSqlDataType(prop.PropertyType);
+                    }
                     classColumns.Add(localColumn);
                 }
 
@@ -405,39 +440,22 @@ namespace Tavstal.TLibrary.Helpers
                     if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
                         continue;
 
+                    var sqlMember = prop.GetCustomAttribute<SqlMemberAttribute>();
                     SqlColumn localColumn = new SqlColumn();
-                    // Column Name
-                    var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
-                    localColumn.ColumnName = propAttribute == null ? prop.Name : propAttribute.Name;
+                    localColumn.ColumnName = prop.Name;
+                    localColumn.ColumnType = ConvertToSqlDataType(prop.FieldType);
 
-                    // Column Type
-                    string typeName = ConvertToSqlDataType(prop.FieldType);
-                    var sqlFieldType = prop.GetCustomAttribute<SqlFieldTypeAttribute>();
-                    if (sqlFieldType != null)
-                        typeName = sqlFieldType.Type;
-                    localColumn.ColumnType = typeName;
+                    if (sqlMember != null)
+                    {
+                        localColumn = sqlMember.ToColumn();
 
-                    // Column Is Nullable
-                    if (prop.GetCustomAttribute<SqlNonNullableAttribute>() != null)
-                        localColumn.IsNullable = false;
-                    else
-                        localColumn.IsNullable = true;
+                        if (localColumn.ColumnName.IsNullOrEmpty())
+                            localColumn.ColumnName = prop.Name;
 
-                    // Colum Primary Key
-                    if (prop.GetCustomAttribute<SqlPrimaryKeyAttribute>() != null)
-                        localColumn.SetAsPrimaryKey();
-
-                    // Column Unique Key
-                    if (prop.GetCustomAttribute<SqlUniqueKeyAttribute>() != null)
-                        localColumn.SetAsUniqueKey();
-
-                    // Column Foreign Key
-                    var foreignKey = prop.GetCustomAttribute<SqlForeignKeyAttribute>();
-                    if (foreignKey != null)
-                        localColumn.SetForeignKey(foreignKey.TableName, foreignKey.TableColumn);
-
+                        if (localColumn.ColumnType.IsNullOrEmpty())
+                            localColumn.ColumnType = ConvertToSqlDataType(prop.FieldType);
+                    }
                     classColumns.Add(localColumn);
-
                 }
                 #endregion
 
@@ -446,7 +464,8 @@ namespace Tavstal.TLibrary.Helpers
                 List<SqlColumn> columnsToRemove = new List<SqlColumn>();
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = $"SHOW TABLES LIKE {tableName}";
+                    command.Parameters.AddWithValue("@TableName", tableName);
+                    command.CommandText = $"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE @TableName;";
 
                     object result = command.ExecuteScalar();
                     if (result == null)
@@ -463,7 +482,7 @@ namespace Tavstal.TLibrary.Helpers
                             var localColumn = new SqlColumn(
                                 columnName: reader.GetString("Field"),
                                 columnType: reader.GetString("Type"),
-                                isNullable: reader.GetBoolean("Null"),
+                                isNullable: reader.GetString("Null") == "YES",
                                 isPrimaryKey: columnKey == "PRI",
                                 isUnique: columnKey == "UNI",
                                 shouldAutoIncrement: columnExtra.Contains("auto_increment"),
@@ -483,19 +502,30 @@ namespace Tavstal.TLibrary.Helpers
                 #region Fill column lists
                 foreach (var column in classColumns)
                 {
-                    if (!liveColumns.Any(x => x.ColumnName == column.ColumnName))
+                    var lcolumn = liveColumns.Find(x => x.ColumnName == column.ColumnName);
+                    if (lcolumn == null)
                     {
                         columnsToAdd.Add(column);
                         continue;
                     }
 
-                    if (liveColumns.Any(x => x.ColumnName == column.ColumnName && x != column))
+                    if (lcolumn.IsPrimaryKey != column.IsPrimaryKey || 
+                        lcolumn.IsUnique != column.IsUnique ||
+                        lcolumn.IsNullable != column.IsNullable ||
+                        lcolumn.ShouldAutoIncrement != column.ShouldAutoIncrement ||
+                        lcolumn.ColumnType.ToLower() != column.ColumnType.ToLower())
                     {
                         columnsToUpdate.Add(column);
                         continue;
                     }
                 }
                 #endregion
+
+                if (columnsToAdd.Count == 0 && columnsToRemove.Count == 0 && columnsToUpdate.Count == 0)
+                {
+                    connection.Close();
+                    return true;
+                }
 
                 #region Modify Table 
                 using (var command = connection.CreateCommand())
@@ -508,7 +538,7 @@ namespace Tavstal.TLibrary.Helpers
                         string nullable = column.IsNullable ? "" : " NOT NULL";
                         string uniqueKey = column.IsUnique ? " UNIQUE" : "";
                         string autoIncrement = column.ShouldAutoIncrement ? " AUTO_INCREMENT" : "";
-                        command.CommandText += $" ADD {column.ColumnName}{nullable} {column.ColumnType}{uniqueKey}{primaryKey}{autoIncrement},";
+                        command.CommandText += $" ADD {column.ColumnName} {column.ColumnType}{nullable}{uniqueKey}{primaryKey}{autoIncrement},";
                     }
                     // UPDATE
                     foreach (SqlColumn column in columnsToUpdate)
@@ -517,7 +547,7 @@ namespace Tavstal.TLibrary.Helpers
                         string nullable = column.IsNullable ? "" : " NOT NULL";
                         string uniqueKey = column.IsUnique ? " UNIQUE" : "";
                         string autoIncrement = column.ShouldAutoIncrement ? " AUTO_INCREMENT" : "";
-                        command.CommandText += $" ALTER COLUMN {column.ColumnName}{nullable} {column.ColumnType}{uniqueKey}{primaryKey}{autoIncrement},";
+                        command.CommandText += $" MODIFY {column.ColumnName} {column.ColumnType}{nullable}{uniqueKey}{primaryKey}{autoIncrement},";
                     }
                     // DROP
                     foreach (SqlColumn column in columnsToRemove)
@@ -594,30 +624,28 @@ namespace Tavstal.TLibrary.Helpers
             try
             {
                 List<T> localList = new List<T>();
-                connection.Open();
-                string limitClause = limit > 0 ? $" LIMIT: {limit}" : "";
+                string limitClause = limit > 0 ? $" LIMIT {limit}" : "";
                 string whereClauseExp = string.Empty;
                 if (!whereClause.IsNullOrEmpty())
                 {
-                    if (whereClause.StartsWith("WHERE"))
-                        whereClause = " " + whereClause;
-
-                    if (!whereClause.StartsWith(" WHERE"))
-                        whereClause = " WHERE" + whereClause;
+                    if (!whereClause.StartsWith("WHERE "))
+                        whereClause = "WHERE " + whereClause;
                 }
+                connection.Open();
                 using (var command = connection.CreateCommand())
                 {
                     if (parameters != null)
                         foreach (var param in parameters)
                             command.Parameters.Add(param);
-                    command.CommandText = $"SELECT * FROM {tableName}{whereClause}{limitClause}";
+                    command.CommandText = $"SELECT * FROM {tableName} {whereClause}{limitClause}";
+
                     MySqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
                         localList.Add(ConvertToObject<T>(reader));
                     }
                 }
-
+                connection.Close();
                 return localList;
             }
             catch (Exception ex)
@@ -763,11 +791,20 @@ namespace Tavstal.TLibrary.Helpers
                     if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
                         continue;
 
-                    var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
-                    string propName = propAttribute == null ? prop.Name : propAttribute.Name;
+                    var memberAttribute = prop.GetCustomAttribute<SqlMemberAttribute>();
+                    string propName = prop.Name;
+
+                    if (memberAttribute != null)
+                    {
+                        if (memberAttribute.ShouldAutoIncrement)
+                            continue;
+
+                        if (!memberAttribute.ColumnName.IsNullOrEmpty())
+                            propName = memberAttribute.ColumnName;
+                    }
 
                     keyString += $"{propName},";
-                    paramString += $"`{prop.GetValue(value)}`,";
+                    paramString += $"'{prop.GetValue(value)}',";
                 }
 
                 foreach (var prop in schemaType.GetFields())
@@ -775,19 +812,29 @@ namespace Tavstal.TLibrary.Helpers
                     if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
                         continue;
 
-                    var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
-                    string propName = propAttribute == null ? prop.Name : propAttribute.Name;
+                    var memberAttribute = prop.GetCustomAttribute<SqlMemberAttribute>();
+                    string propName = prop.Name;
+
+                    if (memberAttribute != null)
+                    {
+                        if (memberAttribute.ShouldAutoIncrement)
+                            continue;
+
+                        if (!memberAttribute.ColumnName.IsNullOrEmpty())
+                            propName = memberAttribute.ColumnName;
+                    }
 
                     keyString += $"{propName},";
-                    paramString += $"`{prop.GetValue(value)}`,";
+                    paramString += $"'{prop.GetValue(value)}',";
                 }
 
                 paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
                 keyString = keyString.Remove(keyString.LastIndexOf(','), 1);
 
+                connection.Open();
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = $"INSERT INTO {tableName} ({keyString}) VALUES ({paramString})";
+                    command.CommandText = $"INSERT INTO {tableName} ({keyString}) VALUES({paramString});";
                     command.ExecuteNonQuery();
                 }
                 connection.Close();
@@ -861,8 +908,17 @@ namespace Tavstal.TLibrary.Helpers
                     if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
                         continue;
 
-                    var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
-                    string propName = propAttribute == null ? prop.Name : propAttribute.Name;
+                    var memberAttribute = prop.GetCustomAttribute<SqlMemberAttribute>();
+                    string propName = prop.Name;
+
+                    if (memberAttribute != null)
+                    {
+                        if (memberAttribute.ShouldAutoIncrement)
+                            continue;
+
+                        if (!memberAttribute.ColumnName.IsNullOrEmpty())
+                            propName = memberAttribute.ColumnName;
+                    }
 
                     setClause += $"{propName}={prop.GetValue(newValue)},";
                 }
@@ -872,18 +928,37 @@ namespace Tavstal.TLibrary.Helpers
                     if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
                         continue;
 
-                    var propAttribute = prop.GetCustomAttribute<SqlNameAttribute>();
-                    string propName = propAttribute == null ? prop.Name : propAttribute.Name;
+                    var memberAttribute = prop.GetCustomAttribute<SqlMemberAttribute>();
+                    string propName = prop.Name;
+
+                    if (memberAttribute != null)
+                    {
+                        if (memberAttribute.ShouldAutoIncrement)
+                            continue;
+
+                        if (!memberAttribute.ColumnName.IsNullOrEmpty())
+                            propName = memberAttribute.ColumnName;
+                    }
 
                     setClause += $"{propName}={prop.GetValue(newValue)},";
                 }
 
                 setClause = setClause.Remove(setClause.LastIndexOf(','), 1);
+                connection.Open();
                 using (var command = connection.CreateCommand())
                 {
                     if (parameters != null)
                         foreach (var parameter in parameters)
                             command.Parameters.Add(parameter);
+
+                    if (!whereClause.IsNullOrEmpty())
+                    {
+                        if (whereClause.StartsWith("WHERE"))
+                            whereClause = whereClause.Replace("WHERE", "");
+
+                        if (whereClause.StartsWith(" WHERE"))
+                            whereClause = whereClause.Replace(" WHERE", "");
+                    }
                     command.CommandText = $"UPDATE {tableName} SET {setClause} WHERE {whereClause}";
                     command.ExecuteNonQuery();
                 }
@@ -952,11 +1027,21 @@ namespace Tavstal.TLibrary.Helpers
             try
             {
                 var schemaType = typeof(T);
+                connection.Open();
                 using (var command = connection.CreateCommand())
                 {
                     if (parameters != null)
                         foreach (var parameter in parameters)
                             command.Parameters.Add(parameter);
+
+                    if (!whereClause.IsNullOrEmpty())
+                    {
+                        if (whereClause.StartsWith("WHERE"))
+                            whereClause = whereClause.Replace("WHERE", "");
+
+                        if (whereClause.StartsWith(" WHERE"))
+                            whereClause = whereClause.Replace(" WHERE", "");
+                    }
                     command.CommandText = $"DELETE FROM {tableName} WHERE {whereClause}";
                     command.ExecuteNonQuery();
                 }

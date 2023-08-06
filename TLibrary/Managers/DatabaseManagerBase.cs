@@ -29,14 +29,13 @@ namespace Tavstal.TLibrary.Managers
             MySqlConnection mySqlConnection = null;
             try
             {
-
                 mySqlConnection = new MySqlConnection(string.Format("SERVER={0};DATABASE={1};UID={2};PASSWORD={3};PORT={4};DEFAULT COMMAND TIMEOUT={5};CharSet=utf8;",
                 _configuration.GetValue<string>("Database:Host"),
                 _configuration.GetValue<string>("Database:DatabaseName"),
                 _configuration.GetValue<string>("Database:UserName"),
                 _configuration.GetValue<string>("Database:UserPassword"),
                 _configuration.GetValue<int>("Database:Port"),
-                _configuration.GetValue<int>("Database:Timeout")));
+                _configuration.GetValue<int>("Database:TimeOut")));
             }
             catch (Exception ex)
             {
