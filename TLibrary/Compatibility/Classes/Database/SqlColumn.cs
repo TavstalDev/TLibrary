@@ -90,5 +90,20 @@ namespace Tavstal.TLibrary.Compatibility.Classes.Database
                    IsNullable == otherColumn.IsNullable;
         }
         public override bool Equals(object obj) => Equals(obj as SqlColumn);
+
+        public override int GetHashCode()
+        {
+            int hashCode = 1349296267;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ColumnName);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ColumnType);
+            hashCode = hashCode * -1521134295 + IsNullable.GetHashCode();
+            hashCode = hashCode * -1521134295 + ShouldAutoIncrement.GetHashCode();
+            hashCode = hashCode * -1521134295 + IsPrimaryKey.GetHashCode();
+            hashCode = hashCode * -1521134295 + IsUnique.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ForeignTable);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ForeignColumn);
+            hashCode = hashCode * -1521134295 + IsForeignKey.GetHashCode();
+            return hashCode;
+        }
     }
 }

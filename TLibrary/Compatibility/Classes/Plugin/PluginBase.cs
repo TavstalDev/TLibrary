@@ -12,36 +12,38 @@ using SDG.Unturned;
 using UnityEngine;
 using System.Data;
 using Tavstal.TLibrary.Compatibility.Classes.Database;
+using System.IO;
+using Tavstal.TLibrary.Compatibility.Interfaces;
+using Tavstal.TLibrary.Extensions;
+using Steamworks;
+using UnityEngine.Networking;
+using System.Collections;
 
 namespace Tavstal.TLibrary.Compatibility.Classes.Plugin
 {
-    public abstract class PluginBase<RocketPluginConfiguration> : RocketPlugin<IRocketPluginConfiguration>
+    public abstract class PluginBase<PluginConfig> : RocketPlugin where PluginConfig : ConfigurationBase
     {
-        public static DatabaseManagerBase DatabaseManager { get; set; }
-        public static HookManager hookManager { get; set; }
-        private static System.Version _version = Assembly.GetExecutingAssembly().GetName().Version;
-        private static DateTime _buildDate = new DateTime(2000, 1, 1).AddDays(_version.Build).AddSeconds(_version.Revision * 2);
+        /// <summary>
+        /// Equals with RocketPlugin.Name
+        /// It's used to prevent using RocketPlugin.name instead of RocketPlugin.Name
+        /// </summary>
+        public string PluginName => this.Name;
+        public PluginConfig Config { get; set; }
+        public virtual PluginBase<PluginConfig> Instance { get; set; }
+        public virtual IDatabaseManager DatabaseManager { get; set; }
+        public static HookManager HookManager { get; set; }
+
+        private static readonly System.Version _version = Assembly.GetExecutingAssembly().GetName().Version;
+        private static readonly DateTime _buildDate = new DateTime(2000, 1, 1).AddDays(_version.Build).AddSeconds(_version.Revision * 2);
         public static System.Version Version { get { return _version; } }
         public static DateTime BuildDate { get { return _buildDate; } }
 
         protected override void Load()
         {
             base.Load();
+            Instance = this;
+            CheckPluginFiles();
             OnLoad();
-            try
-            {
-                var connection = DatabaseManager.CreateConnection();
-
-                if (DatabaseHelper.DoesTableExist<PlayerData>(connection))
-                    DatabaseHelper.CheckTable<PlayerData>(connection);
-                else
-                    DatabaseHelper.CreateTable<PlayerData>(connection);
-            }
-            catch (Exception ex)
-            {
-                LoggerHelper.LogException("Error in TLibrary:");
-                LoggerHelper.LogError(ex);
-            }
         }
 
         protected override void Unload()
@@ -60,19 +62,110 @@ namespace Tavstal.TLibrary.Compatibility.Classes.Plugin
             
         }
 
-        [Obsolete("Use CTranslate instead", true)]
+        public virtual void CheckPluginFiles()
+        {
+            string rocketConfigFile = Path.Combine(this.Directory, $"{PluginName}.configuration.xml");
+            if (File.Exists(rocketConfigFile))
+                File.Delete(rocketConfigFile);
+
+            string rocketTranslationFile = Path.Combine(this.Directory, $"{PluginName}.en.translation.xml");
+            if (File.Exists(rocketTranslationFile))
+                File.Delete(rocketTranslationFile);
+
+            string translationsDirectory = Path.Combine(this.Directory, "Translations");
+            if (!System.IO.Directory.Exists(translationsDirectory))
+                System.IO.Directory.CreateDirectory(translationsDirectory);
+
+            Config = Activator.CreateInstance<PluginConfig>();
+            Config.FileName = "Configuration.yml";
+            Config.FilePath = this.Directory;
+            if (Config.CheckConfigFile())
+                Config = PluginExtensions.ReadConfig<PluginConfig>(Config);
+
+            string defaultTranslationFile = Path.Combine(translationsDirectory, "locale.en.yml");
+            if (!File.Exists(defaultTranslationFile))
+                PluginExtensions.SaveTranslation(Localization, translationsDirectory, "locale.en.yml");
+
+            if (DefaultLocalization != null)
+                Localization = DefaultLocalization;
+
+            if (LanguagePacks != null)
+                if (Config.DownloadLocalePacks && LanguagePacks.Count > 0)
+                    foreach (var pack in LanguagePacks)
+                    {
+                        string path = Path.Combine(translationsDirectory, $"locale.{pack.Key}.yml");
+                        if (File.Exists(path))
+                            continue;
+
+                        UnityWebRequest www = UnityWebRequest.Get(pack.Value);
+                        www.SendWebRequest();
+                        InvokeAction(3, () =>
+                        {
+                            if (www.result == UnityWebRequest.Result.ConnectionError
+                                || www.result == UnityWebRequest.Result.DataProcessingError
+                                || www.result == UnityWebRequest.Result.ProtocolError)
+                            {
+                                LoggerHelper.LogError("Failed to download language packs.");
+                            }
+                            else
+                                File.WriteAllText(path, www.downloadHandler.text);
+                        });
+
+                    }
+
+            string locale = Config.Locale;
+            if (File.Exists(Path.Combine(translationsDirectory, $"locale.{locale}.yml")))
+            {
+                var localLocale = PluginExtensions.ReadTranslation(translationsDirectory, $"locale.{locale}.yml");
+                if (localLocale != null)
+                    if (localLocale.Count > 0)
+                        Localization = localLocale;
+            }
+        }
+
+        public void InvokeAction(float delay, System.Action action)
+        {
+            StartCoroutine(InvokeRoutine(action, delay));
+        }
+
+        internal static IEnumerator InvokeRoutine(System.Action f, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            f();
+        }
+
+        [Obsolete("Use Localize instead", true)]
         protected new string Translate(string translationKey, params object[] placeholder)
         {
             LoggerHelper.LogWarning($"OLD TRANSLATION METHOD WAS USED FOR '{translationKey}'");
-            return Translations.Instance.Translate(translationKey, placeholder);
+            return Localize(false, translationKey, placeholder);
         }
 
-        public string CTranslate(bool AddPrefix, string translationKey, params object[] placeholder)
+        public string Localize(bool AddPrefix, string translationKey, params object[] args)
         {
+            string localization = string.Empty;
+            if (!Localization.TryGetValue(translationKey, out localization))
+                localization = $"<color=#FFAA00>[WARNING]</color> <color=#FFFF55>Untranslated key found in {PluginName}:</color> <color=#FF5555>{translationKey}</color>";
+
             if (AddPrefix)
-                return Translations.Instance.Translate("prefix") + Translations.Instance.Translate(translationKey, placeholder);
+            {
+                string prefixLocalization = string.Empty;
+                Localization.TryGetValue(translationKey, out prefixLocalization);
+                return prefixLocalization + string.Format(localization, args);
+            }
             else
-                return Translations.Instance.Translate(translationKey, placeholder);
+            {
+                return string.Format(localization, args);
+            }
         }
+
+        public string Localize(string translationKey, params object[] args)
+        { 
+           return Localize(false, translationKey, args);
+        }
+
+        public Dictionary<string, string> Localization { get; private set; } = new Dictionary<string, string>();
+        public virtual Dictionary<string, string> DefaultLocalization { get; set; }
+        public virtual Dictionary<string, string> LanguagePacks { get; set; }
     }
 }

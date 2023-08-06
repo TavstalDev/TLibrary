@@ -1,11 +1,10 @@
-﻿using Rocket.Core;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Tavstal.TLibrary.Compatibility.Classes.Plugin;
+using Tavstal.TLibrary.Helpers;
 
-namespace Tavstal.TLibrary.Helpers
+namespace PluginTest
 {
     internal static class LoggerHelper
     {

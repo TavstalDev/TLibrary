@@ -9,14 +9,15 @@ using System.Threading.Tasks;
 using Logger = Tavstal.TLibrary.Helpers.LoggerHelper;
 using Rocket.API;
 using Tavstal.TLibrary.Extensions;
+using Tavstal.TLibrary.Compatibility.Interfaces;
 
 namespace Tavstal.TLibrary.Managers
 {
-    public abstract class DatabaseManagerBase
+    public abstract class DatabaseManagerBase : IDatabaseManager
     {
-        public readonly IRocketPluginConfiguration _configuration;
+        public IConfigurationBase _configuration { get; }
 
-        public DatabaseManagerBase(IRocketPluginConfiguration configuration)
+        public DatabaseManagerBase(IConfigurationBase configuration)
         {
             _configuration = configuration;
             new I18N.West.CP1250();
@@ -28,11 +29,12 @@ namespace Tavstal.TLibrary.Managers
             MySqlConnection mySqlConnection = null;
             try
             {
+
                 mySqlConnection = new MySqlConnection(string.Format("SERVER={0};DATABASE={1};UID={2};PASSWORD={3};PORT={4};DEFAULT COMMAND TIMEOUT={5};CharSet=utf8;",
                 _configuration.GetValue<string>("Database:Host"),
-                _configuration.GetValue<string>("Database:Name"),
-                _configuration.GetValue<string>("Database:User"),
-                _configuration.GetValue<string>("Database:Password"),
+                _configuration.GetValue<string>("Database:DatabaseName"),
+                _configuration.GetValue<string>("Database:UserName"),
+                _configuration.GetValue<string>("Database:UserPassword"),
                 _configuration.GetValue<int>("Database:Port"),
                 _configuration.GetValue<int>("Database:Timeout")));
             }

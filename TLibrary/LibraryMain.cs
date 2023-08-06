@@ -20,7 +20,7 @@ namespace Tavstal.TLibrary
     public class LibraryMain
     {
         private static System.Version _version;
-        private static bool isLoaded = false;
+        private static bool isLoaded { get; set; }
         private static DateTime _buildDate;
         private readonly static string _githubUrl = @"https://api.github.com/repos/TavstalDev/TLibrary/releases/latest";
         public static System.Version Version { get { return _version; } }

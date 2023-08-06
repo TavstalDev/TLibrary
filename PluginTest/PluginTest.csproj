@@ -4,15 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{05EAF096-08FA-4C72-AF53-C3B940F6BCFE}</ProjectGuid>
+    <ProjectGuid>{8684967A-8E17-49BC-89D2-880F65925A78}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tavstal.TLibrary</RootNamespace>
-    <AssemblyName>TLibrary</AssemblyName>
+    <RootNamespace>PluginTest</RootNamespace>
+    <AssemblyName>PluginTest</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <Deterministic>false</Deterministic>
-    <TargetFrameworkProfile />
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,8 +37,8 @@
     <Reference Include="com.rlabrecque.steamworks.net">
       <HintPath>..\Libraries\com.rlabrecque.steamworks.net.dll</HintPath>
     </Reference>
-    <Reference Include="MySql.Data, Version=8.0.30.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MySql.Data">
       <HintPath>..\Libraries\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -58,12 +57,10 @@
     <Reference Include="Pathfinding.Poly2Tri">
       <HintPath>..\Libraries\Pathfinding.Poly2Tri.dll</HintPath>
     </Reference>
-    <Reference Include="RL-I18N, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="RL-I18N">
       <HintPath>..\Libraries\RL-I18N.dll</HintPath>
     </Reference>
-    <Reference Include="RL-I18N.West, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="RL-I18N.West">
       <HintPath>..\Libraries\RL-I18N.West.dll</HintPath>
     </Reference>
     <Reference Include="RL-RestSharp">
@@ -81,7 +78,6 @@
     <Reference Include="SDG.NetTransport">
       <HintPath>..\Libraries\SDG.NetTransport.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -108,55 +104,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Compatibility\Classes\DatabaseSettingsBase.cs" />
-    <Compile Include="Compatibility\Classes\Database\Attributes\SqlNameAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\Attributes\SqlForeignKeyAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\Attributes\SqlFieldTypeAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\Attributes\SqlIgnoreAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\Attributes\SqlUniqueKeyAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\Attributes\SqlPrimaryKeyAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\Attributes\SqlNonNullableAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\SqlColumn.cs" />
-    <Compile Include="Compatibility\Classes\Economy\Transaction.cs" />
-    <Compile Include="Compatibility\Classes\Economy\BankCardDetails.cs" />
-    <Compile Include="Compatibility\Classes\Economy\BankCard.cs" />
-    <Compile Include="Compatibility\Classes\FormatHelper\ConsoleFormat.cs" />
-    <Compile Include="Compatibility\Classes\FormatHelper\TextFormat.cs" />
-    <Compile Include="Compatibility\Classes\Plugin\ConfigurationBase.cs" />
-    <Compile Include="Compatibility\Classes\Plugin\PluginBase.cs" />
-    <Compile Include="Compatibility\Interfaces\IDatabaseSettings.cs" />
-    <Compile Include="Compatibility\Interfaces\IDatabaseManager.cs" />
-    <Compile Include="Compatibility\Interfaces\IConfigurationBase.cs" />
-    <Compile Include="Compatibility\Structs\SerializableVector3.cs" />
-    <Compile Include="Extensions\PluginExtensions.cs" />
-    <Compile Include="Extensions\Rocket\RocketPluginExtensions.cs" />
-    <Compile Include="Extensions\Unturned\PlayerExtensions.cs" />
-    <Compile Include="Extensions\MySqlExtensions.cs" />
-    <Compile Include="Extensions\IntegerExtensions.cs" />
-    <Compile Include="Extensions\ArrayExtensions.cs" />
-    <Compile Include="Extensions\StringExtensions.cs" />
-    <Compile Include="Compatibility\Hooks\Hook.cs" />
-    <Compile Include="Compatibility\Enumerators\ETransaction.cs" />
-    <Compile Include="Compatibility\Enumerators\EPaymentMethod.cs" />
-    <Compile Include="Compatibility\Enumerators\ECurrency.cs" />
-    <Compile Include="Compatibility\Interfaces\HookInterfaces\IEconomyProvider.cs" />
-    <Compile Include="Compatibility\Interfaces\HookInterfaces\IPluginProvider.cs" />
-    <Compile Include="Helpers\DatabaseHelper.cs" />
-    <Compile Include="Helpers\FormatHelper.cs" />
-    <Compile Include="Helpers\LinqHelper.cs" />
-    <Compile Include="Helpers\Unturned\UAssetHelper.cs" />
-    <Compile Include="Helpers\Unturned\UPlayerHelper.cs" />
-    <Compile Include="Helpers\Unturned\UVehicleHelper.cs" />
-    <Compile Include="Helpers\Unturned\UStructureHelper.cs" />
-    <Compile Include="Helpers\Unturned\UBarricadeHelper.cs" />
-    <Compile Include="Helpers\Unturned\UChatHelper.cs" />
-    <Compile Include="Helpers\LoggerHelper.cs" />
-    <Compile Include="Helpers\MathHelper.cs" />
-    <Compile Include="Managers\DatabaseManagerBase.cs" />
-    <Compile Include="Managers\HookManager.cs" />
-    <Compile Include="LibraryMain.cs" />
+    <Compile Include="DatabaseSettings.cs" />
+    <Compile Include="DatabaseManager.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="LoggerHelper.cs" />
+    <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\TLibrary\TLibrary.csproj">
+      <Project>{05eaf096-08fa-4c72-af53-c3b940f6bcfe}</Project>
+      <Name>TLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Tavstal.TLibrary.Extensions
 {
-    public static class PluginExtensions
+    public static class RocketPluginExtensions
     {
         public static T GetField<T>(this IRocketPluginConfiguration config, string name, BindingFlags flags = BindingFlags.Public)
         {
@@ -20,7 +20,7 @@ namespace Tavstal.TLibrary.Extensions
             }
             catch (Exception ex)
             {
-                LoggerHelper.LogException("Error in GetField, PluginExtensions:");
+                LoggerHelper.LogException("Error in GetField, RocketPluginExtensions:");
                 LoggerHelper.LogError(ex);
                 return default;
             }
@@ -34,7 +34,7 @@ namespace Tavstal.TLibrary.Extensions
             }
             catch (Exception ex)
             {
-                LoggerHelper.LogException("Error in GetProperty, PluginExtensions:");
+                LoggerHelper.LogException("Error in GetProperty, RocketPluginExtensions:");
                 LoggerHelper.LogError(ex);
                 return default;
             }
@@ -54,7 +54,7 @@ namespace Tavstal.TLibrary.Extensions
             }
             catch (Exception ex)
             {
-                LoggerHelper.LogException("Error in GetValue, PluginExtensions:");
+                LoggerHelper.LogException("Error in GetValue, RocketPluginExtensions:");
                 LoggerHelper.LogError(ex);
                 return default;
             }

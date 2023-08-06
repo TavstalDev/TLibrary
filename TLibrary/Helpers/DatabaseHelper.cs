@@ -124,7 +124,7 @@ namespace Tavstal.TLibrary.Helpers
         public static T ConvertToObject<T>(this MySqlDataReader reader) where T : class
         {
             if (!reader.HasRows)
-                return default(T);
+                return default;
 
             T obj = Activator.CreateInstance<T>();
             var properties = typeof(T).GetProperties();
