@@ -1,4 +1,5 @@
 ﻿using RestSharp.Extensions;
+using Rocket.API.Serialisation;
 using Rocket.Core.Plugins;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
@@ -250,6 +251,27 @@ namespace Tavstal.TLibrary.Helpers
             }
 
             return players;
+        }
+
+        public static List<RocketPermissionsGroup> GetMutualGroups(UnturnedPlayer player1, UnturnedPlayer player2)
+        {
+            List<RocketPermissionsGroup> p1Groups = Rocket.Core.R.Permissions.GetGroups(player1, true);
+            List<RocketPermissionsGroup> p2Groups = Rocket.Core.R.Permissions.GetGroups(player2, true);
+
+            return p1Groups.Intersect(p2Groups).ToList();
+        }
+
+        internal static uint GenerateFrequency()
+        {
+            uint freq = 0;
+
+            freq = Convert.ToUInt32(MathHelper.Next(300000, 900000));
+            /*if (!InUseFrequencies.Contains(freq))
+                InUseFrequencies.Add(freq);
+            else
+                freq = GenerateFrequency();*/
+
+            return freq;
         }
     }
 }

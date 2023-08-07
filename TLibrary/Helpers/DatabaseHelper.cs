@@ -185,6 +185,13 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Checks if a table with the specified name exists in the database.
+        /// </summary>
+        /// <typeparam name="T">The type associated with the table.</typeparam>
+        /// <param name="connection">The MySQL database connection.</param>
+        /// <param name="tableName">The name of the table to check.</param>
+        /// <returns><c>true</c> if the table exists, otherwise <c>false</c>.</returns>
         public static bool DoesTableExist<T>(this MySqlConnection connection, string tableName) where T : class
         {
             if (connection == null)
@@ -219,6 +226,12 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Checks if a table associated with the specified type exists in the database.
+        /// </summary>
+        /// <typeparam name="T">The type associated with the table.</typeparam>
+        /// <param name="connection">The MySQL database connection.</param>
+        /// <returns><c>true</c> if the table exists, otherwise <c>false</c>.</returns>
         public static bool DoesTableExist<T>(this MySqlConnection connection) where T : class
         {
             if (connection == null)

@@ -39,25 +39,5 @@ namespace Tavstal.TLibrary.Extensions
                 return default;
             }
         }
-
-        public static T GetValue<T>(this IRocketPluginConfiguration config, string name, BindingFlags flags = BindingFlags.Public)
-        {
-            try
-            {
-                T value = default;
-                var obj = JObject.FromObject(config);
-
-                if (obj.TryGetValue(name, out JToken result))
-                    value = result.Value<T>();
-
-                return value;
-            }
-            catch (Exception ex)
-            {
-                LoggerHelper.LogException("Error in GetValue, RocketPluginExtensions:");
-                LoggerHelper.LogError(ex);
-                return default;
-            }
-        }
     }
 }

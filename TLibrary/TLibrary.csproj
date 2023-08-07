@@ -116,6 +116,7 @@
     <Compile Include="Compatibility\Classes\Economy\Transaction.cs" />
     <Compile Include="Compatibility\Classes\Economy\BankCardDetails.cs" />
     <Compile Include="Compatibility\Classes\Economy\BankCard.cs" />
+    <Compile Include="Compatibility\Classes\FileParameter.cs" />
     <Compile Include="Compatibility\Classes\FormatHelper\ConsoleFormat.cs" />
     <Compile Include="Compatibility\Classes\FormatHelper\TextFormat.cs" />
     <Compile Include="Compatibility\Classes\Plugin\ConfigurationBase.cs" />
@@ -139,7 +140,9 @@
     <Compile Include="Compatibility\Interfaces\HookInterfaces\IPluginProvider.cs" />
     <Compile Include="Helpers\DatabaseHelper.cs" />
     <Compile Include="Helpers\FormatHelper.cs" />
+    <Compile Include="Helpers\EffectHelper.cs" />
     <Compile Include="Helpers\LinqHelper.cs" />
+    <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="Helpers\Unturned\UAssetHelper.cs" />
     <Compile Include="Helpers\Unturned\UPlayerHelper.cs" />
     <Compile Include="Helpers\Unturned\UVehicleHelper.cs" />
@@ -152,6 +155,7 @@
     <Compile Include="Managers\HookManager.cs" />
     <Compile Include="LibraryMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\DiscordWebhook.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
