@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tavstal.TLibrary.Compatibility.Classes.Database
+namespace Tavstal.TLibrary.Compatibility.Database
 {
     [System.AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
     public class SqlNameAttribute : Attribute

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Logger = Tavstal.TLibrary.Helpers.LoggerHelper;
 using Rocket.API;
 using Tavstal.TLibrary.Extensions;
-using Tavstal.TLibrary.Compatibility.Interfaces;
+using Tavstal.TLibrary.Compatibility;
 
 namespace Tavstal.TLibrary.Managers
 {

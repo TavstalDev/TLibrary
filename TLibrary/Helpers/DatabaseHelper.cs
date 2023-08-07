@@ -11,7 +11,7 @@ using System.Reflection;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using System.Data;
-using Tavstal.TLibrary.Compatibility.Classes.Database;
+using Tavstal.TLibrary.Compatibility.Database;
 using Tavstal.TLibrary.Extensions;
 using SDG.Unturned;
 using UnityEngine;

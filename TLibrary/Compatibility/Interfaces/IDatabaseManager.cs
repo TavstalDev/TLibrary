@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tavstal.TLibrary.Compatibility.Interfaces
+namespace Tavstal.TLibrary.Compatibility
 {
     public interface IDatabaseManager
     {

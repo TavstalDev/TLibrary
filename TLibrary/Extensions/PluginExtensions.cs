@@ -4,14 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Tavstal.TLibrary.Compatibility.Classes.Plugin;
+using Tavstal.TLibrary.Compatibility;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
 using Newtonsoft.Json.Linq;
 using Rocket.API;
 using System.Reflection;
 using Tavstal.TLibrary.Helpers;
-using Tavstal.TLibrary.Compatibility.Interfaces;
 
 namespace Tavstal.TLibrary.Extensions
 {

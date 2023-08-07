@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Tavstal.TLibrary.Compatibility.Structs
+namespace Tavstal.TLibrary.Compatibility
 {
     public struct SerializableVector3
     {

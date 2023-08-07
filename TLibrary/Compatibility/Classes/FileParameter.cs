@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tavstal.TLibrary.Compatibility.Classes
+namespace Tavstal.TLibrary.Compatibility
 {
     public class FileParameter
     {

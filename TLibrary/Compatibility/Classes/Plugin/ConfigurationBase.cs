@@ -10,9 +10,8 @@ using YamlDotNet.Serialization.NamingConventions;
 using System.IO;
 using System.Diagnostics.SymbolStore;
 using System.CodeDom;
-using Tavstal.TLibrary.Compatibility.Interfaces;
 
-namespace Tavstal.TLibrary.Compatibility.Classes.Plugin
+namespace Tavstal.TLibrary.Compatibility
 {
     public class ConfigurationBase : IConfigurationBase
     {

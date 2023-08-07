@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Tavstal.TLibrary.Extensions;
 using UnityEngine;
 
-namespace Tavstal.TLibrary.Compatibility.Classes.Database
+namespace Tavstal.TLibrary.Compatibility.Database
 {
     public class SqlColumn
     {

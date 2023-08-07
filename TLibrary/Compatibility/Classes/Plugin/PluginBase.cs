@@ -11,15 +11,15 @@ using Tavstal.TLibrary.Helpers;
 using SDG.Unturned;
 using UnityEngine;
 using System.Data;
-using Tavstal.TLibrary.Compatibility.Classes.Database;
+using Tavstal.TLibrary.Compatibility.Database;
 using System.IO;
-using Tavstal.TLibrary.Compatibility.Interfaces;
+using Tavstal.TLibrary.Compatibility;
 using Tavstal.TLibrary.Extensions;
 using Steamworks;
 using UnityEngine.Networking;
 using System.Collections;
 
-namespace Tavstal.TLibrary.Compatibility.Classes.Plugin
+namespace Tavstal.TLibrary.Compatibility
 {
     public abstract class PluginBase<PluginConfig> : RocketPlugin where PluginConfig : ConfigurationBase
     {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tavstal.TLibrary.Helpers;
 
 namespace Tavstal.TLibrary.Extensions
 {
@@ -133,6 +134,42 @@ namespace Tavstal.TLibrary.Extensions
                 return default;
 
             return list.ElementAt(list.Length - 1);
+        }
+
+        /// <summary>
+        /// Shuffles the elements of the array in random order.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the array.</typeparam>
+        /// <param name="list">The array to be shuffled.</param>
+        public static void Shuffle<T>(this T[] list)
+        {
+            int count = list.Length;
+            while (count > 0)
+            {
+                count--;
+                int index = MathHelper.Next(count + 1);
+                T value = list[index];
+                list[index] = list[count];
+                list[count] = value;
+            }
+        }
+
+        /// <summary>
+        /// Shuffles the elements of the list in random order.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the list.</typeparam>
+        /// <param name="list">The list to be shuffled.</param>
+        public static void Shuffle<T>(this List<T> list)
+        {
+            int count = list.Count;
+            while (count > 0)
+            {
+                count--;
+                int index = MathHelper.Next(count + 1);
+                T value = list[index];
+                list[index] = list[count];
+                list[count] = value;
+            }
         }
     }
 }
