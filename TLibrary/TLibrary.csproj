@@ -146,6 +146,7 @@
     <Compile Include="Compatibility\Structs\SerializableVector3.cs" />
     <Compile Include="Extensions\PluginExtensions.cs" />
     <Compile Include="Extensions\Rocket\RocketPluginExtensions.cs" />
+    <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="Extensions\Unturned\PlayerExtensions.cs" />
     <Compile Include="Extensions\MySqlExtensions.cs" />
     <Compile Include="Extensions\IntegerExtensions.cs" />
