@@ -14,7 +14,7 @@ namespace Tavstal.TLibrary.Managers
         private readonly Dictionary<string, Hook> _hooks = new Dictionary<string, Hook>();
         public IEnumerable<Hook> Hooks => _hooks.Values;
 
-        internal HookManager() { }
+        public HookManager() { }
 
         public void Load(Type type)
         {
