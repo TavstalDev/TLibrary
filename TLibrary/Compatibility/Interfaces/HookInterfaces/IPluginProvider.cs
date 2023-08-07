@@ -11,6 +11,7 @@ namespace Tavstal.TLibrary.Compatibility
     {
         T GetConfigValue<T>(string VariableName);
         JObject GetConfig();
-        string Translate(string translationKey, params object[] placeholder);
+        string Localize(string translationKey, params object[] placeholder);
+        string Localize(bool addPrefix, string translationKey, params object[] placeholder);
     }
 }
