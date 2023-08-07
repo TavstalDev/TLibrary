@@ -10,7 +10,7 @@ namespace Tavstal.TLibrary.Compatibility.Economy
     {
         XP,
         CASH,
-        BAKN,
+        BANK,
         CRYPTO
     }
 }
