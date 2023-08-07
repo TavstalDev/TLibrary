@@ -204,7 +204,7 @@ namespace Tavstal.TLibrary.Helpers
                 using (var command = connection.CreateCommand())
                 {
                     command.Parameters.AddWithValue("@TableName", tableName);
-                    command.CommandText = $"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE @TableName;";
+                    command.CommandText = $"SHOW TABLES LIKE @TableName;";
 
                     object result = command.ExecuteScalar();
                     if (result != null)
@@ -275,7 +275,7 @@ namespace Tavstal.TLibrary.Helpers
                 using (var command = connection.CreateCommand())
                 {
                     command.Parameters.AddWithValue("@TableName", tableName);
-                    command.CommandText = $"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE @TableName;";
+                    command.CommandText = $"SHOW TABLES LIKE @TableName;";
                     object result = command.ExecuteScalar();
                     if (result != null)
                         return false;
