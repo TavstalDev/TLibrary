@@ -911,6 +911,9 @@ namespace Tavstal.TLibrary.Helpers
             if (connection == null)
                 return false;
 
+            if (whereClause.IsNullOrEmpty())
+                return false;
+
             try
             {
                 var schemaType = typeof(T);
@@ -1011,6 +1014,154 @@ namespace Tavstal.TLibrary.Helpers
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
 
                 return UpdateTableRow<T>(connection, tableAttribute.Name, newValue, whereClause, parameters);
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
+            }
+        }
+
+        public static bool UpdateTableRow<T>(this MySqlConnection connection, string tableName, string whereClause, Compatibility.Database.SqlParameter newValue)
+        {
+            if (connection == null)
+                return false;
+
+            if (newValue == null)
+                return false;
+
+            if (whereClause.IsNullOrEmpty())
+                return false;
+
+            try
+            {
+                var schemaType = typeof(T);
+                string setClause = $"{newValue.ColumnName}={newValue.Value.ParameterName}";
+
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.Parameters.Add(newValue.Value);
+
+                    if (whereClause.StartsWith("WHERE"))
+                        whereClause = whereClause.Replace("WHERE", "");
+
+                    if (whereClause.StartsWith(" WHERE"))
+                        whereClause = whereClause.Replace(" WHERE", "");
+
+                    command.CommandText = $"UPDATE {tableName} SET {setClause} WHERE {whereClause}";
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
+            }
+        }
+
+        public static bool UpdateTableRow<T>(this MySqlConnection connection, string whereClause, Compatibility.Database.SqlParameter newValue)
+        {
+            if (connection == null)
+                return false;
+
+            if (newValue == null)
+                return false;
+
+            if (whereClause.IsNullOrEmpty())
+                return false;
+
+            try
+            {
+                var schemaType = typeof(T);
+                var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
+                if (tableAttribute == null)
+                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
+
+                return UpdateTableRow<T>(connection, tableName: tableAttribute.Name, whereClause: whereClause, newValue: newValue);
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
+            }
+        }
+
+        public static bool UpdateTableRow<T>(this MySqlConnection connection, string tableName, string whereClause, List<Compatibility.Database.SqlParameter> newValues)
+        {
+            if (connection == null)
+                return false;
+
+            if (newValues == null)
+                return false;
+
+            if (newValues.Count == 0)
+                return false;
+
+            if (whereClause.IsNullOrEmpty())
+                return false;
+
+            try
+            {
+                var schemaType = typeof(T);
+                string setClause = string.Empty;
+
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    foreach (var par in newValues)
+                    {
+                        setClause += $"{par.ColumnName}={par.Value.ParameterName},";
+                        command.Parameters.Add(par.Value);
+                    }
+
+                    setClause = setClause.Remove(setClause.LastIndexOf(','), 1);
+                    if (whereClause.StartsWith("WHERE"))
+                        whereClause = whereClause.Replace("WHERE", "");
+
+                    if (whereClause.StartsWith(" WHERE"))
+                        whereClause = whereClause.Replace(" WHERE", "");
+
+                    command.CommandText = $"UPDATE {tableName} SET {setClause} WHERE {whereClause}";
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
+            }
+        }
+
+        public static bool UpdateTableRow<T>(this MySqlConnection connection, string whereClause, List<Compatibility.Database.SqlParameter> newValues)
+        {
+            if (connection == null)
+                return false;
+
+            try
+            {
+                var schemaType = typeof(T);
+                var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
+                if (tableAttribute == null)
+                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
+
+                return UpdateTableRow<T>(connection, tableAttribute.Name, whereClause, newValues);
             }
             catch (Exception ex)
             {

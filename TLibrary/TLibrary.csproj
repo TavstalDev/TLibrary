@@ -131,6 +131,7 @@
     <Compile Include="Compatibility\Classes\Database\Attributes\SqlMemberAttribute.cs" />
     <Compile Include="Compatibility\Classes\Database\Attributes\SqlNameAttribute.cs" />
     <Compile Include="Compatibility\Classes\Database\Attributes\SqlIgnoreAttribute.cs" />
+    <Compile Include="Compatibility\Classes\Database\SqlParameter.cs" />
     <Compile Include="Compatibility\Classes\Database\SqlColumn.cs" />
     <Compile Include="Compatibility\Classes\Economy\Transaction.cs" />
     <Compile Include="Compatibility\Classes\Economy\BankCardDetails.cs" />
