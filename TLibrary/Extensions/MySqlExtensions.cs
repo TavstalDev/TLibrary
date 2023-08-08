@@ -98,11 +98,11 @@ namespace Tavstal.TLibrary.Extensions
                 {
                     IsConnectionAuthFailed = true;
                     LoggerHelper.LogWarning("Failed to connect to the database. Please check your config file.");
-                    LoggerHelper.LogError($"{myex.Number} : {myex}");
+                    LoggerHelper.LogError($"{myex}");
                     return false;
                 }
 
-                LoggerHelper.LogException("Mysql error in TLibrary:");
+                LoggerHelper.LogException($"Mysql error in TLibrary:");
                 LoggerHelper.LogError(myex);
                 return false;
             }
@@ -116,10 +116,7 @@ namespace Tavstal.TLibrary.Extensions
 
         internal static bool IsAuthenticationError(MySqlException ex)
         {
-            // List of MySQL error codes related to authentication
-            int[] authErrorCodes = { 1045, 1049, 1698, /* Add more codes if needed */ };
-
-            return authErrorCodes.Contains(ex.Number);
+            return ex.ToString().StartsWith("MySql.Data.MySqlClient.MySqlException (0x80004005)") || ex.ToString().Contains("Access denied for user");
         }
     }
 }
