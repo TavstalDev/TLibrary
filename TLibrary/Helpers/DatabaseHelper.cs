@@ -200,7 +200,7 @@ namespace Tavstal.TLibrary.Helpers
             try
             {
                 var schemaType = typeof(T);
-                connection.Open();
+                connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     command.Parameters.AddWithValue("@TableName", tableName);
@@ -271,7 +271,7 @@ namespace Tavstal.TLibrary.Helpers
             {
                 var schemaType = typeof(T);
 
-                connection.Open();
+                connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     command.Parameters.AddWithValue("@TableName", tableName);
@@ -472,7 +472,7 @@ namespace Tavstal.TLibrary.Helpers
                 }
                 #endregion
 
-                connection.Open();
+                connection.OpenSafe();
                 List<SqlColumn> liveColumns = new List<SqlColumn>();
                 List<SqlColumn> columnsToRemove = new List<SqlColumn>();
                 using (var command = connection.CreateCommand())
@@ -644,7 +644,7 @@ namespace Tavstal.TLibrary.Helpers
                     if (!whereClause.StartsWith("WHERE "))
                         whereClause = "WHERE " + whereClause;
                 }
-                connection.Open();
+                connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     if (parameters != null)
@@ -844,7 +844,7 @@ namespace Tavstal.TLibrary.Helpers
                 paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
                 keyString = keyString.Remove(keyString.LastIndexOf(','), 1);
 
-                connection.Open();
+                connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = $"INSERT INTO {tableName} ({keyString}) VALUES({paramString});";
@@ -960,7 +960,7 @@ namespace Tavstal.TLibrary.Helpers
                 }
 
                 setClause = setClause.Remove(setClause.LastIndexOf(','), 1);
-                connection.Open();
+                connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     if (parameters != null)
@@ -1041,7 +1041,7 @@ namespace Tavstal.TLibrary.Helpers
                 var schemaType = typeof(T);
                 string setClause = $"{newValue.ColumnName}={newValue.Value.ParameterName}";
 
-                connection.Open();
+                connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     command.Parameters.Add(newValue.Value);
@@ -1117,7 +1117,7 @@ namespace Tavstal.TLibrary.Helpers
                 var schemaType = typeof(T);
                 string setClause = string.Empty;
 
-                connection.Open();
+                connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     foreach (var par in newValues)
@@ -1191,7 +1191,7 @@ namespace Tavstal.TLibrary.Helpers
             try
             {
                 var schemaType = typeof(T);
-                connection.Open();
+                connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     if (parameters != null)
