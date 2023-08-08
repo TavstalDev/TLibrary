@@ -32,7 +32,7 @@ namespace Tavstal.TLibrary.Helpers
             switch (Type.GetTypeCode(type))
             {
                 case TypeCode.Boolean:
-                    return "BIT";
+                    return "BOOL";
                 case TypeCode.SByte:
                 case TypeCode.Byte:
                     return "TINYINT";
@@ -54,7 +54,7 @@ namespace Tavstal.TLibrary.Helpers
                 case TypeCode.Char:
                     return "CHAR";
                 case TypeCode.String:
-                    return length.HasValue ? $"VARCHAR({length.Value})" : "VARCHAR";
+                    return length.HasValue ? $"VARCHAR({length.Value})" : "TEXT";
                 case TypeCode.DateTime:
                     return "DATETIME";
                 default:
@@ -87,6 +87,8 @@ namespace Tavstal.TLibrary.Helpers
             switch (sqlDataType.ToUpper())
             {
                 case "BIT":
+                case "BOOL":
+                case "BOOLEAN":
                     return typeof(bool);
                 case "TINYINT":
                     return typeof(byte);
@@ -197,6 +199,9 @@ namespace Tavstal.TLibrary.Helpers
             if (connection == null)
                 return false;
 
+            if (MySqlExtensions.IsConnectionAuthFailed)
+                return false;
+
             try
             {
                 var schemaType = typeof(T);
@@ -267,6 +272,9 @@ namespace Tavstal.TLibrary.Helpers
             if (connection == null)
                 return false;
 
+            if (MySqlExtensions.IsConnectionAuthFailed)
+                return false;
+
             try
             {
                 var schemaType = typeof(T);
@@ -292,6 +300,7 @@ namespace Tavstal.TLibrary.Helpers
                     string propName = prop.Name;
                     string typeName = ConvertToSqlDataType(prop.PropertyType);
                     string nullableString = string.Empty;
+                    string unsignedString = string.Empty;
                     string autoincrementString = string.Empty;
                     var sqlMember = prop.GetCustomAttribute<SqlMemberAttribute>();
 
@@ -309,6 +318,9 @@ namespace Tavstal.TLibrary.Helpers
                         if (!sqlMember.IsNullable)
                             nullableString = $" NOT NULL";
 
+                        if (sqlMember.IsUnsigned)
+                            nullableString = $" UNSIGNED";
+
                         if (sqlMember.IsPrimaryKey)
                             keyParams += $"PRIMARY KEY({propName}),";
                         else if (sqlMember.IsUnique)
@@ -317,10 +329,10 @@ namespace Tavstal.TLibrary.Helpers
                         if (sqlMember.IsForeignKey)
                             keyParams += $"FOREIGN KEY ({propName}) REFERENCES {sqlMember.ForeignTable}({sqlMember.ForeignColumn}),";
                     }
-                    schemaParams += $"{propName} {typeName}{nullableString}{autoincrementString},";
+                    schemaParams += $"{propName} {typeName}{unsignedString}{nullableString}{autoincrementString},";
                 }
 
-                foreach (var prop in schemaType.GetFields())
+                /*foreach (var prop in schemaType.GetFields())
                 {
                     if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
                         continue;
@@ -328,6 +340,7 @@ namespace Tavstal.TLibrary.Helpers
                     string propName = prop.Name;
                     string typeName = ConvertToSqlDataType(prop.FieldType);
                     string nullableString = string.Empty;
+                    string unsignedString = string.Empty;
                     string autoincrementString = string.Empty;
                     var sqlMember = prop.GetCustomAttribute<SqlMemberAttribute>();
 
@@ -345,6 +358,9 @@ namespace Tavstal.TLibrary.Helpers
                         if (!sqlMember.IsNullable)
                             nullableString = $" NOT NULL";
 
+                        if (sqlMember.IsUnsigned)
+                            nullableString = $" UNSIGNED";
+
                         if (sqlMember.IsPrimaryKey)
                             keyParams += $"PRIMARY KEY({propName}),";
                         else if (sqlMember.IsUnique)
@@ -353,8 +369,8 @@ namespace Tavstal.TLibrary.Helpers
                         if (sqlMember.IsForeignKey)
                             keyParams += $"FOREIGN KEY ({propName}) REFERENCES {sqlMember.ForeignTable}({sqlMember.ForeignColumn}),";
                     }
-                    schemaParams += $"{propName} {typeName}{nullableString}{autoincrementString},";
-                }
+                    schemaParams += $"{propName} {typeName}{unsignedString}{nullableString}{autoincrementString},";
+                }*/
 
                 using (var command = connection.CreateCommand())
                 {
@@ -419,6 +435,9 @@ namespace Tavstal.TLibrary.Helpers
             if (connection == null)
                 return false;
 
+            if (MySqlExtensions.IsConnectionAuthFailed)
+                return false;
+
             try
             {
                 var schemaType = typeof(T);
@@ -448,7 +467,7 @@ namespace Tavstal.TLibrary.Helpers
                     classColumns.Add(localColumn);
                 }
 
-                foreach (var prop in schemaType.GetFields())
+                /*foreach (var prop in schemaType.GetFields())
                 {
                     if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
                         continue;
@@ -469,7 +488,7 @@ namespace Tavstal.TLibrary.Helpers
                             localColumn.ColumnType = ConvertToSqlDataType(prop.FieldType);
                     }
                     classColumns.Add(localColumn);
-                }
+                }*/
                 #endregion
 
                 connection.OpenSafe();
@@ -491,13 +510,15 @@ namespace Tavstal.TLibrary.Helpers
                         {
                             string columnKey = reader.GetString("Key");
                             string columnExtra = reader.GetString("Extra");
+                            string type = reader.GetString("Type");
 
                             var localColumn = new SqlColumn(
                                 columnName: reader.GetString("Field"),
-                                columnType: reader.GetString("Type"),
+                                columnType: type.Replace("unsigned", ""),
                                 isNullable: reader.GetString("Null") == "YES",
                                 isPrimaryKey: columnKey == "PRI",
                                 isUnique: columnKey == "UNI",
+                                isUnsigned: type.ContainsIgnoreCase("unsigned"),
                                 shouldAutoIncrement: columnExtra.Contains("auto_increment"),
                                 isForeignKey: false,
                                 foreignTable: null,
@@ -522,11 +543,20 @@ namespace Tavstal.TLibrary.Helpers
                         continue;
                     }
 
+                    LoggerHelper.LogWarning($"table ########### class");
+                    LoggerHelper.LogWarning($"PRIMARY {lcolumn.IsPrimaryKey} - {column.IsPrimaryKey} --> {lcolumn.IsPrimaryKey == column.IsPrimaryKey}");
+                    LoggerHelper.LogWarning($"UNIQUE {lcolumn.IsUnique} - {column.IsUnique} --> {lcolumn.IsUnique == column.IsUnique}");
+                    LoggerHelper.LogWarning($"NULLABE {lcolumn.IsNullable} - {column.IsNullable}  --> {lcolumn.IsNullable == column.IsNullable}");
+                    LoggerHelper.LogWarning($"UNSIGNED {lcolumn.IsUnsigned} - {column.IsUnsigned}  --> {lcolumn.IsUnsigned == column.IsUnsigned}");
+                    LoggerHelper.LogWarning($"AUTOINC {lcolumn.ShouldAutoIncrement} - {column.ShouldAutoIncrement}  --> {lcolumn.ShouldAutoIncrement == column.ShouldAutoIncrement}");
+                    LoggerHelper.LogWarning($"TYPE {lcolumn.ColumnType.ToLower().Replace(" ", "")} - {column.ColumnType.ToLower().Replace(" ", "")}   --> {lcolumn.ColumnType.ToLower().Replace(" ", "") == column.ColumnType.ToLower().Replace(" ", "")}");
+
                     if (lcolumn.IsPrimaryKey != column.IsPrimaryKey || 
                         lcolumn.IsUnique != column.IsUnique ||
                         lcolumn.IsNullable != column.IsNullable ||
+                        lcolumn.IsUnsigned != column.IsUnsigned ||
                         lcolumn.ShouldAutoIncrement != column.ShouldAutoIncrement ||
-                        lcolumn.ColumnType.ToLower() != column.ColumnType.ToLower())
+                        lcolumn.ColumnType.ToLower().Replace(" ", "") != column.ColumnType.ToLower().Replace(" ", ""))
                     {
                         columnsToUpdate.Add(column);
                         continue;
@@ -549,18 +579,20 @@ namespace Tavstal.TLibrary.Helpers
                     {
                         string primaryKey = column.IsPrimaryKey ? " PRIMARY KEY" : "";
                         string nullable = column.IsNullable ? "" : " NOT NULL";
+                        string unsigned = column.IsUnsigned ? " UNSIGNED" : "";
                         string uniqueKey = column.IsUnique ? " UNIQUE" : "";
                         string autoIncrement = column.ShouldAutoIncrement ? " AUTO_INCREMENT" : "";
-                        command.CommandText += $" ADD {column.ColumnName} {column.ColumnType}{nullable}{uniqueKey}{primaryKey}{autoIncrement},";
+                        command.CommandText += $" ADD {column.ColumnName} {column.ColumnType}{unsigned}{nullable}{uniqueKey}{primaryKey}{autoIncrement},";
                     }
                     // UPDATE
                     foreach (SqlColumn column in columnsToUpdate)
                     {
                         string primaryKey = column.IsPrimaryKey ? " PRIMARY KEY" : "";
+                        string unsigned = column.IsUnsigned ? " UNSIGNED" : "";
                         string nullable = column.IsNullable ? "" : " NOT NULL";
                         string uniqueKey = column.IsUnique ? " UNIQUE" : "";
                         string autoIncrement = column.ShouldAutoIncrement ? " AUTO_INCREMENT" : "";
-                        command.CommandText += $" MODIFY {column.ColumnName} {column.ColumnType}{nullable}{uniqueKey}{primaryKey}{autoIncrement},";
+                        command.CommandText += $" MODIFY {column.ColumnName} {column.ColumnType}{unsigned}{nullable}{uniqueKey}{primaryKey}{autoIncrement},";
                     }
                     // DROP
                     foreach (SqlColumn column in columnsToRemove)
@@ -632,6 +664,9 @@ namespace Tavstal.TLibrary.Helpers
         public static List<T> GetTableRows<T>(this MySqlConnection connection, string tableName, string whereClause, List<MySqlParameter> parameters, int limit = -1) where T : class
         {
             if (connection == null)
+                return null;
+
+            if (MySqlExtensions.IsConnectionAuthFailed)
                 return null;
 
             try
@@ -719,6 +754,9 @@ namespace Tavstal.TLibrary.Helpers
             if (connection == null)
                 return null;
 
+            if (MySqlExtensions.IsConnectionAuthFailed)
+                return null;
+
             try
             {
                 var list = connection.GetTableRows<T>(tableName: tableName, whereClause: whereClause, parameters: parameters, limit: 1);
@@ -793,6 +831,9 @@ namespace Tavstal.TLibrary.Helpers
             if (connection == null)
                 return false;
 
+            if (MySqlExtensions.IsConnectionAuthFailed)
+                return false;
+
             try
             {
                 var schemaType = typeof(T);
@@ -820,7 +861,7 @@ namespace Tavstal.TLibrary.Helpers
                     paramString += $"'{prop.GetValue(value)}',";
                 }
 
-                foreach (var prop in schemaType.GetFields())
+                /*foreach (var prop in schemaType.GetFields())
                 {
                     if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
                         continue;
@@ -839,7 +880,7 @@ namespace Tavstal.TLibrary.Helpers
 
                     keyString += $"{propName},";
                     paramString += $"'{prop.GetValue(value)}',";
-                }
+                }*/
 
                 paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
                 keyString = keyString.Remove(keyString.LastIndexOf(','), 1);
@@ -939,7 +980,7 @@ namespace Tavstal.TLibrary.Helpers
                     setClause += $"{propName}={prop.GetValue(newValue)},";
                 }
 
-                foreach (var prop in schemaType.GetFields())
+                /*foreach (var prop in schemaType.GetFields())
                 {
                     if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
                         continue;
@@ -958,6 +999,7 @@ namespace Tavstal.TLibrary.Helpers
 
                     setClause += $"{propName}={prop.GetValue(newValue)},";
                 }
+                */
 
                 setClause = setClause.Remove(setClause.LastIndexOf(','), 1);
                 connection.OpenSafe();
@@ -1006,6 +1048,9 @@ namespace Tavstal.TLibrary.Helpers
             if (connection == null)
                 return false;
 
+            if (MySqlExtensions.IsConnectionAuthFailed)
+                return false;
+
             try
             {
                 var schemaType = typeof(T);
@@ -1034,6 +1079,9 @@ namespace Tavstal.TLibrary.Helpers
                 return false;
 
             if (whereClause.IsNullOrEmpty())
+                return false;
+
+            if (MySqlExtensions.IsConnectionAuthFailed)
                 return false;
 
             try
@@ -1079,6 +1127,9 @@ namespace Tavstal.TLibrary.Helpers
             if (whereClause.IsNullOrEmpty())
                 return false;
 
+            if (MySqlExtensions.IsConnectionAuthFailed)
+                return false;
+
             try
             {
                 var schemaType = typeof(T);
@@ -1110,6 +1161,9 @@ namespace Tavstal.TLibrary.Helpers
                 return false;
 
             if (whereClause.IsNullOrEmpty())
+                return false;
+
+            if (MySqlExtensions.IsConnectionAuthFailed)
                 return false;
 
             try
@@ -1186,6 +1240,9 @@ namespace Tavstal.TLibrary.Helpers
         public static bool RemoveTableRow<T>(this MySqlConnection connection, string tableName, string whereClause, List<MySqlParameter> parameters)
         {
             if (connection == null)
+                return false;
+
+            if (MySqlExtensions.IsConnectionAuthFailed)
                 return false;
 
             try

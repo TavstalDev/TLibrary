@@ -97,7 +97,7 @@ namespace Tavstal.TLibrary.Extensions
                 if (IsAuthenticationError(myex))
                 {
                     IsConnectionAuthFailed = true;
-                    LoggerHelper.LogWarning("Failed to connect to the database. Please check your config file.");
+                    LoggerHelper.LogWarning("# Failed to connect to the database. Please check the plugin's config file.");
                     LoggerHelper.LogError($"{myex}");
                     return false;
                 }

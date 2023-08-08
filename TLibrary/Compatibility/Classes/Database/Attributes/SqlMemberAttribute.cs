@@ -12,6 +12,7 @@ namespace Tavstal.TLibrary.Compatibility.Database
         public string ColumnName { get; internal set; }
         public string ColumnType { get; internal set; }
         public bool IsNullable { get; internal set; }
+        public bool IsUnsigned { get; internal set; }
         public bool ShouldAutoIncrement { get; internal set; }
         public bool IsPrimaryKey { get; private set; }
         public bool IsUnique { get; private set; }
@@ -19,7 +20,7 @@ namespace Tavstal.TLibrary.Compatibility.Database
         public string ForeignColumn { get; private set; }
         public bool IsForeignKey { get; private set; }
 
-        public SqlMemberAttribute(string columnName = null, string columnType = null, bool isNullable = false, bool shouldAutoIncrement = false, bool isPrimaryKey = false, bool isUniqueKey = false, string foreignTable = null, string foreignColumn = null, bool isForeignKey = false)
+        public SqlMemberAttribute(string columnName = null, string columnType = null, bool isNullable = false, bool shouldAutoIncrement = false, bool isPrimaryKey = false, bool isUniqueKey = false, bool isUnsigned = false, string foreignTable = null, string foreignColumn = null, bool isForeignKey = false)
         {
             ColumnName = columnName;
             ColumnType = columnType;
@@ -30,11 +31,12 @@ namespace Tavstal.TLibrary.Compatibility.Database
             ForeignTable = foreignTable;
             ForeignColumn = foreignColumn;
             IsForeignKey = isForeignKey;
+            IsUnsigned = isUnsigned;
         }
     
         public SqlColumn ToColumn()
         {
-            return new SqlColumn(ColumnName, ColumnType, IsNullable, ShouldAutoIncrement, IsPrimaryKey, IsUnique, ForeignTable, ForeignColumn, IsForeignKey);
+            return new SqlColumn(ColumnName, ColumnType, IsNullable, ShouldAutoIncrement, IsPrimaryKey, IsUnique, IsUnsigned, ForeignTable, ForeignColumn, IsForeignKey);
         }
     }
 }

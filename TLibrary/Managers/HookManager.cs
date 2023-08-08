@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Logger = Tavstal.TLibrary.Helpers.LoggerHelper;
 using Tavstal.TLibrary.Compatibility;
+using System.Reflection;
 
 namespace Tavstal.TLibrary.Managers
 {
@@ -41,11 +42,9 @@ namespace Tavstal.TLibrary.Managers
             hook.Load();
         }
 
-        public void LoadAll()
+        public void LoadAll(Assembly pluginAssembly)
         {
-            var assembly = GetType().Assembly;
-
-            foreach (Type t in assembly.GetTypes().ToList().FindAll(x => !x.IsAbstract && typeof(Hook).IsAssignableFrom(x)))
+            foreach (Type t in pluginAssembly.GetTypes().ToList().FindAll(x => !x.IsAbstract && typeof(Hook).IsAssignableFrom(x)))
             {
                 var hook = CreateInstance<Hook>(t);
                 try

@@ -10,13 +10,14 @@ using Logger = Tavstal.TLibrary.Helpers.LoggerHelper;
 using Rocket.API;
 using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Compatibility;
+using System.Web.Management;
 
 namespace Tavstal.TLibrary.Managers
 {
     public abstract class DatabaseManagerBase : IDatabaseManager
     {
         public IConfigurationBase _configuration { get; }
-        
+
         public DatabaseManagerBase(IConfigurationBase configuration)
         {
             _configuration = configuration;

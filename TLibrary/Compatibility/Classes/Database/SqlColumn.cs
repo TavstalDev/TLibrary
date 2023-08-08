@@ -14,6 +14,7 @@ namespace Tavstal.TLibrary.Compatibility.Database
         public string ColumnName { get; internal set; }
         public string ColumnType { get; internal set; }
         public bool IsNullable { get; internal set; }
+        public bool IsUnsigned { get; internal set; }
         public bool ShouldAutoIncrement { get; internal set; }
         public bool IsPrimaryKey { get; private set; }
         public bool IsUnique { get; private set; }
@@ -26,7 +27,7 @@ namespace Tavstal.TLibrary.Compatibility.Database
 
         }
 
-        public SqlColumn(string columnName, string columnType, bool isNullable, bool shouldAutoIncrement, bool isPrimaryKey, bool isUnique, string foreignTable, string foreignColumn, bool isForeignKey) 
+        public SqlColumn(string columnName, string columnType, bool isNullable, bool shouldAutoIncrement, bool isPrimaryKey, bool isUnique, bool isUnsigned, string foreignTable, string foreignColumn, bool isForeignKey) 
         {
             ColumnName = columnName;
             ColumnType = columnType;
@@ -34,6 +35,7 @@ namespace Tavstal.TLibrary.Compatibility.Database
             ShouldAutoIncrement = shouldAutoIncrement;
             IsPrimaryKey = isPrimaryKey;
             IsUnique = isUnique;
+            IsUnsigned = isUnsigned;
             ForeignTable = foreignTable;
             ForeignColumn = foreignColumn;
             IsForeignKey = isForeignKey;
@@ -87,7 +89,8 @@ namespace Tavstal.TLibrary.Compatibility.Database
                    ShouldAutoIncrement == otherColumn.ShouldAutoIncrement &&
                    IsUnique == otherColumn.IsUnique &&
                    IsPrimaryKey == otherColumn.IsPrimaryKey &&
-                   IsNullable == otherColumn.IsNullable;
+                   IsNullable == otherColumn.IsNullable &&
+                   IsUnsigned == otherColumn.IsUnsigned;
         }
         public override bool Equals(object obj) => Equals(obj as SqlColumn);
 
@@ -97,6 +100,7 @@ namespace Tavstal.TLibrary.Compatibility.Database
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ColumnName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ColumnType);
             hashCode = hashCode * -1521134295 + IsNullable.GetHashCode();
+            hashCode = hashCode * -1521134295 + IsUnsigned.GetHashCode();
             hashCode = hashCode * -1521134295 + ShouldAutoIncrement.GetHashCode();
             hashCode = hashCode * -1521134295 + IsPrimaryKey.GetHashCode();
             hashCode = hashCode * -1521134295 + IsUnique.GetHashCode();
