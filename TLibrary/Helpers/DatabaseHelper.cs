@@ -81,6 +81,11 @@ namespace Tavstal.TLibrary.Helpers
         /// <returns>The corresponding C# data type as a Type object.</returns>
         public static Type ConvertSqlToCSharpDataType(string sqlDataType)
         {
+            sqlDataType = sqlDataType.ToUpper();
+
+            if (sqlDataType == "TINYINT(1)")
+                sqlDataType = "BOOL";
+
             if (sqlDataType.Contains('('))
                 sqlDataType = sqlDataType.Split('(')[0];
 
@@ -543,20 +548,14 @@ namespace Tavstal.TLibrary.Helpers
                         continue;
                     }
 
-                    LoggerHelper.LogWarning($"table ########### class");
-                    LoggerHelper.LogWarning($"PRIMARY {lcolumn.IsPrimaryKey} - {column.IsPrimaryKey} --> {lcolumn.IsPrimaryKey == column.IsPrimaryKey}");
-                    LoggerHelper.LogWarning($"UNIQUE {lcolumn.IsUnique} - {column.IsUnique} --> {lcolumn.IsUnique == column.IsUnique}");
-                    LoggerHelper.LogWarning($"NULLABE {lcolumn.IsNullable} - {column.IsNullable}  --> {lcolumn.IsNullable == column.IsNullable}");
-                    LoggerHelper.LogWarning($"UNSIGNED {lcolumn.IsUnsigned} - {column.IsUnsigned}  --> {lcolumn.IsUnsigned == column.IsUnsigned}");
-                    LoggerHelper.LogWarning($"AUTOINC {lcolumn.ShouldAutoIncrement} - {column.ShouldAutoIncrement}  --> {lcolumn.ShouldAutoIncrement == column.ShouldAutoIncrement}");
-                    LoggerHelper.LogWarning($"TYPE {lcolumn.ColumnType.ToLower().Replace(" ", "")} - {column.ColumnType.ToLower().Replace(" ", "")}   --> {lcolumn.ColumnType.ToLower().Replace(" ", "") == column.ColumnType.ToLower().Replace(" ", "")}");
+                    //LoggerHelper.LogWarning($"TYPE {lcolumn.ColumnType.ToLower().Replace(" ", "")} - {column.ColumnType.ToLower().Replace(" ", "")}   --> {lcolumn.ColumnType.ToLower().Replace(" ", "") == column.ColumnType.ToLower().Replace(" ", "")}");
 
                     if (lcolumn.IsPrimaryKey != column.IsPrimaryKey || 
                         lcolumn.IsUnique != column.IsUnique ||
                         lcolumn.IsNullable != column.IsNullable ||
                         lcolumn.IsUnsigned != column.IsUnsigned ||
                         lcolumn.ShouldAutoIncrement != column.ShouldAutoIncrement ||
-                        lcolumn.ColumnType.ToLower().Replace(" ", "") != column.ColumnType.ToLower().Replace(" ", ""))
+                        ConvertSqlToCSharpDataType(lcolumn.ColumnType) != ConvertSqlToCSharpDataType(column.ColumnType))
                     {
                         columnsToUpdate.Add(column);
                         continue;
