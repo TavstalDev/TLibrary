@@ -81,15 +81,13 @@ namespace Tavstal.TLibrary.Helpers
         /// <returns>The corresponding C# data type as a Type object.</returns>
         public static Type ConvertSqlToCSharpDataType(string sqlDataType)
         {
-            sqlDataType = sqlDataType.ToUpper();
-
             if (sqlDataType == "TINYINT(1)")
                 sqlDataType = "BOOL";
 
             if (sqlDataType.Contains('('))
                 sqlDataType = sqlDataType.Split('(')[0];
 
-            switch (sqlDataType.ToUpper())
+            switch (sqlDataType.Replace(" ", "").ToUpper())
             {
                 case "BIT":
                 case "BOOL":
