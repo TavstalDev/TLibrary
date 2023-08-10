@@ -87,7 +87,7 @@ namespace Tavstal.TLibrary.Compatibility
 
             string defaultTranslationFile = Path.Combine(translationsDirectory, "locale.en.yml");
             if (!File.Exists(defaultTranslationFile))
-                PluginExtensions.SaveTranslation(Localization, translationsDirectory, "locale.en.yml");
+                PluginExtensions.SaveTranslation(DefaultLocalization, translationsDirectory, "locale.en.yml");
 
             if (LanguagePacks != null)
                 if (Config.DownloadLocalePacks && LanguagePacks.Count > 0)
@@ -118,8 +118,14 @@ namespace Tavstal.TLibrary.Compatibility
             {
                 var localLocale = PluginExtensions.ReadTranslation(translationsDirectory, $"locale.{locale}.yml");
                 if (localLocale != null)
+                {
                     if (localLocale.Count > 0)
                         Localization = localLocale;
+                    else if (localLocale.Count == 0 && locale == "en")
+                    {
+                        PluginExtensions.SaveTranslation(DefaultLocalization, translationsDirectory, "locale.en.yml");
+                    }
+                }
             }
         }
 
