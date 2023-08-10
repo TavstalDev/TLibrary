@@ -16,6 +16,7 @@ using Tavstal.TLibrary.Extensions;
 using SDG.Unturned;
 using UnityEngine;
 using YamlDotNet.Core.Tokens;
+using Newtonsoft.Json.Linq;
 
 namespace Tavstal.TLibrary.Helpers
 {
@@ -855,7 +856,10 @@ namespace Tavstal.TLibrary.Helpers
                     }
 
                     keyString += $"{propName},";
-                    paramString += $"'{prop.GetValue(value)}',";
+                    if (prop.PropertyType == typeof(bool))
+                        paramString += $"'{(int)prop.GetValue(value)}',";
+                    else
+                        paramString += $"'{prop.GetValue(value)}',";
                 }
 
                 /*foreach (var prop in schemaType.GetFields())
@@ -974,7 +978,10 @@ namespace Tavstal.TLibrary.Helpers
                             propName = memberAttribute.ColumnName;
                     }
 
-                    setClause += $"{propName}={prop.GetValue(newValue)},";
+                    if (prop.PropertyType == typeof(bool))
+                        setClause += $"{propName}={(int)prop.GetValue(newValue)},";
+                    else
+                        setClause += $"{propName}={prop.GetValue(newValue)},";
                 }
 
                 /*foreach (var prop in schemaType.GetFields())
