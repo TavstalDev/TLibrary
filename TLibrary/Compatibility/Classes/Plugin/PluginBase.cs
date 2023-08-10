@@ -156,7 +156,7 @@ namespace Tavstal.TLibrary.Compatibility
             if (AddPrefix)
             {
                 string prefixLocalization = string.Empty;
-                Localization.TryGetValue(translationKey, out prefixLocalization);
+                Localization.TryGetValue("prefix", out prefixLocalization);
                 return prefixLocalization + string.Format(localization, args);
             }
             else
