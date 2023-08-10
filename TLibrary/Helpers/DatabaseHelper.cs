@@ -857,7 +857,7 @@ namespace Tavstal.TLibrary.Helpers
 
                     keyString += $"{propName},";
                     if (prop.PropertyType == typeof(bool))
-                        paramString += $"'{(int)prop.GetValue(value)}',";
+                        paramString += $"'{Convert.ToInt32(prop.GetValue(value))}',";
                     else
                         paramString += $"'{prop.GetValue(value)}',";
                 }
@@ -979,7 +979,7 @@ namespace Tavstal.TLibrary.Helpers
                     }
 
                     if (prop.PropertyType == typeof(bool))
-                        setClause += $"{propName}={(int)prop.GetValue(newValue)},";
+                        setClause += $"{propName}={Convert.ToInt32(prop.GetValue(newValue))},";
                     else
                         setClause += $"{propName}={prop.GetValue(newValue)},";
                 }
