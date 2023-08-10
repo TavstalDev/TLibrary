@@ -82,12 +82,12 @@ namespace Tavstal.TLibrary.Compatibility
             if (Config.CheckConfigFile())
                 Config = PluginExtensions.ReadConfig<PluginConfig>(Config);
 
+            if (DefaultLocalization != null)
+                Localization = DefaultLocalization;
+
             string defaultTranslationFile = Path.Combine(translationsDirectory, "locale.en.yml");
             if (!File.Exists(defaultTranslationFile))
                 PluginExtensions.SaveTranslation(Localization, translationsDirectory, "locale.en.yml");
-
-            if (DefaultLocalization != null)
-                Localization = DefaultLocalization;
 
             if (LanguagePacks != null)
                 if (Config.DownloadLocalePacks && LanguagePacks.Count > 0)
