@@ -18,6 +18,7 @@ using Tavstal.TLibrary.Extensions;
 using Steamworks;
 using UnityEngine.Networking;
 using System.Collections;
+using System.Globalization;
 
 namespace Tavstal.TLibrary.Compatibility
 {
@@ -81,13 +82,28 @@ namespace Tavstal.TLibrary.Compatibility
             Config.FilePath = this.Directory;
             if (Config.CheckConfigFile())
                 Config = PluginExtensions.ReadConfig<PluginConfig>(Config);
+            else
+            {
+                CultureInfo ci = CultureInfo.InstalledUICulture;
+                string langISO = ci.TwoLetterISOLanguageName.ToLower();
+                if (langISO != "en" && LanguagePacks != null)
+                {
+                    if (LanguagePacks.ContainsKey(ci.TwoLetterISOLanguageName))
+                    {
+                        Config.Locale = langISO;
+                        Config.SaveConfig();
+                    }
+                }
+            }
 
             if (DefaultLocalization != null)
                 Localization = DefaultLocalization;
 
             string defaultTranslationFile = Path.Combine(translationsDirectory, "locale.en.yml");
             if (!File.Exists(defaultTranslationFile))
+            {
                 PluginExtensions.SaveTranslation(DefaultLocalization, translationsDirectory, "locale.en.yml");
+            }
 
             if (LanguagePacks != null)
                 if (Config.DownloadLocalePacks && LanguagePacks.Count > 0)
@@ -112,6 +128,8 @@ namespace Tavstal.TLibrary.Compatibility
                         });
 
                     }
+
+            
 
             string locale = Config.Locale;
             if (File.Exists(Path.Combine(translationsDirectory, $"locale.{locale}.yml")))
