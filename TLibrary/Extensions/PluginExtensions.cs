@@ -11,6 +11,8 @@ using Newtonsoft.Json.Linq;
 using Rocket.API;
 using System.Reflection;
 using Tavstal.TLibrary.Helpers;
+using SDG.Unturned;
+using System.Globalization;
 
 namespace Tavstal.TLibrary.Extensions
 {
@@ -42,12 +44,22 @@ namespace Tavstal.TLibrary.Extensions
         public static T ReadConfig<T>(this ConfigurationBase configuration) where T : ConfigurationBase
         {
             string fullPath = Path.Combine(configuration.FilePath, configuration.FileName);
-            var deserializer = new DeserializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .Build();
-            string text = File.ReadAllText(fullPath);
+            try
+            {
+                var deserializer = new DeserializerBuilder()
+                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                    .Build();
+                string text = File.ReadAllText(fullPath);
 
-            return deserializer.Deserialize<T>(text);
+                return deserializer.Deserialize<T>(text);
+            }
+            catch
+            {
+                LoggerHelper.LogException("Failed to read the configuration file, it might be outdated.\nSaving current one and generating a new file...");
+                File.Move(fullPath, Path.Combine(configuration.FilePath, configuration.FileName.Insert(configuration.FileName.IndexOf(".yml"), "_auto_save")));
+                configuration.SaveConfig();
+                return null;
+            }
         }
 
         /// <summary>

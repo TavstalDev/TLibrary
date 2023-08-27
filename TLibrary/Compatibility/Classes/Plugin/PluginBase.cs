@@ -81,7 +81,7 @@ namespace Tavstal.TLibrary.Compatibility
             Config.FileName = "Configuration.yml";
             Config.FilePath = this.Directory;
             if (Config.CheckConfigFile())
-                Config = PluginExtensions.ReadConfig<PluginConfig>(Config);
+                Config = PluginExtensions.ReadConfig<PluginConfig>(Config) ?? Config;
             else
             {
                 CultureInfo ci = CultureInfo.InstalledUICulture;
