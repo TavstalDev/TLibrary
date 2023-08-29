@@ -34,6 +34,18 @@ namespace Tavstal.TLibrary.Extensions
         }
 
         /// <summary>
+        /// Checks if the provided index is a valid index within the Dictionary.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the Dictionary.</typeparam>
+        /// <param name="self">The Dictionary to check.</param>
+        /// <param name="index">The index to check for validity.</param>
+        /// <returns>True if the index is valid, false otherwise.</returns>
+        public static bool IsValidIndex<TKey, TValue>(this Dictionary<TKey, TValue> self, int index)
+        {
+            return self.Count - 1 >= index;
+        }
+
+        /// <summary>
         /// Removes all elements that match the conditions defined by the specified predicate from the List.
         /// </summary>
         /// <typeparam name="T">The type of elements in the List.</typeparam>
