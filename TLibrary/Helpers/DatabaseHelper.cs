@@ -938,6 +938,84 @@ namespace Tavstal.TLibrary.Helpers
         }
 
         /// <summary>
+        /// Adds a new amount of rows to the MySQL database table with the specified name.
+        /// The row data is provided as an object of type T.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="tableName">The name of the table to which the row will be added.</param>
+        /// <param name="value">The object representing the row data to be added.</param>
+        /// <returns>True if the row was successfully added; otherwise, false.</returns>
+        public static bool AddTableRows<T>(this MySqlConnection connection, string tableName, List<T> values)
+        {
+            if (connection == null)
+                return false;
+
+            if (MySqlExtensions.IsConnectionAuthFailed)
+                return false;
+
+            try
+            {
+                var schemaType = typeof(T);
+                string paramString = string.Empty;
+                string keyString = string.Empty;
+                var properties = schemaType.GetProperties();
+
+                foreach (var value in values)
+                {
+                    paramString += "(";
+                    foreach (var prop in properties)
+                    {
+                        if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                            continue;
+
+                        var memberAttribute = prop.GetCustomAttribute<SqlMemberAttribute>();
+                        string propName = prop.Name;
+
+                        if (memberAttribute != null)
+                        {
+                            if (memberAttribute.ShouldAutoIncrement)
+                                continue;
+
+                            if (!memberAttribute.ColumnName.IsNullOrEmpty())
+                                propName = memberAttribute.ColumnName;
+                        }
+
+                        if (!keyString.Contains(propName))
+                            keyString += $"{propName},";
+
+                        if (prop.PropertyType == typeof(bool))
+                            paramString += $"'{Convert.ToInt32(prop.GetValue(value))}',";
+                        else
+                            paramString += $"'{prop.GetValue(value)}',";
+                    }
+                    paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
+                    paramString += "),";
+                }
+
+                paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
+                keyString = keyString.Remove(keyString.LastIndexOf(','), 1);
+
+                connection.OpenSafe();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = $"INSERT INTO {tableName} ({keyString}) VALUES{paramString};";
+                    command.ExecuteNonQuery();
+                }
+                connection.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Updates an existing row in the MySQL database table associated with the type T.
         /// The row data is provided as an object of type T, and the update is performed based on the provided WHERE clause and parameters.
         /// </summary>
