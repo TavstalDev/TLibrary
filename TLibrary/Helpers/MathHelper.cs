@@ -97,6 +97,33 @@ namespace Tavstal.TLibrary.Helpers
         }
 
         /// <summary>
+        /// Returns a random integer between 0 (inclusive) and the specified maximum value (exclusive).
+        /// </summary>
+        /// <param name="max">The exclusive maximum value of the random range.</param>
+        /// <returns>A random integer between 0 (inclusive) and the specified maximum value (exclusive).</returns>
+        public static uint Next()
+        {
+            lock (syncObj)
+            {
+                if (_random == null)
+                    _random = new System.Random();
+                return (uint)(_random.Next(1 << 30)) << 2 | (uint)(_random.Next(1 << 2));
+            }
+        }
+
+        /// <summary>
+        /// Clamps the specified value between the specified minimum and maximum values.
+        /// </summary>
+        /// <param name="value">The value to clamp.</param>
+        /// <param name="minValue">The minimum value to clamp to.</param>
+        /// <param name="maxValue">The maximum value to clamp to.</param>
+        /// <returns>The clamped value.</returns>
+        public static uint Clamp(uint value, uint minValue, uint maxValue)
+        {
+            return maxValue < value ? maxValue : (value < minValue ? minValue : value);
+        }
+
+        /// <summary>
         /// Generates a random double value within the specified range.
         /// </summary>
         /// <param name="min">The minimum value of the range (inclusive).</param>
