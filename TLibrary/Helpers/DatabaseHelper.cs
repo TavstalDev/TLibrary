@@ -61,7 +61,7 @@ namespace Tavstal.TLibrary.Helpers
                 default:
                     if (type == typeof(Guid))
                     {
-                        return "UNIQUEIDENTIFIER";
+                        return "LONGTEXT";
                     }
                     else if (type == typeof(byte[]))
                     {
@@ -113,8 +113,10 @@ namespace Tavstal.TLibrary.Helpers
                     return typeof(string);
                 case "DATETIME":
                     return typeof(DateTime);
-                case "UNIQUEIDENTIFIER":
-                    return typeof(Guid);
+                case "LONGTEXT":
+                    {
+                        return typeof(Guid);
+                    }
                 case "VARBINARY":
                     return typeof(byte[]);
                 default:
