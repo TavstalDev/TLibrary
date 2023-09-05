@@ -13,7 +13,5 @@ namespace Tavstal.TLibrary.Compatibility
         IConfigurationBase _configuration { get; }
 
         MySqlConnection CreateConnection();
-
-        void CheckSchema();
     }
 }

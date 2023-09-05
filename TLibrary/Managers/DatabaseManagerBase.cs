@@ -45,7 +45,7 @@ namespace Tavstal.TLibrary.Managers
             return mySqlConnection;
         }
 
-        public virtual void CheckSchema()
+        protected virtual void CheckSchema()
         {
             
         }

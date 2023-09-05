@@ -206,7 +206,11 @@ namespace Tavstal.TLibrary.Helpers
                 return false;
 
             if (MySqlExtensions.IsConnectionAuthFailed)
+            {
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
                 return false;
+            }
 
             try
             {
@@ -279,7 +283,11 @@ namespace Tavstal.TLibrary.Helpers
                 return false;
 
             if (MySqlExtensions.IsConnectionAuthFailed)
+            {
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
                 return false;
+            }
 
             try
             {
@@ -442,7 +450,11 @@ namespace Tavstal.TLibrary.Helpers
                 return false;
 
             if (MySqlExtensions.IsConnectionAuthFailed)
+            {
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
                 return false;
+            }
 
             try
             {
@@ -667,7 +679,11 @@ namespace Tavstal.TLibrary.Helpers
                 return null;
 
             if (MySqlExtensions.IsConnectionAuthFailed)
+            {
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
                 return null;
+            }
 
             try
             {
@@ -755,7 +771,11 @@ namespace Tavstal.TLibrary.Helpers
                 return null;
 
             if (MySqlExtensions.IsConnectionAuthFailed)
+            {
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
                 return null;
+            }
 
             try
             {
@@ -832,7 +852,11 @@ namespace Tavstal.TLibrary.Helpers
                 return false;
 
             if (MySqlExtensions.IsConnectionAuthFailed)
+            {
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
                 return false;
+            }
 
             try
             {
@@ -954,7 +978,11 @@ namespace Tavstal.TLibrary.Helpers
                 return false;
 
             if (MySqlExtensions.IsConnectionAuthFailed)
+            {
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
                 return false;
+            }
 
             try
             {
@@ -1033,8 +1061,19 @@ namespace Tavstal.TLibrary.Helpers
             if (connection == null)
                 return false;
 
-            if (whereClause.IsNullOrEmpty())
+            if (MySqlExtensions.IsConnectionAuthFailed)
+            {
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
                 return false;
+            }
+
+            if (whereClause.IsNullOrEmpty())
+            {
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
+                return false;
+            }
 
             try
             {
@@ -1133,7 +1172,11 @@ namespace Tavstal.TLibrary.Helpers
                 return false;
 
             if (MySqlExtensions.IsConnectionAuthFailed)
+            {
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
                 return false;
+            }
 
             try
             {
@@ -1166,7 +1209,11 @@ namespace Tavstal.TLibrary.Helpers
                 return false;
 
             if (MySqlExtensions.IsConnectionAuthFailed)
+            {
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
                 return false;
+            }
 
             try
             {
@@ -1212,7 +1259,11 @@ namespace Tavstal.TLibrary.Helpers
                 return false;
 
             if (MySqlExtensions.IsConnectionAuthFailed)
+            {
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
                 return false;
+            }
 
             try
             {
@@ -1248,7 +1299,11 @@ namespace Tavstal.TLibrary.Helpers
                 return false;
 
             if (MySqlExtensions.IsConnectionAuthFailed)
+            {
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
                 return false;
+            }
 
             try
             {
@@ -1327,7 +1382,11 @@ namespace Tavstal.TLibrary.Helpers
                 return false;
 
             if (MySqlExtensions.IsConnectionAuthFailed)
+            {
+                if (connection.State != ConnectionState.Closed)
+                    connection.Close();
                 return false;
+            }
 
             try
             {
