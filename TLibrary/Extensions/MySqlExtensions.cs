@@ -15,11 +15,6 @@ namespace Tavstal.TLibrary.Extensions
     public static class MySqlExtensions
     {
         /// <summary>
-        /// Used to prevent mysql auth error spam
-        /// </summary>
-        public static bool IsConnectionAuthFailed { get; private set; }
-
-        /// <summary>
         /// Retrieves a JSON object of type T from the specified column in the <paramref name="reader"/>.
         /// </summary>
         /// <typeparam name="T">The type of object to deserialize the JSON to.</typeparam>
@@ -78,9 +73,6 @@ namespace Tavstal.TLibrary.Extensions
 
         public static bool OpenSafe(this MySqlConnection connection)
         {
-            if (IsConnectionAuthFailed)
-                return false;
-
             if (connection.State == System.Data.ConnectionState.Open)
                 return true;
 
@@ -96,20 +88,25 @@ namespace Tavstal.TLibrary.Extensions
             {
                 if (IsAuthenticationError(myex))
                 {
-                    IsConnectionAuthFailed = true;
-                    LoggerHelper.LogWarning("# Failed to connect to the database. Please check the plugin's config file.");
+                    LoggerHelper.LogWarning("# Failed to connect to the database due to authentication error. Please check the plugin's config file.");
                     LoggerHelper.LogError($"{myex}");
+                    if (connection.State != System.Data.ConnectionState.Closed)
+                        connection.Close();
                     return false;
                 }
 
                 LoggerHelper.LogException($"Mysql error in TLibrary:");
                 LoggerHelper.LogError(myex);
+                if (connection.State != System.Data.ConnectionState.Closed)
+                    connection.Close();
                 return false;
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
+                if (connection.State != System.Data.ConnectionState.Closed)
+                    connection.Close();
                 return false;
             }
         }

@@ -205,13 +205,6 @@ namespace Tavstal.TLibrary.Helpers
             if (connection == null)
                 return false;
 
-            if (MySqlExtensions.IsConnectionAuthFailed)
-            {
-                if (connection.State != ConnectionState.Closed)
-                    connection.Close();
-                return false;
-            }
-
             try
             {
                 var schemaType = typeof(T);
@@ -281,13 +274,6 @@ namespace Tavstal.TLibrary.Helpers
         {
             if (connection == null)
                 return false;
-
-            if (MySqlExtensions.IsConnectionAuthFailed)
-            {
-                if (connection.State != ConnectionState.Closed)
-                    connection.Close();
-                return false;
-            }
 
             try
             {
@@ -448,13 +434,6 @@ namespace Tavstal.TLibrary.Helpers
         {
             if (connection == null)
                 return false;
-
-            if (MySqlExtensions.IsConnectionAuthFailed)
-            {
-                if (connection.State != ConnectionState.Closed)
-                    connection.Close();
-                return false;
-            }
 
             try
             {
@@ -678,13 +657,6 @@ namespace Tavstal.TLibrary.Helpers
             if (connection == null)
                 return null;
 
-            if (MySqlExtensions.IsConnectionAuthFailed)
-            {
-                if (connection.State != ConnectionState.Closed)
-                    connection.Close();
-                return null;
-            }
-
             try
             {
                 List<T> localList = new List<T>();
@@ -770,13 +742,6 @@ namespace Tavstal.TLibrary.Helpers
             if (connection == null)
                 return null;
 
-            if (MySqlExtensions.IsConnectionAuthFailed)
-            {
-                if (connection.State != ConnectionState.Closed)
-                    connection.Close();
-                return null;
-            }
-
             try
             {
                 var list = connection.GetTableRows<T>(tableName: tableName, whereClause: whereClause, parameters: parameters, limit: 1);
@@ -850,13 +815,6 @@ namespace Tavstal.TLibrary.Helpers
         {
             if (connection == null)
                 return false;
-
-            if (MySqlExtensions.IsConnectionAuthFailed)
-            {
-                if (connection.State != ConnectionState.Closed)
-                    connection.Close();
-                return false;
-            }
 
             try
             {
@@ -977,13 +935,6 @@ namespace Tavstal.TLibrary.Helpers
             if (connection == null)
                 return false;
 
-            if (MySqlExtensions.IsConnectionAuthFailed)
-            {
-                if (connection.State != ConnectionState.Closed)
-                    connection.Close();
-                return false;
-            }
-
             try
             {
                 var schemaType = typeof(T);
@@ -1060,13 +1011,6 @@ namespace Tavstal.TLibrary.Helpers
         {
             if (connection == null)
                 return false;
-
-            if (MySqlExtensions.IsConnectionAuthFailed)
-            {
-                if (connection.State != ConnectionState.Closed)
-                    connection.Close();
-                return false;
-            }
 
             if (whereClause.IsNullOrEmpty())
             {
@@ -1171,13 +1115,6 @@ namespace Tavstal.TLibrary.Helpers
             if (connection == null)
                 return false;
 
-            if (MySqlExtensions.IsConnectionAuthFailed)
-            {
-                if (connection.State != ConnectionState.Closed)
-                    connection.Close();
-                return false;
-            }
-
             try
             {
                 var schemaType = typeof(T);
@@ -1207,13 +1144,6 @@ namespace Tavstal.TLibrary.Helpers
 
             if (whereClause.IsNullOrEmpty())
                 return false;
-
-            if (MySqlExtensions.IsConnectionAuthFailed)
-            {
-                if (connection.State != ConnectionState.Closed)
-                    connection.Close();
-                return false;
-            }
 
             try
             {
@@ -1258,13 +1188,6 @@ namespace Tavstal.TLibrary.Helpers
             if (whereClause.IsNullOrEmpty())
                 return false;
 
-            if (MySqlExtensions.IsConnectionAuthFailed)
-            {
-                if (connection.State != ConnectionState.Closed)
-                    connection.Close();
-                return false;
-            }
-
             try
             {
                 var schemaType = typeof(T);
@@ -1297,13 +1220,6 @@ namespace Tavstal.TLibrary.Helpers
 
             if (whereClause.IsNullOrEmpty())
                 return false;
-
-            if (MySqlExtensions.IsConnectionAuthFailed)
-            {
-                if (connection.State != ConnectionState.Closed)
-                    connection.Close();
-                return false;
-            }
 
             try
             {
@@ -1380,13 +1296,6 @@ namespace Tavstal.TLibrary.Helpers
         {
             if (connection == null)
                 return false;
-
-            if (MySqlExtensions.IsConnectionAuthFailed)
-            {
-                if (connection.State != ConnectionState.Closed)
-                    connection.Close();
-                return false;
-            }
 
             try
             {
