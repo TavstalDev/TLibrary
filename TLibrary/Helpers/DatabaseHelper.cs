@@ -18,6 +18,8 @@ using UnityEngine;
 using YamlDotNet.Core.Tokens;
 using Newtonsoft.Json.Linq;
 using MySqlX.XDevAPI.Common;
+using System.Web.Compilation;
+using System.Web.UI.WebControls;
 
 namespace Tavstal.TLibrary.Helpers
 {
@@ -125,6 +127,23 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        private static TEnum ParseEnum<TEnum>(Type enumType, int value)
+        {
+            Array enumValues = Enum.GetValues(enumType);
+            TEnum localEnum = default;
+
+            foreach (object enumValue in enumValues)
+            {
+                int enumIntValue = (int)enumValue;
+                if (enumIntValue == value)
+                {
+                    localEnum = (TEnum)enumValue;
+                    break;
+                }
+            }
+            return localEnum;
+        }
+
         /// <summary>
         /// Converts the current row in the MySqlDataReader to an object of the specified type.
         /// </summary>
@@ -157,7 +176,7 @@ namespace Tavstal.TLibrary.Helpers
                     var value = reader.GetValue(ordinal);
 
                     if (prop.PropertyType.IsEnum)
-                        prop.SetValue(obj, (T)value);
+                        prop.SetValue(obj, Enum.ToObject(prop.PropertyType, value));
                     else
                     {
                         if (prop.PropertyType.Name == value.GetType().Name)
