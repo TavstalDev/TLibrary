@@ -17,6 +17,7 @@ using SDG.Unturned;
 using UnityEngine;
 using YamlDotNet.Core.Tokens;
 using Newtonsoft.Json.Linq;
+using MySqlX.XDevAPI.Common;
 
 namespace Tavstal.TLibrary.Helpers
 {
@@ -155,13 +156,18 @@ namespace Tavstal.TLibrary.Helpers
                     int ordinal = reader.GetOrdinal(propName);
                     var value = reader.GetValue(ordinal);
 
-                    if (prop.PropertyType.Name == value.GetType().Name)
-                        prop.SetValue(obj, value);
+                    if (prop.PropertyType.IsEnum)
+                        prop.SetValue(obj, (T)value);
                     else
-                        prop.SetValue(obj, Convert.ChangeType(value, prop.PropertyType));
+                    {
+                        if (prop.PropertyType.Name == value.GetType().Name)
+                            prop.SetValue(obj, value);
+                        else
+                            prop.SetValue(obj, Convert.ChangeType(value, prop.PropertyType));
+                    }
                 }
 
-                foreach (var prop in typeof(T).GetFields())
+                /*foreach (var prop in typeof(T).GetFields())
                 {
                     if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
                         continue;
@@ -181,7 +187,7 @@ namespace Tavstal.TLibrary.Helpers
                         prop.SetValue(obj, value);
                     else
                         prop.SetValue(obj, Convert.ChangeType(value, prop.FieldType));
-                }
+                }*/
 
                 return obj;
             }
