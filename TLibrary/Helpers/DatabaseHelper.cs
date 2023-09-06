@@ -937,6 +937,12 @@ namespace Tavstal.TLibrary.Helpers
             if (connection == null)
                 return false;
 
+            if (values == null)
+                return false;
+
+            if (values.Count == 0)
+                return false;
+
             try
             {
                 var schemaType = typeof(T);
@@ -974,12 +980,15 @@ namespace Tavstal.TLibrary.Helpers
                         else
                             paramString += $"'{prop.GetValue(value)}',";
                     }
-                    paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
+                    if (paramString.LastIndexOf(',') > 0)
+                        paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
                     paramString += "),";
                 }
 
-                paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
-                keyString = keyString.Remove(keyString.LastIndexOf(','), 1);
+                if (paramString.LastIndexOf(',') > 0)
+                    paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
+                if (keyString.LastIndexOf(',') > 0)
+                    keyString = keyString.Remove(keyString.LastIndexOf(','), 1);
 
                 connection.OpenSafe();
                 using (var command = connection.CreateCommand())
