@@ -842,6 +842,8 @@ namespace Tavstal.TLibrary.Helpers
                     keyString += $"{propName},";
                     if (prop.PropertyType == typeof(bool))
                         paramString += $"'{Convert.ToInt32(prop.GetValue(value))}',";
+                    else if (prop.PropertyType == typeof(DateTime))
+                        paramString += $"'{((DateTime)prop.GetValue(value)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
                     else
                         paramString += $"'{prop.GetValue(value)}',";
                 }
@@ -967,6 +969,8 @@ namespace Tavstal.TLibrary.Helpers
 
                         if (prop.PropertyType == typeof(bool))
                             paramString += $"'{Convert.ToInt32(prop.GetValue(value))}',";
+                        else if (prop.PropertyType == typeof(DateTime))
+                            paramString += $"'{((DateTime)prop.GetValue(value)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
                         else
                             paramString += $"'{prop.GetValue(value)}',";
                     }
@@ -1043,6 +1047,8 @@ namespace Tavstal.TLibrary.Helpers
 
                     if (prop.PropertyType == typeof(bool))
                         setClause += $"{propName}={Convert.ToInt32(prop.GetValue(newValue))},";
+                    else if (prop.PropertyType == typeof(DateTime))
+                        setClause += $"'{((DateTime)prop.GetValue(newValue)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
                     else
                         setClause += $"{propName}={prop.GetValue(newValue)},";
                 }
