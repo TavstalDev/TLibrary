@@ -43,10 +43,7 @@ namespace Tavstal.TLibrary.Compatibility.Database
             if (memberExpression == null)
                 throw new ArgumentException("Invalid expression");
 
-            var type = typeof(T);
-
             Type propertyType = memberExpression.Member.GetType();
-            LoggerHelper.LogWarning($"Property type: {propertyType.Name} - {propertyType.FullName}");
             string propertyName = memberExpression.Member.Name;
 
             if (propertyType.GetCustomAttribute<SqlIgnoreAttribute>() != null)
