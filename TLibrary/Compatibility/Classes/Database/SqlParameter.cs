@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Tavstal.TLibrary.Extensions;
+using Tavstal.TLibrary.Helpers;
 using UnityEngine;
 
 namespace Tavstal.TLibrary.Compatibility.Database
@@ -28,14 +29,30 @@ namespace Tavstal.TLibrary.Compatibility.Database
             if (expression == null)
                 return null;
 
-            var info = expression.Parameters.ElementAt(0);
-            Type type = info.Type;
+            MemberExpression memberExpression = null;
 
-            if (type.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+            if (expression.Body is MemberExpression)
+            {
+                memberExpression = (MemberExpression)expression.Body;
+            }
+            else if (expression.Body is UnaryExpression unaryExpression && unaryExpression.Operand is MemberExpression)
+            {
+                memberExpression = (MemberExpression)unaryExpression.Operand;
+            }
+
+            if (memberExpression == null)
+                throw new ArgumentException("Invalid expression");
+
+            var type = typeof(T);
+
+            Type propertyType = memberExpression.Member.GetType();
+            LoggerHelper.LogWarning($"Property type: {propertyType.Name} - {propertyType.FullName}");
+            string propertyName = memberExpression.Member.Name;
+
+            if (propertyType.GetCustomAttribute<SqlIgnoreAttribute>() != null)
                 return null;
 
-            var memberAttribute = type.GetCustomAttribute<SqlMemberAttribute>();
-            string propName = type.Name;
+            var memberAttribute = propertyType.GetCustomAttribute<SqlMemberAttribute>();
 
             if (memberAttribute != null)
             {
@@ -43,13 +60,13 @@ namespace Tavstal.TLibrary.Compatibility.Database
                     return null;
 
                 if (!memberAttribute.ColumnName.IsNullOrEmpty())
-                    propName = memberAttribute.ColumnName;
+                    propertyName = memberAttribute.ColumnName;
 
                 if (!memberAttribute.IsNullable && value == null)
                     return null;
             }
 
-            return new SqlParameter(propName, new MySqlParameter($"@{propName}", value: value));
+            return new SqlParameter(propertyName, new MySqlParameter($"@{propertyName}", value: value));
         }
         
     }
