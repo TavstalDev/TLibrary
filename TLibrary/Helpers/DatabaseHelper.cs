@@ -120,6 +120,10 @@ namespace Tavstal.TLibrary.Helpers
                     {
                         return typeof(Guid);
                     }
+                case "TEXT":
+                    {
+                        return typeof(string);
+                    }
                 case "VARBINARY":
                     return typeof(byte[]);
                 default:
