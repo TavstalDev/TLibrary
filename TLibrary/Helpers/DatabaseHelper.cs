@@ -131,6 +131,16 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        private static string ConvertIllegalCharsToSql(string value)
+        {
+            return value.Replace("'", "U+0027");
+        }
+
+        private static string ConvertSqlToIllegalChars(string value)
+        {
+            return value.Replace("U+0027", "'");
+        }
+
         private static TEnum ParseEnum<TEnum>(Type enumType, int value)
         {
             Array enumValues = Enum.GetValues(enumType);
@@ -183,10 +193,20 @@ namespace Tavstal.TLibrary.Helpers
                         prop.SetValue(obj, Enum.ToObject(prop.PropertyType, value));
                     else
                     {
-                        if (prop.PropertyType.Name == value.GetType().Name)
-                            prop.SetValue(obj, value);
+                        if (prop.PropertyType == typeof(string))
+                        {
+                            if (prop.PropertyType.Name == value.GetType().Name)
+                                prop.SetValue(obj, ConvertSqlToIllegalChars((string)value));
+                            else
+                                prop.SetValue(obj, ConvertSqlToIllegalChars((string)Convert.ChangeType(value, prop.PropertyType)));
+                        }
                         else
-                            prop.SetValue(obj, Convert.ChangeType(value, prop.PropertyType));
+                        {
+                            if (prop.PropertyType.Name == value.GetType().Name)
+                                prop.SetValue(obj, value);
+                            else
+                                prop.SetValue(obj, Convert.ChangeType(value, prop.PropertyType));
+                        }
                     }
                 }
 
@@ -873,6 +893,8 @@ namespace Tavstal.TLibrary.Helpers
                         paramString += $"'{Convert.ToInt32(prop.GetValue(value))}',";
                     else if (prop.PropertyType == typeof(DateTime))
                         paramString += $"'{((DateTime)prop.GetValue(value)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
+                    else if (prop.PropertyType == typeof(string))
+                        paramString += $"'{ConvertIllegalCharsToSql((string)prop.GetValue(value))}',";
                     else
                         paramString += $"'{prop.GetValue(value)}',";
                 }
@@ -985,6 +1007,8 @@ namespace Tavstal.TLibrary.Helpers
                             paramString += $"'{Convert.ToInt32(prop.GetValue(value))}',";
                         else if (prop.PropertyType == typeof(DateTime))
                             paramString += $"'{((DateTime)prop.GetValue(value)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
+                        else if (prop.PropertyType == typeof(string))
+                            paramString += $"'{ConvertIllegalCharsToSql((string)prop.GetValue(value))}',";
                         else
                             paramString += $"'{prop.GetValue(value)}',";
                     }
@@ -1065,9 +1089,11 @@ namespace Tavstal.TLibrary.Helpers
                     if (prop.PropertyType == typeof(bool) || prop.PropertyType.IsEnum)
                         setClause += $"{propName}={Convert.ToInt32(prop.GetValue(newValue))},";
                     else if (prop.PropertyType == typeof(DateTime))
-                        setClause += $"'{((DateTime)prop.GetValue(newValue)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
+                        setClause += $"{propName}='{((DateTime)prop.GetValue(newValue)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
+                    else if (prop.PropertyType == typeof(string))
+                        setClause += $"{propName}='{ConvertIllegalCharsToSql((string)prop.GetValue(newValue))}',";
                     else
-                        setClause += $"{propName}={prop.GetValue(newValue)},";
+                        setClause += $"{propName}='{prop.GetValue(newValue)}',";
                 }
 
                 setClause = setClause.Remove(setClause.LastIndexOf(','), 1);
