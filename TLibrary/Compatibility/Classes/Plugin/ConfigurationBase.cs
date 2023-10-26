@@ -3,25 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using YamlDotNet;
-using YamlDotNet.RepresentationModel;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 using System.IO;
 using System.Diagnostics.SymbolStore;
 using System.CodeDom;
+using Newtonsoft.Json;
 
 namespace Tavstal.TLibrary.Compatibility
 {
     public class ConfigurationBase : IConfigurationBase
     {
-        [YamlIgnore]
+        [JsonIgnore]
         public string FilePath { get; set; }
-        [YamlIgnore]
+        [JsonIgnore]
         public string FileName { get; set; }
-        [YamlMember(Order = 0, Description = "Set the language of the plugin. (en, de, es etc.) WARNING: It does not translate 100% of the UI.")]
         public string Locale { get; set; }
-        [YamlMember(Order = 1, Description = "Download official language packs")]
         public bool DownloadLocalePacks { get; set; }
 
         /// <param name="filename">Example: myfile.txt</param>

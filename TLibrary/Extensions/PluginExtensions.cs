@@ -5,14 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tavstal.TLibrary.Compatibility;
-using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization;
 using Newtonsoft.Json.Linq;
 using Rocket.API;
 using System.Reflection;
 using Tavstal.TLibrary.Helpers;
 using SDG.Unturned;
 using System.Globalization;
+using Newtonsoft.Json;
 
 namespace Tavstal.TLibrary.Extensions
 {
@@ -46,12 +45,8 @@ namespace Tavstal.TLibrary.Extensions
             string fullPath = Path.Combine(configuration.FilePath, configuration.FileName);
             try
             {
-                var deserializer = new DeserializerBuilder()
-                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                    .Build();
                 string text = File.ReadAllText(fullPath);
-
-                return deserializer.Deserialize<T>(text);
+                return JsonConvert.DeserializeObject<T>(text);
             }
             catch
             {
@@ -79,12 +74,8 @@ namespace Tavstal.TLibrary.Extensions
             }
 
 
-            var deserializer = new DeserializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .Build();
             string text = File.ReadAllText(fullPath);
-
-            configuration = deserializer.Deserialize<T>(text);
+            configuration = JsonConvert.DeserializeObject<T>(text);
         }
 
         /// <summary>
@@ -94,11 +85,7 @@ namespace Tavstal.TLibrary.Extensions
         public static void SaveConfig(this ConfigurationBase configuration)
         {
             string fullPath = Path.Combine(configuration.FilePath, configuration.FileName);
-            var serializer = new SerializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .Build();
-            var yaml = serializer.Serialize(configuration);
-            File.WriteAllText(fullPath, yaml);
+            File.WriteAllText(fullPath, JsonConvert.SerializeObject(configuration, formatting: Formatting.Indented));
         }
 
         /// <summary>
@@ -110,12 +97,9 @@ namespace Tavstal.TLibrary.Extensions
         public static Dictionary<string, string> ReadTranslation(string filePath, string fileName)
         {
             string fullPath = Path.Combine(filePath, fileName);
-            var deserializer = new DeserializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .Build();
             string text = File.ReadAllText(fullPath);
 
-            return deserializer.Deserialize<Dictionary<string, string>>(text);
+            return JsonConvert.DeserializeObject<Dictionary<string, string>>(text);
         }
 
         /// <summary>
@@ -127,10 +111,7 @@ namespace Tavstal.TLibrary.Extensions
         public static void SaveTranslation(Dictionary<string, string> locale, string filePath, string fileName)
         {
             string fullPath = Path.Combine(filePath, fileName);
-            var serializer = new SerializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .Build();
-            var yaml = serializer.Serialize(locale);
+            var yaml = JsonConvert.SerializeObject(locale, formatting: Formatting.Indented);
             File.WriteAllText(fullPath, yaml);
         }
 

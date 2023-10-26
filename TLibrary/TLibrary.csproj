@@ -122,9 +122,6 @@
       <HintPath>..\Libraries\UnityEngine.UnityWebRequestModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="YamlDotNet">
-      <HintPath>..\Libraries\YamlDotNet.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compatibility\Classes\DatabaseSettingsBase.cs" />
