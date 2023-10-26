@@ -51,7 +51,7 @@ namespace Tavstal.TLibrary.Extensions
             catch
             {
                 LoggerHelper.LogException("Failed to read the configuration file, it might be outdated.\nSaving current one and generating a new file...");
-                File.Move(fullPath, Path.Combine(configuration.FilePath, configuration.FileName.Insert(configuration.FileName.IndexOf(".yml"), $"_save_{DateTime.Now.ToString("s").Replace("-", "").Replace(":", "")}")));
+                File.Move(fullPath, Path.Combine(configuration.FilePath, configuration.FileName.Insert(configuration.FileName.IndexOf(".json"), $"_save_{DateTime.Now.ToString("s").Replace("-", "").Replace(":", "")}")));
                 configuration.SaveConfig();
                 return null;
             }

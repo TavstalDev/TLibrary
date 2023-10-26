@@ -78,7 +78,7 @@ namespace Tavstal.TLibrary.Compatibility
                 System.IO.Directory.CreateDirectory(translationsDirectory);
 
             Config = Activator.CreateInstance<PluginConfig>();
-            Config.FileName = "Configuration.yml";
+            Config.FileName = "Configuration.json";
             Config.FilePath = this.Directory;
             if (Config.CheckConfigFile())
                 Config = PluginExtensions.ReadConfig<PluginConfig>(Config) ?? Config;
@@ -99,17 +99,17 @@ namespace Tavstal.TLibrary.Compatibility
             if (DefaultLocalization != null)
                 Localization = DefaultLocalization;
 
-            string defaultTranslationFile = Path.Combine(translationsDirectory, "locale.en.yml");
+            string defaultTranslationFile = Path.Combine(translationsDirectory, "locale.en.json");
             if (!File.Exists(defaultTranslationFile))
             {
-                PluginExtensions.SaveTranslation(DefaultLocalization, translationsDirectory, "locale.en.yml");
+                PluginExtensions.SaveTranslation(DefaultLocalization, translationsDirectory, "locale.en.json");
             }
 
             if (LanguagePacks != null)
                 if (Config.DownloadLocalePacks && LanguagePacks.Count > 0)
                     foreach (var pack in LanguagePacks)
                     {
-                        string path = Path.Combine(translationsDirectory, $"locale.{pack.Key}.yml");
+                        string path = Path.Combine(translationsDirectory, $"locale.{pack.Key}.json");
                         if (File.Exists(path))
                             continue;
 
@@ -132,16 +132,16 @@ namespace Tavstal.TLibrary.Compatibility
             
 
             string locale = Config.Locale;
-            if (File.Exists(Path.Combine(translationsDirectory, $"locale.{locale}.yml")))
+            if (File.Exists(Path.Combine(translationsDirectory, $"locale.{locale}.json")))
             {
-                var localLocale = PluginExtensions.ReadTranslation(translationsDirectory, $"locale.{locale}.yml");
+                var localLocale = PluginExtensions.ReadTranslation(translationsDirectory, $"locale.{locale}.json");
                 if (localLocale != null)
                 {
                     if (localLocale.Count > 0)
                         Localization = localLocale;
                     else if (localLocale.Count == 0 && locale == "en")
                     {
-                        PluginExtensions.SaveTranslation(DefaultLocalization, translationsDirectory, "locale.en.yml");
+                        PluginExtensions.SaveTranslation(DefaultLocalization, translationsDirectory, "locale.en.json");
                     }
                 }
             }
