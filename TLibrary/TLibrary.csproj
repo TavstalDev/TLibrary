@@ -52,15 +52,19 @@
     </Reference>
     <Reference Include="Pathfinding.ClipperLib">
       <HintPath>..\..\TShop2\Libraries\Pathfinding.ClipperLib.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Pathfinding.Ionic.Zip.Reduced">
       <HintPath>..\..\TShop2\Libraries\Pathfinding.Ionic.Zip.Reduced.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Pathfinding.JsonFx">
       <HintPath>..\..\TShop2\Libraries\Pathfinding.JsonFx.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Pathfinding.Poly2Tri">
       <HintPath>..\..\TShop2\Libraries\Pathfinding.Poly2Tri.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RL-I18N, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
