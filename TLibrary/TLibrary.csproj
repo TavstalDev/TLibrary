@@ -138,7 +138,7 @@
     <Compile Include="Compatibility\Interfaces\IDatabaseSettings.cs" />
     <Compile Include="Compatibility\Interfaces\IDatabaseManager.cs" />
     <Compile Include="Compatibility\Interfaces\IConfigurationBase.cs" />
-    <Compile Include="Compatibility\Structs\SerializableVector3.cs" />
+    <Compile Include="Compatibility\Classes\SerializableVector3.cs" />
     <Compile Include="Extensions\PluginExtensions.cs" />
     <Compile Include="Extensions\Rocket\RocketPluginExtensions.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />

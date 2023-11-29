@@ -7,7 +7,8 @@ using UnityEngine;
 
 namespace Tavstal.TLibrary.Compatibility
 {
-    public struct SerializableVector3
+    [Serializable]
+    public class SerializableVector3
     {
         public float X { get; set; }
         public float Y { get; set; }
