@@ -137,11 +137,13 @@
     <Compile Include="Compatibility\Classes\Plugin\ConfigurationBase.cs" />
     <Compile Include="Compatibility\Classes\Plugin\PluginBase.cs" />
     <Compile Include="Compatibility\Classes\Plugin\SubCommand.cs" />
+    <Compile Include="Compatibility\Classes\Plugin\TLogger.cs" />
     <Compile Include="Compatibility\Interfaces\ICommand.cs" />
     <Compile Include="Compatibility\Interfaces\IDatabaseSettings.cs" />
     <Compile Include="Compatibility\Interfaces\IDatabaseManager.cs" />
     <Compile Include="Compatibility\Interfaces\IConfigurationBase.cs" />
     <Compile Include="Compatibility\Classes\SerializableVector3.cs" />
+    <Compile Include="Compatibility\Interfaces\IPlugin.cs" />
     <Compile Include="Extensions\PluginExtensions.cs" />
     <Compile Include="Extensions\Rocket\RocketPluginExtensions.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
@@ -167,7 +169,6 @@
     <Compile Include="Helpers\Unturned\UStructureHelper.cs" />
     <Compile Include="Helpers\Unturned\UBarricadeHelper.cs" />
     <Compile Include="Helpers\Unturned\UChatHelper.cs" />
-    <Compile Include="Helpers\LoggerHelper.cs" />
     <Compile Include="Helpers\MathHelper.cs" />
     <Compile Include="Managers\DatabaseManagerBase.cs" />
     <Compile Include="Managers\HookManager.cs" />

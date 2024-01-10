@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 using System.Web.Util;
+using Tavstal.TLibrary.Compatibility;
+using Tavstal.TLibrary.Compatibility.Interfaces;
 using UnityEngine;
 
 namespace Tavstal.TLibrary.Helpers
@@ -21,31 +23,31 @@ namespace Tavstal.TLibrary.Helpers
         public static void ServerSendChatMessage(string text, string icon = null, SteamPlayer fromPlayer = null, SteamPlayer toPlayer = null, EChatMode mode = EChatMode.GLOBAL)
         => ChatManager.serverSendMessage(text, Color.white, fromPlayer, toPlayer, mode, icon, true);
 
-        /*public static void SendCommandReply(object toPlayer, string translation, params object[] args)
-        {
-            string icon = "";
-            if (toPlayer is SteamPlayer steamPlayer)
-                ServerSendChatMessage(FormatHelper.FormatTextV2(Translate(true, translation, args)), icon, null, steamPlayer, EChatMode.GLOBAL);
-            else
-                LoggerHelper.LogRichCommand(Translate(false, translation, args));
-        }
-
-        public static void SendChatMessage(SteamPlayer toPlayer, string translation, params object[] args)
-        {
-            string icon = "";
-            ServerSendChatMessage(FormatHelper.FormatTextV2(Translate(true, translation, args)), icon, null, toPlayer, EChatMode.GLOBAL);
-        }
-
-        public static void SendChatMessage(string translation, params object[] args)
-        {
-            string icon = "";
-            ServerSendChatMessage(Translate(true, translation, args), icon, null, null, EChatMode.GLOBAL);
-        }*/
-
         public static void SendChatMessageUntranslated(SteamPlayer toPlayer, string text)
         {
             string icon = "";
             ServerSendChatMessage(text, icon, null, toPlayer, EChatMode.GLOBAL);
+        }
+
+        public static void SendCommandReply(IPlugin plugin, object toPlayer, string translation, params object[] args)
+        {
+            string icon = "";
+            if (toPlayer is SteamPlayer steamPlayer)
+                ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, steamPlayer, EChatMode.GLOBAL);
+            else
+                plugin.GetLogger().LogRichCommand(plugin.Localize(false, translation, args));
+        }
+
+        public static void SendChatMessage(IPlugin plugin, SteamPlayer toPlayer, string translation, params object[] args)
+        {
+            string icon = "";
+            ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, toPlayer, EChatMode.GLOBAL);
+        }
+
+        public static void SendChatMessage(IPlugin plugin, string translation, params object[] args)
+        {
+            string icon = "";
+            ServerSendChatMessage(plugin.Localize(true, translation, args), icon, null, null, EChatMode.GLOBAL);
         }
     }
 }
