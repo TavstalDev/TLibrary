@@ -19,20 +19,20 @@ using Steamworks;
 using UnityEngine.Networking;
 using System.Collections;
 using System.Globalization;
+using Tavstal.TLibrary.Compatibility.Interfaces;
+using System.Runtime.CompilerServices;
 
 namespace Tavstal.TLibrary.Compatibility
 {
-    public abstract class PluginBase<PluginConfig> : RocketPlugin where PluginConfig : ConfigurationBase
+    public abstract class PluginBase<PluginConfig> : RocketPlugin, IPlugin where PluginConfig : ConfigurationBase
     {
-        /// <summary>
-        /// Equals with RocketPlugin.Name
-        /// It's used to prevent using RocketPlugin.name instead of RocketPlugin.Name
-        /// </summary>
-        public string PluginName => this.Name;
         public PluginConfig Config { get; set; }
         public virtual PluginBase<PluginConfig> Instance { get; set; }
         public virtual IDatabaseManager DatabaseManager { get; set; }
         public static HookManager HookManager { get; set; }
+
+        private static TLogger _logger;
+        public static TLogger Logger { get { return _logger; } }
 
         private static readonly System.Version _version = Assembly.GetExecutingAssembly().GetName().Version;
         private static readonly DateTime _buildDate = new DateTime(2000, 1, 1).AddDays(_version.Build).AddSeconds(_version.Revision * 2);
@@ -41,6 +41,7 @@ namespace Tavstal.TLibrary.Compatibility
 
         protected override void Load()
         {
+            _logger = TLogger.CreateInstance(this, false);
             base.Load();
             Instance = this;
             CheckPluginFiles();
@@ -51,6 +52,16 @@ namespace Tavstal.TLibrary.Compatibility
         {
             base.Unload();
             OnUnLoad();
+        }
+
+        public string GetPluginName()
+        {
+            return this.Name;
+        }
+
+        public TLogger GetLogger()
+        {
+            return _logger;
         }
 
         public virtual void OnLoad()
@@ -65,11 +76,11 @@ namespace Tavstal.TLibrary.Compatibility
 
         public virtual void CheckPluginFiles()
         {
-            string rocketConfigFile = Path.Combine(this.Directory, $"{PluginName}.configuration.xml");
+            string rocketConfigFile = Path.Combine(this.Directory, $"{GetPluginName()}.configuration.xml");
             if (File.Exists(rocketConfigFile))
                 File.Delete(rocketConfigFile);
 
-            string rocketTranslationFile = Path.Combine(this.Directory, $"{PluginName}.en.translation.xml");
+            string rocketTranslationFile = Path.Combine(this.Directory, $"{GetPluginName()}.en.translation.xml");
             if (File.Exists(rocketTranslationFile))
                 File.Delete(rocketTranslationFile);
 
@@ -121,7 +132,7 @@ namespace Tavstal.TLibrary.Compatibility
                                 || www.result == UnityWebRequest.Result.DataProcessingError
                                 || www.result == UnityWebRequest.Result.ProtocolError)
                             {
-                                LoggerHelper.LogError("Failed to download language packs.");
+                                Logger.LogError("Failed to download language packs.");
                             }
                             else
                                 File.WriteAllText(path, www.downloadHandler.text);
@@ -161,7 +172,7 @@ namespace Tavstal.TLibrary.Compatibility
         [Obsolete("Use Localize instead", true)]
         protected new string Translate(string translationKey, params object[] placeholder)
         {
-            LoggerHelper.LogWarning($"OLD TRANSLATION METHOD WAS USED FOR '{translationKey}'");
+            Logger.LogWarning($"OLD TRANSLATION METHOD WAS USED FOR '{translationKey}'");
             return Localize(false, translationKey, placeholder);
         }
 
@@ -169,7 +180,7 @@ namespace Tavstal.TLibrary.Compatibility
         {
             string localization = string.Empty;
             if (!Localization.TryGetValue(translationKey, out localization))
-                localization = $"<color=#FFAA00>[WARNING]</color> <color=#FFFF55>Untranslated key found in {PluginName}:</color> <color=#FF5555>{translationKey}</color>";
+                localization = $"<color=#FFAA00>[WARNING]</color> <color=#FFFF55>Untranslated key found in {GetPluginName()}:</color> <color=#FF5555>{translationKey}</color>";
 
             if (AddPrefix)
             {
