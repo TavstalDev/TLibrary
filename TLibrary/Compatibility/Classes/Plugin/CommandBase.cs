@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Rocket.API;
 using Rocket.Core.Commands;
 using Rocket.Unturned.Player;
+using Tavstal.TLibrary.Compatibility.Interfaces;
+using Tavstal.TLibrary.Extensions;
+using Tavstal.TLibrary.Helpers;
 
 namespace Tavstal.TLibrary.Compatibility
 {
     public abstract class CommandBase : IRocketCommand
     {
+        public abstract IPlugin Plugin { get; }
         public abstract AllowedCaller AllowedCaller { get; }
         public abstract string Name { get; }
         public abstract string Help { get; }
@@ -21,16 +26,18 @@ namespace Tavstal.TLibrary.Compatibility
 
         public abstract List<SubCommand> SubCommands { get; }
 
+        public abstract void ExecuteBody(IRocketPlayer caller, string[] args);
 
-        public virtual void Execute(IRocketPlayer caller, string[] command)
+        public void Execute(IRocketPlayer caller, string[] args)
         {
+            // Check AllowedCaller
             switch (AllowedCaller)
             {
                 case AllowedCaller.Console:
                     {
                         if (caller is UnturnedPlayer)
                         {
-                            // not allowed to use command
+                            UChatHelper.SendCommandReply(Plugin, caller, "command_caller_not_console");
                             return;
                         }
                         break;
@@ -39,17 +46,38 @@ namespace Tavstal.TLibrary.Compatibility
                     {
                         if (caller is ConsolePlayer)
                         {
-                            // not allowed to use command
+                            UChatHelper.SendCommandReply(Plugin, caller, "command_caller_not_player");
                             return;
                         }
                         break;
                     }
             }
+
+            // Check Permission
+            if (caller is UnturnedPlayer)
+            {
+                if (caller.HasPermission())
+                {
+
+                }
+            }
+
+            if (args.Length > 0 && SubCommands.IsValidIndex(0))
+            {
+                SubCommand subCommand = GetSubCommandByName(args[0]);
+                if (subCommand != null)
+                {
+                    if (args.Remove(x => x == args[0]))
+                        subCommand.Execute(caller, args);
+                }
+            }
+            else
+                ExecuteBody(caller, args);
         }
 
-        public virtual void IsSubCommand()
+        private SubCommand GetSubCommandByName(string arg)
         {
-
+            return SubCommands.Find(x => x.Name.ToLower() == arg.ToLower() || x.Aliases.Contains(arg.ToLower()));
         }
     }
 }

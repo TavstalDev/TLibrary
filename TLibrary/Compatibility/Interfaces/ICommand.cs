@@ -9,7 +9,6 @@ namespace Tavstal.TLibrary.Compatibility.Interfaces
 {
     public interface ICommand
     {
-
         string Name { get; }
 
         string Help { get; }
@@ -20,6 +19,6 @@ namespace Tavstal.TLibrary.Compatibility.Interfaces
 
         List<string> Permissions { get; }
 
-        void Execute(IRocketPlayer caller, string[] command);
+        void Execute(IRocketPlayer caller, string[] args);
     }
 }

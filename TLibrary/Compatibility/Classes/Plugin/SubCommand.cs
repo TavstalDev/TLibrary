@@ -20,7 +20,7 @@ namespace Tavstal.TLibrary.Compatibility
 
         public List<string> Permissions { get; private set; }
 
-        public virtual void Execute(IRocketPlayer caller, string[] command)
+        public virtual void Execute(IRocketPlayer caller, string[] args)
         {
 
         }
