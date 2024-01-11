@@ -26,7 +26,7 @@ namespace Tavstal.TLibrary.Compatibility
 
         public abstract List<SubCommand> SubCommands { get; }
 
-        public abstract void ExecuteBody(IRocketPlayer caller, string[] args);
+        public abstract void ExecutionRequested(IRocketPlayer caller, string[] args);
 
         public void Execute(IRocketPlayer caller, string[] args)
         {
@@ -76,11 +76,11 @@ namespace Tavstal.TLibrary.Compatibility
                     if (args.Remove(x => x == args[0]))
                         subCommand.Execute(caller, args);
                     else
-                        UChatHelper.SendCommandReply(Plugin, caller, "error_command_sub_not_found");
+                        UChatHelper.SendCommandReply(Plugin, caller, "error_subcommand_not_found", Syntax);
                 }
             }
             else
-                ExecuteBody(caller, args);
+                ExecutionRequested(caller, args);
         }
 
         private SubCommand GetSubCommandByName(string arg)
