@@ -30,6 +30,8 @@ namespace Tavstal.TLibrary.Compatibility
 
         public void Execute(IRocketPlayer caller, string[] args)
         {
+            bool isPlayer = caller is UnturnedPlayer;
+
             // Check AllowedCaller
             switch (AllowedCaller)
             {
@@ -54,12 +56,10 @@ namespace Tavstal.TLibrary.Compatibility
             }
 
             // Check Permission
-            if (caller is UnturnedPlayer)
+            if (isPlayer && !Permissions.Any(x => caller.HasPermission(x)))
             {
-                if (caller.HasPermission())
-                {
-
-                }
+                UChatHelper.SendCommandReply(Plugin, caller, "error_command_no_permission");
+                return;
             }
 
             if (args.Length > 0 && SubCommands.IsValidIndex(0))
@@ -67,8 +67,16 @@ namespace Tavstal.TLibrary.Compatibility
                 SubCommand subCommand = GetSubCommandByName(args[0]);
                 if (subCommand != null)
                 {
+                    if (isPlayer && !subCommand.Permissions.Any(x => caller.HasPermission(x)))
+                    {
+                        UChatHelper.SendCommandReply(Plugin, caller, "error_command_no_permission");
+                        return;
+                    }
+
                     if (args.Remove(x => x == args[0]))
                         subCommand.Execute(caller, args);
+                    else
+                        UChatHelper.SendCommandReply(Plugin, caller, "error_command_sub_not_found");
                 }
             }
             else
