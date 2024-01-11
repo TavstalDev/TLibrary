@@ -14,14 +14,41 @@ using Tavstal.TLibrary.Helpers;
 
 namespace Tavstal.TLibrary.Compatibility
 {
+    /// <summary>
+    /// Abstract class for creating commands
+    /// </summary>
     public abstract class CommandBase : IRocketCommand
     {
+        /// <summary>
+        /// The plugin that owns the command
+        /// Example usage: MyPlugin.Instance
+        /// </summary>
         public abstract IPlugin Plugin { get; }
+
+        /// <summary>
+        /// The allowed caller of the command
+        /// <br/>Values: Console, Player, Both
+        /// </summary>
         public abstract AllowedCaller AllowedCaller { get; }
+        /// <summary>
+        /// Name of the command
+        /// </summary>
         public abstract string Name { get; }
+        /// <summary>
+        /// Description about the command
+        /// </summary>
         public abstract string Help { get; }
+        /// <summary>
+        /// Example usage of the command
+        /// </summary>
         public abstract string Syntax { get; }
+        /// <summary>
+        /// Other acceptabla names
+        /// </summary>
         public abstract List<string> Aliases { get; }
+        /// <summary>
+        /// Permissions that the command can be used with
+        /// </summary>
         public abstract List<string> Permissions { get; }
 
         public abstract List<SubCommand> SubCommands { get; }
