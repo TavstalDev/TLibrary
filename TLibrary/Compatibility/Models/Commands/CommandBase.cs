@@ -72,11 +72,12 @@ namespace Tavstal.TLibrary.Compatibility
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="args"></param>
-        public virtual void ExecuteHelp(IRocketPlayer caller, string subcommand, string[] args)
+        public virtual void ExecuteHelp(IRocketPlayer caller, bool isError, string subcommand, string[] args)
         {
+            string translation = isError ? "error_command_syntax" : "success_command_help";
             if (args == null || args.Length == 0)
             {
-                UChatHelper.SendCommandReply(Plugin, caller, "error_command_syntax", Name, Syntax);
+                UChatHelper.SendCommandReply(Plugin, caller, translation, Name, Syntax);
                 return;
             }
 
@@ -85,12 +86,12 @@ namespace Tavstal.TLibrary.Compatibility
                 SubCommand subCommand = GetSubCommandByName(subcommand);
                 if (subCommand != null)
                 {
-                    UChatHelper.SendCommandReply(Plugin, caller, "error_command_syntax", Name, subCommand.Syntax);
+                    UChatHelper.SendCommandReply(Plugin, caller, translation, Name, subCommand.Syntax);
                     return;
                 }
             }
 
-            UChatHelper.SendCommandReply(Plugin, caller, "error_command_syntax", Name, Syntax);
+            UChatHelper.SendCommandReply(Plugin, caller, translation, Name, Syntax);
         }
 
         /// <summary>
@@ -154,12 +155,12 @@ namespace Tavstal.TLibrary.Compatibility
             if (args.Length > 1 && (args[0].ToLower() == "help" || args[0].ToLower() == "?"))
             {
                 args.Remove(x => x == args[0]);
-                ExecuteHelp(caller, null, args);
+                ExecuteHelp(caller, false, null, args);
             }
             else
             {
                 if (!ExecutionRequested(caller, args))
-                    ExecuteHelp(caller, null, null);
+                    ExecuteHelp(caller, true, null, null);
             }
         }
 

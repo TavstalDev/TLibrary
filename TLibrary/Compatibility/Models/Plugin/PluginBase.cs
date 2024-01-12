@@ -226,7 +226,8 @@ namespace Tavstal.TLibrary.Compatibility
             { "error_command_caller_not_player", "&cThis command must be executed by a player." },
             { "error_command_no_permission", "&cYou do not have enough permission to execute this command." },
             { "error_command_syntax", "&cWrong syntax! Usage: /{0} {1}" },
-            { "error_subcommand_not_found", "&cThe '/{0}' command does not have '{1}' subcommand." }
+            { "error_subcommand_not_found", "&cThe '/{0}' command does not have '{1}' subcommand." },
+            { "success_command_help", "&aUsage: /{0} {1}" },
         };
         
         public virtual Dictionary<string, string> DefaultLocalization { get; set; }
