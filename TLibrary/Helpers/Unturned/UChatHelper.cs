@@ -8,7 +8,7 @@ namespace Tavstal.TLibrary.Helpers
     /// <summary>
     /// Unturned chat helper
     /// </summary>
-    internal static class UChatHelper
+    public static class UChatHelper
     {
         //private static string Translate(bool addPrefix, string key, params object[] args) => TAdvancedHealthMain.Instance.Translate(addPrefix, key, args);
 
