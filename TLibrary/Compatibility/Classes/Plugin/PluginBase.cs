@@ -24,8 +24,15 @@ using System.Runtime.CompilerServices;
 
 namespace Tavstal.TLibrary.Compatibility
 {
+    /// <summary>
+    /// Abstract Plugin Base Class
+    /// </summary>
+    /// <typeparam name="PluginConfig"></typeparam>
     public abstract class PluginBase<PluginConfig> : RocketPlugin, IPlugin where PluginConfig : ConfigurationBase
     {
+        /// <summary>
+        /// Plugin Configuration
+        /// </summary>
         public PluginConfig Config { get; set; }
         public virtual PluginBase<PluginConfig> Instance { get; set; }
         public virtual IDatabaseManager DatabaseManager { get; set; }
@@ -107,8 +114,9 @@ namespace Tavstal.TLibrary.Compatibility
                 }
             }
 
+            Dictionary<string, string> localLocalization = new Dictionary<string, string>();
             if (DefaultLocalization != null)
-                Localization = DefaultLocalization;
+                localLocalization = DefaultLocalization;
 
             string defaultTranslationFile = Path.Combine(translationsDirectory, "locale.en.json");
             if (!File.Exists(defaultTranslationFile))
@@ -149,13 +157,24 @@ namespace Tavstal.TLibrary.Compatibility
                 if (localLocale != null)
                 {
                     if (localLocale.Count > 0)
-                        Localization = localLocale;
+                        localLocalization = localLocale;
                     else if (localLocale.Count == 0 && locale == "en")
                     {
                         PluginExtensions.SaveTranslation(DefaultLocalization, translationsDirectory, "locale.en.json");
                     }
                 }
             }
+
+            foreach (var l in CommonLocalization)
+            {
+                if (!localLocalization.ContainsKey(l.Key))
+                    Localization.Add(l.Key, l.Value);
+            }
+            foreach (var l in localLocalization)
+            {
+                Localization.Add(l.Key, l.Value);
+            }
+
         }
 
         public void InvokeAction(float delay, System.Action action)
@@ -200,6 +219,16 @@ namespace Tavstal.TLibrary.Compatibility
         }
 
         public Dictionary<string, string> Localization { get; private set; } = new Dictionary<string, string>();
+
+        private Dictionary<string, string> CommonLocalization => new Dictionary<string, string>
+        {
+            { "error_command_caller_not_console", "&cThis command must be executed by the console." },
+            { "error_command_caller_not_player", "&cThis command must be executed by a player." },
+            { "error_command_no_permission", "&cYou do not have enough permission to execute this command." },
+            { "error_command_syntax", "&cWrong syntax! Usage: /{0} {1}" },
+            { "error_subcommand_not_found", "&cThe '/{0}' command does not have '{1}' subcommand." }
+        };
+        
         public virtual Dictionary<string, string> DefaultLocalization { get; set; }
         public virtual Dictionary<string, string> LanguagePacks { get; set; }
     }

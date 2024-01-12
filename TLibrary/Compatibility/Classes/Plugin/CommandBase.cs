@@ -35,11 +35,12 @@ namespace Tavstal.TLibrary.Compatibility
         /// </summary>
         public abstract string Name { get; }
         /// <summary>
-        /// Description about the command
+        /// Description of the command
         /// </summary>
         public abstract string Help { get; }
         /// <summary>
         /// Example usage of the command
+        /// <br/>Example: "help | action1 | action2"
         /// </summary>
         public abstract string Syntax { get; }
         /// <summary>
@@ -47,14 +48,56 @@ namespace Tavstal.TLibrary.Compatibility
         /// </summary>
         public abstract List<string> Aliases { get; }
         /// <summary>
-        /// Permissions that the command can be used with
+        /// Permissions that the command require
         /// </summary>
         public abstract List<string> Permissions { get; }
 
+        /// <summary>
+        /// Subcommands like /example help
+        /// <br/>help can be modified with on ExecuteHelp
+        /// </summary>
         public abstract List<SubCommand> SubCommands { get; }
 
-        public abstract void ExecutionRequested(IRocketPlayer caller, string[] args);
+        /// <summary>
+        /// Called when the command is executed
+        /// </summary>
+        /// <returns>True when the arguments were correctly used</returns>
+        /// <param name="caller"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public abstract bool ExecutionRequested(IRocketPlayer caller, string[] args);
 
+        /// <summary>
+        /// Called when the command is executed with help subcommand
+        /// </summary>
+        /// <param name="caller"></param>
+        /// <param name="args"></param>
+        public virtual void ExecuteHelp(IRocketPlayer caller, string[] args)
+        {
+            if (args == null || args.Length == 0)
+            {
+                UChatHelper.SendCommandReply(Plugin, caller, "error_command_syntax", Name, Syntax);
+                return;
+            }
+
+            if (args.Length == 1)
+            {
+                SubCommand subCommand = GetSubCommandByName(args[0]);
+                if (subCommand != null)
+                {
+                    UChatHelper.SendCommandReply(Plugin, caller, "error_command_syntax", Name, subCommand.Syntax);
+                    return;
+                }
+            }
+
+            UChatHelper.SendCommandReply(Plugin, caller, "error_command_syntax", Name, Syntax);
+        }
+
+        /// <summary>
+        /// Rocket ICommand Execute implementation
+        /// </summary>
+        /// <param name="caller"></param>
+        /// <param name="args"></param>
         public void Execute(IRocketPlayer caller, string[] args)
         {
             bool isPlayer = caller is UnturnedPlayer;
@@ -66,7 +109,7 @@ namespace Tavstal.TLibrary.Compatibility
                     {
                         if (caller is UnturnedPlayer)
                         {
-                            UChatHelper.SendCommandReply(Plugin, caller, "command_caller_not_console");
+                            UChatHelper.SendCommandReply(Plugin, caller, "error_command_caller_not_console");
                             return;
                         }
                         break;
@@ -75,7 +118,7 @@ namespace Tavstal.TLibrary.Compatibility
                     {
                         if (caller is ConsolePlayer)
                         {
-                            UChatHelper.SendCommandReply(Plugin, caller, "command_caller_not_player");
+                            UChatHelper.SendCommandReply(Plugin, caller, "error_command_caller_not_player");
                             return;
                         }
                         break;
@@ -103,11 +146,21 @@ namespace Tavstal.TLibrary.Compatibility
                     if (args.Remove(x => x == args[0]))
                         subCommand.Execute(caller, args);
                     else
-                        UChatHelper.SendCommandReply(Plugin, caller, "error_subcommand_not_found", Syntax);
+                        UChatHelper.SendCommandReply(Plugin, caller, "error_subcommand_not_found", Name, args[0]);
+                    return;
                 }
             }
+            
+            if (args.Length > 1 && (args[0].ToLower() == "help" || args[0].ToLower() == "?"))
+            {
+                args.Remove(x => x == args[0]);
+                ExecuteHelp(caller, args);
+            }
             else
-                ExecutionRequested(caller, args);
+            {
+                if (!ExecutionRequested(caller, args))
+                    ExecuteHelp(caller, null);
+            }
         }
 
         private SubCommand GetSubCommandByName(string arg)

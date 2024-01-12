@@ -1,4 +1,5 @@
-﻿using SDG.Unturned;
+﻿using Rocket.Unturned.Player;
+using SDG.Unturned;
 using Tavstal.TLibrary.Compatibility.Interfaces;
 using UnityEngine;
 
@@ -19,7 +20,7 @@ namespace Tavstal.TLibrary.Helpers
         /// </summary>
         /// <param name="toPlayer"></param>
         /// <param name="text"></param>
-        public static void SendChatMessageUntranslated(SteamPlayer toPlayer, string text)
+        public static void SendPlainChatMessage(SteamPlayer toPlayer, string text)
         {
             string icon = "";
             ServerSendChatMessage(text, icon, null, toPlayer, EChatMode.GLOBAL);
@@ -37,8 +38,28 @@ namespace Tavstal.TLibrary.Helpers
             string icon = "";
             if (toPlayer is SteamPlayer steamPlayer)
                 ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, steamPlayer, EChatMode.GLOBAL);
+            else if (toPlayer is UnturnedPlayer player)
+                ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, player.SteamPlayer(), EChatMode.GLOBAL);
             else
                 plugin.GetLogger().LogRichCommand(plugin.Localize(false, translation, args));
+        }
+
+        /// <summary>
+        /// Send chat message as command reply to a specific player
+        /// </summary>
+        /// <param name="plugin"></param>
+        /// <param name="toPlayer"></param>
+        /// <param name="translation"></param>
+        /// <param name="args"></param>
+        public static void SendPlainCommandReply(IPlugin plugin, object toPlayer, string translation, params object[] args)
+        {
+            string icon = "";
+            if (toPlayer is SteamPlayer steamPlayer)
+                ServerSendChatMessage(FormatHelper.FormatTextV2(string.Format(translation, args)), icon, null, steamPlayer, EChatMode.GLOBAL);
+            else if (toPlayer is UnturnedPlayer player)
+                ServerSendChatMessage(FormatHelper.FormatTextV2(string.Format(translation, args)), icon, null, player.SteamPlayer(), EChatMode.GLOBAL);
+            else
+                plugin.GetLogger().LogRichCommand(string.Format(translation, args));
         }
 
         /// <summary>
