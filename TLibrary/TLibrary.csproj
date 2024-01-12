@@ -121,28 +121,28 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Compatibility\Classes\DatabaseSettingsBase.cs" />
-    <Compile Include="Compatibility\Classes\Database\Attributes\SqlMemberAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\Attributes\SqlNameAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\Attributes\SqlIgnoreAttribute.cs" />
-    <Compile Include="Compatibility\Classes\Database\SqlParameter.cs" />
-    <Compile Include="Compatibility\Classes\Database\SqlColumn.cs" />
-    <Compile Include="Compatibility\Classes\Economy\Transaction.cs" />
-    <Compile Include="Compatibility\Classes\Economy\BankCardDetails.cs" />
-    <Compile Include="Compatibility\Classes\Economy\BankCard.cs" />
-    <Compile Include="Compatibility\Classes\FileParameter.cs" />
-    <Compile Include="Compatibility\Classes\FormatHelper\ConsoleFormat.cs" />
-    <Compile Include="Compatibility\Classes\FormatHelper\TextFormat.cs" />
-    <Compile Include="Compatibility\Classes\Plugin\CommandBase.cs" />
-    <Compile Include="Compatibility\Classes\Plugin\ConfigurationBase.cs" />
-    <Compile Include="Compatibility\Classes\Plugin\PluginBase.cs" />
-    <Compile Include="Compatibility\Classes\Plugin\SubCommand.cs" />
-    <Compile Include="Compatibility\Classes\Plugin\TLogger.cs" />
+    <Compile Include="Compatibility\Models\DatabaseSettingsBase.cs" />
+    <Compile Include="Compatibility\Models\Database\Attributes\SqlMemberAttribute.cs" />
+    <Compile Include="Compatibility\Models\Database\Attributes\SqlNameAttribute.cs" />
+    <Compile Include="Compatibility\Models\Database\Attributes\SqlIgnoreAttribute.cs" />
+    <Compile Include="Compatibility\Models\Database\SqlParameter.cs" />
+    <Compile Include="Compatibility\Models\Database\SqlColumn.cs" />
+    <Compile Include="Compatibility\Models\Economy\Transaction.cs" />
+    <Compile Include="Compatibility\Models\Economy\BankCardDetails.cs" />
+    <Compile Include="Compatibility\Models\Economy\BankCard.cs" />
+    <Compile Include="Compatibility\Models\FileParameter.cs" />
+    <Compile Include="Compatibility\Models\FormatHelper\ConsoleFormat.cs" />
+    <Compile Include="Compatibility\Models\FormatHelper\TextFormat.cs" />
+    <Compile Include="Compatibility\Models\Commands\CommandBase.cs" />
+    <Compile Include="Compatibility\Models\Plugin\ConfigurationBase.cs" />
+    <Compile Include="Compatibility\Models\Plugin\PluginBase.cs" />
+    <Compile Include="Compatibility\Models\Commands\SubCommand.cs" />
+    <Compile Include="Compatibility\Models\Plugin\TLogger.cs" />
     <Compile Include="Compatibility\Interfaces\ICommand.cs" />
     <Compile Include="Compatibility\Interfaces\IDatabaseSettings.cs" />
     <Compile Include="Compatibility\Interfaces\IDatabaseManager.cs" />
     <Compile Include="Compatibility\Interfaces\IConfigurationBase.cs" />
-    <Compile Include="Compatibility\Classes\SerializableVector3.cs" />
+    <Compile Include="Compatibility\Models\SerializableVector3.cs" />
     <Compile Include="Compatibility\Interfaces\IPlugin.cs" />
     <Compile Include="Extensions\PluginExtensions.cs" />
     <Compile Include="Extensions\Rocket\RocketPluginExtensions.cs" />
