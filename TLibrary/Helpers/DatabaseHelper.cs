@@ -888,14 +888,25 @@ namespace Tavstal.TLibrary.Helpers
                     }
 
                     keyString += $"{propName},";
-                    if (prop.PropertyType == typeof(bool) || prop.PropertyType.IsEnum)
-                        paramString += $"'{Convert.ToInt32(prop.GetValue(value))}',";
-                    else if (prop.PropertyType == typeof(DateTime))
-                        paramString += $"'{((DateTime)prop.GetValue(value)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
-                    else if (prop.PropertyType == typeof(string))
-                        paramString += $"'{ConvertIllegalCharsToSql((string)prop.GetValue(value))}',";
-                    else
-                        paramString += $"'{prop.GetValue(value)}',";
+                    bool isNull = false;
+                    if (prop.GetValue(value) == null)
+                    {
+                        isNull = true;
+                        paramString += "NULL,";
+                    }
+
+
+                    if (!isNull)
+                    {
+                        if (prop.PropertyType == typeof(bool) || prop.PropertyType.IsEnum)
+                            paramString += $"'{Convert.ToInt32(prop.GetValue(value))}',";
+                        else if (prop.PropertyType == typeof(DateTime))
+                            paramString += $"'{((DateTime)prop.GetValue(value)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
+                        else if (prop.PropertyType == typeof(string))
+                            paramString += $"'{ConvertIllegalCharsToSql((string)prop.GetValue(value))}',";
+                        else
+                            paramString += $"'{prop.GetValue(value)}',";
+                    }
                 }
 
                 paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
@@ -1002,14 +1013,24 @@ namespace Tavstal.TLibrary.Helpers
                         if (!keyString.Contains(propName))
                             keyString += $"{propName},";
 
-                        if (prop.PropertyType == typeof(bool) || prop.PropertyType.IsEnum)
-                            paramString += $"'{Convert.ToInt32(prop.GetValue(value))}',";
-                        else if (prop.PropertyType == typeof(DateTime))
-                            paramString += $"'{((DateTime)prop.GetValue(value)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
-                        else if (prop.PropertyType == typeof(string))
-                            paramString += $"'{ConvertIllegalCharsToSql((string)prop.GetValue(value))}',";
-                        else
-                            paramString += $"'{prop.GetValue(value)}',";
+                        bool isNull = false;
+                        if (prop.GetValue(value) == null)
+                        {
+                            isNull = true;
+                            paramString += "NULL,";
+                        }
+
+                        if (!isNull)
+                        {
+                            if (prop.PropertyType == typeof(bool) || prop.PropertyType.IsEnum)
+                                paramString += $"'{Convert.ToInt32(prop.GetValue(value))}',";
+                            else if (prop.PropertyType == typeof(DateTime))
+                                paramString += $"'{((DateTime)prop.GetValue(value)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
+                            else if (prop.PropertyType == typeof(string))
+                                paramString += $"'{ConvertIllegalCharsToSql((string)prop.GetValue(value))}',";
+                            else
+                                paramString += $"'{prop.GetValue(value)}',";
+                        }
                     }
                     if (paramString.LastIndexOf(',') > 0)
                         paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
@@ -1085,14 +1106,24 @@ namespace Tavstal.TLibrary.Helpers
                             propName = memberAttribute.ColumnName;
                     }
 
-                    if (prop.PropertyType == typeof(bool) || prop.PropertyType.IsEnum)
-                        setClause += $"{propName}={Convert.ToInt32(prop.GetValue(newValue))},";
-                    else if (prop.PropertyType == typeof(DateTime))
-                        setClause += $"{propName}='{((DateTime)prop.GetValue(newValue)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
-                    else if (prop.PropertyType == typeof(string))
-                        setClause += $"{propName}='{ConvertIllegalCharsToSql((string)prop.GetValue(newValue))}',";
-                    else
-                        setClause += $"{propName}='{prop.GetValue(newValue)}',";
+                    bool isNull = false;
+                    if (prop.GetValue(newValue) == null)
+                    {
+                        isNull = true;
+                        setClause += $"{propName}='NULL',";
+                    }
+
+                    if (!isNull)
+                    {
+                        if (prop.PropertyType == typeof(bool) || prop.PropertyType.IsEnum)
+                            setClause += $"{propName}={Convert.ToInt32(prop.GetValue(newValue))},";
+                        else if (prop.PropertyType == typeof(DateTime))
+                            setClause += $"{propName}='{((DateTime)prop.GetValue(newValue)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
+                        else if (prop.PropertyType == typeof(string))
+                            setClause += $"{propName}='{ConvertIllegalCharsToSql((string)prop.GetValue(newValue))}',";
+                        else
+                            setClause += $"{propName}='{prop.GetValue(newValue)}',";
+                    }
                 }
 
                 setClause = setClause.Remove(setClause.LastIndexOf(','), 1);
