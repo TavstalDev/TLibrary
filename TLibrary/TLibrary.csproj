@@ -172,7 +172,6 @@
     <Compile Include="Helpers\MathHelper.cs" />
     <Compile Include="Managers\DatabaseManagerBase.cs" />
     <Compile Include="Managers\HookManager.cs" />
-    <Compile Include="LibraryMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\DiscordWebhook.cs" />
   </ItemGroup>

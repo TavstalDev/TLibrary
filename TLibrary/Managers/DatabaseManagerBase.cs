@@ -6,20 +6,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Logger = Tavstal.TLibrary.Helpers.LoggerHelper;
 using Rocket.API;
 using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Compatibility;
 using System.Web.Management;
+using Tavstal.TLibrary.Compatibility.Interfaces;
 
 namespace Tavstal.TLibrary.Managers
 {
     public abstract class DatabaseManagerBase : IDatabaseManager
     {
+        public IPlugin _plugin { get; }
         public IConfigurationBase _configuration { get; }
 
-        public DatabaseManagerBase(IConfigurationBase configuration)
+        public DatabaseManagerBase(IPlugin plugin, IConfigurationBase configuration)
         {
+            _plugin = plugin;
             _configuration = configuration;
             new I18N.West.CP1250();
             CheckSchema();
@@ -40,7 +42,7 @@ namespace Tavstal.TLibrary.Managers
             }
             catch (Exception ex)
             {
-                Logger.LogException(ex.ToString());
+                _plugin.GetLogger().LogException(ex.ToString());
             }
             return mySqlConnection;
         }

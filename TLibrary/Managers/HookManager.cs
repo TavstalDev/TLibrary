@@ -3,38 +3,42 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Logger = Tavstal.TLibrary.Helpers.LoggerHelper;
 using Tavstal.TLibrary.Compatibility;
 using System.Reflection;
+using Tavstal.TLibrary.Compatibility.Interfaces;
 
 namespace Tavstal.TLibrary.Managers
 {
     public class HookManager
     {
-
+        private readonly IPlugin _plugin;
+        private readonly TLogger _logger;
         private readonly Dictionary<string, Hook> _hooks = new Dictionary<string, Hook>();
         public IEnumerable<Hook> Hooks => _hooks.Values;
 
-        public HookManager() { }
+        public HookManager(IPlugin plugin) {
+            _plugin = plugin;
+            _logger = _plugin.GetLogger();
+        }
 
         public void Load(Type type)
         {
             if (!typeof(Hook).IsAssignableFrom(type))
             {
-                Logger.LogException("'{0}' is not a hook.");
+                _logger.LogException("'{0}' is not a hook.");
                 return;
             }
 
             if (type.IsAbstract)
             {
-                Logger.LogException(string.Format("Cannot register {0} because it is abstract.", type.Name));
+                _logger.LogException(string.Format("Cannot register {0} because it is abstract.", type.Name));
                 return;
             }
 
             var hook = CreateInstance<Hook>(type);
             if (_hooks.ContainsKey(hook.Name))
             {
-                Logger.LogException("Hook with '{0}' name already exists.");
+                _logger.LogException("Hook with '{0}' name already exists.");
                 return;
             }
 
@@ -51,7 +55,7 @@ namespace Tavstal.TLibrary.Managers
                 {
                     if (_hooks.ContainsKey(hook.Name))
                     {
-                        Logger.LogException(string.Format("Hook with '{0}' name already exists.", hook.Name));
+                        _logger.LogException(string.Format("Hook with '{0}' name already exists.", hook.Name));
                         continue;
                     }
 
@@ -60,8 +64,8 @@ namespace Tavstal.TLibrary.Managers
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogException(string.Format("Failed to add the '{0}' hook to the library.", hook.Name));
-                    Logger.LogError(ex);
+                    _logger.LogException(string.Format("Failed to add the '{0}' hook to the library.", hook.Name));
+                    _logger.LogError(ex);
                 }
             }
         }
@@ -70,7 +74,7 @@ namespace Tavstal.TLibrary.Managers
         {
             if (type != typeof(Hook))
             {
-                Logger.LogException(string.Format("'{0}' is not a hook.", type.Name));
+                _logger.LogException(string.Format("'{0}' is not a hook.", type.Name));
                 return;
             }
 
@@ -78,14 +82,14 @@ namespace Tavstal.TLibrary.Managers
             if (!_hooks.Any(x => x.Value.GetType() == type))
             {
 
-                Logger.LogException(string.Format("'{0}' is not loaded.", type.Name));
+                _logger.LogException(string.Format("'{0}' is not loaded.", type.Name));
                 return;
             }
 
             var hook = _hooks.Values.FirstOrDefault(x => x.GetType() == type);
             if (hook == null)
             {
-                Logger.LogException(string.Format("'{0}' is not found.", type.Name));
+                _logger.LogException(string.Format("'{0}' is not found.", type.Name));
                 return;
             }
 
@@ -140,8 +144,8 @@ namespace Tavstal.TLibrary.Managers
             }
             catch (Exception ex)
             {
-                Logger.LogException(string.Format("Failed to create instance for '{0}' hook.", type.Name));
-                Logger.LogError(ex);
+                _logger.LogException(string.Format("Failed to create instance for '{0}' hook.", type.Name));
+                _logger.LogError(ex);
                 return default;
             }
 

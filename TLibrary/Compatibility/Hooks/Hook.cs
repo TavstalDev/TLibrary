@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Logger = Tavstal.TLibrary.Helpers.LoggerHelper;
+using Tavstal.TLibrary.Compatibility.Interfaces;
 
 namespace Tavstal.TLibrary.Compatibility
 {
     public abstract class Hook
     {
+        public IPlugin Plugin { get; set; }
         public string Name { get; private set; }
         public bool IsEssential { get; private set; }
         public bool IsLoaded { get; private set; }
@@ -34,8 +35,8 @@ namespace Tavstal.TLibrary.Compatibility
             }
             catch (Exception ex)
             {
-                Logger.LogError($"Failed to load '{Name}' hook.");
-                Logger.LogException(ex.ToString());
+                Plugin.GetLogger().LogError($"Failed to load '{Name}' hook.");
+                Plugin.GetLogger().LogException(ex.ToString());
             }
         }
 
@@ -50,8 +51,8 @@ namespace Tavstal.TLibrary.Compatibility
             catch (Exception ex)
             {
                 IsLoaded = false;
-                Logger.LogError($"Failed to unload '{Name}' hook.");
-                Logger.LogException(ex.ToString());
+                Plugin.GetLogger().LogError($"Failed to unload '{Name}' hook.");
+                Plugin.GetLogger().LogException(ex.ToString());
             }
         }
 
