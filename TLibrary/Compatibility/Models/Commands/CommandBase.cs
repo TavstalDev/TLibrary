@@ -144,18 +144,18 @@ namespace Tavstal.TLibrary.Compatibility
                         return;
                     }
 
-                    if (args.Remove(x => x == args[0]))
-                        subCommand.Execute(caller, args);
-                    else
-                        UChatHelper.SendCommandReply(Plugin, caller, "error_subcommand_not_found", Name, args[0]);
+                    List<string> argList = args.ToList();
+                    argList.RemoveAt(0);
+                    subCommand.Execute(caller, argList.ToArray());
                     return;
                 }
             }
             
             if (args.Length > 0 && (args[0].ToLower() == "help" || args[0].ToLower() == "?"))
             {
-                args.Remove(x => x == args[0]);
-                ExecuteHelp(caller, false, null, args);
+                List<string> argList = args.ToList();
+                argList.RemoveAt(0);
+                ExecuteHelp(caller, false, null, argList.ToArray());
             }
             else
             {
