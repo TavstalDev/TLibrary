@@ -33,7 +33,7 @@ namespace Tavstal.TLibrary.Helpers
         /// <param name="toPlayer"></param>
         /// <param name="translation"></param>
         /// <param name="args"></param>
-        public static void SendCommandReply(IPlugin plugin, object toPlayer, string translation, params object[] args)
+        public static void SendCommandReply(this IPlugin plugin, object toPlayer, string translation, params object[] args)
         {
             string icon = "";
             if (toPlayer is SteamPlayer steamPlayer)
@@ -51,7 +51,7 @@ namespace Tavstal.TLibrary.Helpers
         /// <param name="toPlayer"></param>
         /// <param name="translation"></param>
         /// <param name="args"></param>
-        public static void SendPlainCommandReply(IPlugin plugin, object toPlayer, string translation, params object[] args)
+        public static void SendPlainCommandReply(this IPlugin plugin, object toPlayer, string translation, params object[] args)
         {
             string icon = "";
             if (toPlayer is SteamPlayer steamPlayer)
@@ -69,7 +69,7 @@ namespace Tavstal.TLibrary.Helpers
         /// <param name="toPlayer"></param>
         /// <param name="translation"></param>
         /// <param name="args"></param>
-        public static void SendChatMessage(IPlugin plugin, SteamPlayer toPlayer, string translation, params object[] args)
+        public static void SendChatMessage(this IPlugin plugin, SteamPlayer toPlayer, string translation, params object[] args)
         {
             string icon = "";
             ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, toPlayer, EChatMode.GLOBAL);
@@ -82,7 +82,7 @@ namespace Tavstal.TLibrary.Helpers
         /// <param name="plugin"></param>
         /// <param name="translation"></param>
         /// <param name="args"></param>
-        public static void SendChatMessage(IPlugin plugin, string translation, params object[] args)
+        public static void SendChatMessage(this IPlugin plugin, string translation, params object[] args)
         {
             string icon = "";
             ServerSendChatMessage(plugin.Localize(true, translation, args), icon, null, null, EChatMode.GLOBAL);
