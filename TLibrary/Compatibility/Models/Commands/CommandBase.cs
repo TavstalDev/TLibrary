@@ -152,7 +152,7 @@ namespace Tavstal.TLibrary.Compatibility
                 }
             }
             
-            if (args.Length > 1 && (args[0].ToLower() == "help" || args[0].ToLower() == "?"))
+            if (args.Length > 0 && (args[0].ToLower() == "help" || args[0].ToLower() == "?"))
             {
                 args.Remove(x => x == args[0]);
                 ExecuteHelp(caller, false, null, args);
