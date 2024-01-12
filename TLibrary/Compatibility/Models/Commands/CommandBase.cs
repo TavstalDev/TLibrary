@@ -72,7 +72,7 @@ namespace Tavstal.TLibrary.Compatibility
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="args"></param>
-        public virtual void ExecuteHelp(IRocketPlayer caller, string[] args)
+        public virtual void ExecuteHelp(IRocketPlayer caller, string subcommand, string[] args)
         {
             if (args == null || args.Length == 0)
             {
@@ -80,9 +80,9 @@ namespace Tavstal.TLibrary.Compatibility
                 return;
             }
 
-            if (args.Length == 1)
+            if (subcommand != null)
             {
-                SubCommand subCommand = GetSubCommandByName(args[0]);
+                SubCommand subCommand = GetSubCommandByName(subcommand);
                 if (subCommand != null)
                 {
                     UChatHelper.SendCommandReply(Plugin, caller, "error_command_syntax", Name, subCommand.Syntax);
@@ -154,12 +154,12 @@ namespace Tavstal.TLibrary.Compatibility
             if (args.Length > 1 && (args[0].ToLower() == "help" || args[0].ToLower() == "?"))
             {
                 args.Remove(x => x == args[0]);
-                ExecuteHelp(caller, args);
+                ExecuteHelp(caller, null, args);
             }
             else
             {
                 if (!ExecutionRequested(caller, args))
-                    ExecuteHelp(caller, null);
+                    ExecuteHelp(caller, null, null);
             }
         }
 
