@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Tavstal.TLibrary.Compatibility.Economy
 {
+    /// <summary>
+    /// Bank card details class used to make updating BankCards more maintanable
+    /// </summary>
     [Serializable]
     public class BankCardDetails
     {
@@ -16,7 +19,7 @@ namespace Tavstal.TLibrary.Compatibility.Economy
 
         public BankCardDetails(BankCard card)
         {
-            CardBalance = card.CardBalance;
+            CardBalance = card.Balance;
             IsActive = card.IsActive;
             IsInATM = card.IsInATM;
             Transactions = card.Transactions;

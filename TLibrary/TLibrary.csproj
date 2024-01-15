@@ -162,7 +162,6 @@
     <Compile Include="Compatibility\Hooks\Hook.cs" />
     <Compile Include="Compatibility\Enumerators\ETransaction.cs" />
     <Compile Include="Compatibility\Enumerators\EPaymentMethod.cs" />
-    <Compile Include="Compatibility\Enumerators\ECurrency.cs" />
     <Compile Include="Compatibility\Interfaces\HookInterfaces\IEconomyProvider.cs" />
     <Compile Include="Compatibility\Interfaces\HookInterfaces\IPluginProvider.cs" />
     <Compile Include="Helpers\DatabaseHelper.cs" />

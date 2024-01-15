@@ -34,8 +34,17 @@ namespace Tavstal.TLibrary.Compatibility
         /// Plugin Configuration
         /// </summary>
         public PluginConfig Config { get; set; }
+        /// <summary>
+        /// Instance of the Plugin
+        /// </summary>
         public virtual PluginBase<PluginConfig> Instance { get; set; }
+        /// <summary>
+        /// Optional Database Manager
+        /// </summary>
         public virtual IDatabaseManager DatabaseManager { get; set; }
+        /// <summary>
+        /// Hook Manager used to work with plugin hooks
+        /// </summary>
         public static HookManager HookManager { get; set; }
 
         private static TLogger _logger;
@@ -46,6 +55,9 @@ namespace Tavstal.TLibrary.Compatibility
         public static System.Version Version { get { return _version; } }
         public static DateTime BuildDate { get { return _buildDate; } }
 
+        /// <summary>
+        /// Used when the plugin loads
+        /// </summary>
         protected override void Load()
         {
             _logger = TLogger.CreateInstance(this, false);
@@ -55,32 +67,54 @@ namespace Tavstal.TLibrary.Compatibility
             OnLoad();
         }
 
+        /// <summary>
+        /// Used when the plugin unloads
+        /// </summary>
         protected override void Unload()
         {
             base.Unload();
             OnUnLoad();
         }
 
+        /// <summary>
+        /// Returns the name of the plugin
+        /// </summary>
+        /// <returns>A <see cref="string"></see> containing the name of the plugin.</returns>
         public string GetPluginName()
         {
             return this.Name;
         }
 
+        /// <summary>
+        /// Returns the logger
+        /// </summary>
+        /// <returns>Object of a <see cref="TLogger"/></returns>
         public TLogger GetLogger()
         {
             return _logger;
         }
 
+        /// <summary>
+        /// Called after the plugins Load() function was called
+        /// </summary>
         public virtual void OnLoad()
         {
 
         }
 
+        /// <summary>
+        /// Called after the plugins Unload() function was called
+        /// </summary>
         public virtual void OnUnLoad() 
         {
             
         }
 
+        /// <summary>
+        /// Used to check the plugin files.
+        /// <br/>Deleting rocket generated files
+        /// <br/>And generating and loading the json configurations and translations
+        /// </summary>
         public virtual void CheckPluginFiles()
         {
             string rocketConfigFile = Path.Combine(this.Directory, $"{GetPluginName()}.configuration.xml");
@@ -177,17 +211,34 @@ namespace Tavstal.TLibrary.Compatibility
 
         }
 
+        /// <summary>
+        /// Used to invoke async actions
+        /// </summary>
+        /// <param name="delay"></param>
+        /// <param name="action"></param>
         public void InvokeAction(float delay, System.Action action)
         {
             StartCoroutine(InvokeRoutine(action, delay));
         }
 
-        internal static IEnumerator InvokeRoutine(System.Action f, float delay)
+        /// <summary>
+        /// Used to invoke async actions
+        /// </summary>
+        /// <param name="f"></param>
+        /// <param name="delay"></param>
+        /// <returns></returns>
+        private static IEnumerator InvokeRoutine(System.Action f, float delay)
         {
             yield return new WaitForSeconds(delay);
             f();
         }
 
+        /// <summary>
+        /// Rocket's built in translation method, it shouldn't be used.
+        /// </summary>
+        /// <param name="translationKey"></param>
+        /// <param name="placeholder"></param>
+        /// <returns></returns>
         [Obsolete("Use Localize instead", true)]
         protected new string Translate(string translationKey, params object[] placeholder)
         {
@@ -195,6 +246,13 @@ namespace Tavstal.TLibrary.Compatibility
             return Localize(false, translationKey, placeholder);
         }
 
+        /// <summary>
+        /// Custom method used to translate stuff with multi language support
+        /// </summary>
+        /// <param name="AddPrefix"></param>
+        /// <param name="translationKey"></param>
+        /// <param name="args"></param>
+        /// <returns>A <see cref="string"/> containing the translated text on success, or the translationKey on failure.</returns>
         public string Localize(bool AddPrefix, string translationKey, params object[] args)
         {
             string localization = string.Empty;
@@ -204,8 +262,10 @@ namespace Tavstal.TLibrary.Compatibility
             if (AddPrefix)
             {
                 string prefixLocalization = string.Empty;
-                Localization.TryGetValue("prefix", out prefixLocalization);
-                return prefixLocalization + string.Format(localization, args);
+                if (Localization.TryGetValue("prefix", out prefixLocalization))
+                    return prefixLocalization + string.Format(localization, args);
+                else 
+                    return string.Format(localization, args);
             }
             else
             {
@@ -213,13 +273,25 @@ namespace Tavstal.TLibrary.Compatibility
             }
         }
 
+        /// <summary>
+        /// Custom method used to translate stuff with multi language support
+        /// </summary>
+        /// <param name="translationKey"></param>
+        /// <param name="args"></param>
+        /// <returns>A <see cref="string"/> containing the translated text on success, or the translationKey on failure.</returns>
         public string Localize(string translationKey, params object[] args)
         { 
            return Localize(false, translationKey, args);
         }
 
+        /// <summary>
+        /// The final localization dictionary, this will contain the loaded translations.
+        /// </summary>
         public Dictionary<string, string> Localization { get; private set; } = new Dictionary<string, string>();
 
+        /// <summary>
+        /// Translation keys used in the library, can be overwritten by declararing the keys in <see cref="DefaultLocalization"/>
+        /// </summary>
         private Dictionary<string, string> CommonLocalization => new Dictionary<string, string>
         {
             { "error_command_caller_not_console", "&cThis command must be executed by the console." },
@@ -230,7 +302,13 @@ namespace Tavstal.TLibrary.Compatibility
             { "success_command_help", "&aUsage: /{0} {1}" },
         };
         
+        /// <summary>
+        /// Default translations in the native language.
+        /// </summary>
         public virtual Dictionary<string, string> DefaultLocalization { get; set; }
+        /// <summary>
+        /// Officialy supported language packs.
+        /// </summary>
         public virtual Dictionary<string, string> LanguagePacks { get; set; }
     }
 }

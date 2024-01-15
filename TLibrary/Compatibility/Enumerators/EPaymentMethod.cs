@@ -8,9 +8,9 @@ namespace Tavstal.TLibrary.Compatibility.Economy
 {
     public enum EPaymentMethod
     {
-        XP,
-        WALLET,
-        BANK,
-        CRYPTO
+        EXPERIENCE,
+        CASH,
+        BANK_ACCOUNT,
+        CRYPTO_WALLET
     }
 }

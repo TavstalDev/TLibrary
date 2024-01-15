@@ -13,9 +13,18 @@ using UnityEngine;
 
 namespace Tavstal.TLibrary.Compatibility.Database
 {
+    /// <summary>
+    /// Used to handle column value more easily
+    /// </summary>
     public class SqlParameter
     {
+        /// <summary>
+        /// Name of the column
+        /// </summary>
         public string ColumnName { get; internal set; }
+        /// <summary>
+        /// A <see cref="MySqlParameter"/> used as value
+        /// </summary>
         public MySqlParameter Value { get; internal set; }
 
         internal SqlParameter(string column, MySqlParameter param)

@@ -9,6 +9,9 @@ using UnityEngine;
 
 namespace Tavstal.TLibrary.Compatibility.Database
 {
+    /// <summary>
+    /// Class used to help in handling SQL columns
+    /// </summary>
     public class SqlColumn
     {
         public string ColumnName { get; internal set; }
