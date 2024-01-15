@@ -130,16 +130,33 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Function made for maintanable code, it will replace illegals chars that can break the sql query.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         private static string ConvertIllegalCharsToSql(string value)
         {
             return value.Replace("'", "U+0027");
         }
 
+        /// <summary>
+        /// Function made for maintanable code, it will convert back illegals chars that can break the sql query.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         private static string ConvertSqlToIllegalChars(string value)
         {
             return value.Replace("U+0027", "'");
         }
 
+        /// <summary>
+        /// Enum parser
+        /// </summary>
+        /// <typeparam name="TEnum"></typeparam>
+        /// <param name="enumType"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         private static TEnum ParseEnum<TEnum>(Type enumType, int value)
         {
             Array enumValues = Enum.GetValues(enumType);
@@ -208,28 +225,6 @@ namespace Tavstal.TLibrary.Helpers
                         }
                     }
                 }
-
-                /*foreach (var prop in typeof(T).GetFields())
-                {
-                    if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
-                        continue;
-
-                    string propName = prop.Name;
-                    var memberAtt = prop.GetCustomAttribute<SqlMemberAttribute>();
-                    if (memberAtt != null)
-                    {
-                        if (!memberAtt.ColumnName.IsNullOrEmpty())
-                            propName = memberAtt.ColumnName;
-                    }
-
-                    int ordinal = reader.GetOrdinal(propName);
-                    var value = reader.GetValue(ordinal);
-
-                    if (prop.FieldType.Name == value.GetType().Name)
-                        prop.SetValue(obj, value);
-                    else
-                        prop.SetValue(obj, Convert.ChangeType(value, prop.FieldType));
-                }*/
 
                 return obj;
             }
@@ -380,46 +375,6 @@ namespace Tavstal.TLibrary.Helpers
                     schemaParams += $"{propName} {typeName}{unsignedString}{nullableString}{autoincrementString},";
                 }
 
-                /*foreach (var prop in schemaType.GetFields())
-                {
-                    if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
-                        continue;
-
-                    string propName = prop.Name;
-                    string typeName = ConvertToSqlDataType(prop.FieldType);
-                    string nullableString = string.Empty;
-                    string unsignedString = string.Empty;
-                    string autoincrementString = string.Empty;
-                    var sqlMember = prop.GetCustomAttribute<SqlMemberAttribute>();
-
-                    if (sqlMember != null)
-                    {
-                        if (!sqlMember.ColumnName.IsNullOrEmpty())
-                            propName = sqlMember.ColumnName;
-
-                        if (!sqlMember.ColumnType.IsNullOrEmpty())
-                            typeName = sqlMember.ColumnType;
-
-                        if (sqlMember.ShouldAutoIncrement)
-                            autoincrementString = $" AUTO_INCREMENT";
-
-                        if (!sqlMember.IsNullable)
-                            nullableString = $" NOT NULL";
-
-                        if (sqlMember.IsUnsigned)
-                            nullableString = $" UNSIGNED";
-
-                        if (sqlMember.IsPrimaryKey)
-                            keyParams += $"PRIMARY KEY({propName}),";
-                        else if (sqlMember.IsUnique)
-                            keyParams += $"UNIQUE ({propName}),";
-
-                        if (sqlMember.IsForeignKey)
-                            keyParams += $"FOREIGN KEY ({propName}) REFERENCES {sqlMember.ForeignTable}({sqlMember.ForeignColumn}),";
-                    }
-                    schemaParams += $"{propName} {typeName}{unsignedString}{nullableString}{autoincrementString},";
-                }*/
-
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = $"CREATE TABLE {tableName} ({schemaParams}{keyParams})";
@@ -511,29 +466,6 @@ namespace Tavstal.TLibrary.Helpers
                     }
                     classColumns.Add(localColumn);
                 }
-
-                /*foreach (var prop in schemaType.GetFields())
-                {
-                    if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
-                        continue;
-
-                    var sqlMember = prop.GetCustomAttribute<SqlMemberAttribute>();
-                    SqlColumn localColumn = new SqlColumn();
-                    localColumn.ColumnName = prop.Name;
-                    localColumn.ColumnType = ConvertToSqlDataType(prop.FieldType);
-
-                    if (sqlMember != null)
-                    {
-                        localColumn = sqlMember.ToColumn();
-
-                        if (localColumn.ColumnName.IsNullOrEmpty())
-                            localColumn.ColumnName = prop.Name;
-
-                        if (localColumn.ColumnType.IsNullOrEmpty())
-                            localColumn.ColumnType = ConvertToSqlDataType(prop.FieldType);
-                    }
-                    classColumns.Add(localColumn);
-                }*/
                 #endregion
 
                 connection.OpenSafe();
@@ -1192,6 +1124,16 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Updates an existing row in the MySQL database table associated with the type T.
+        /// The row data is provided as a <see cref="Compatibility.Database.SqlParameter"/>, and the update is performed based on the provided WHERE clause and parameters.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="tableName"></param>
+        /// <param name="whereClause"></param>
+        /// <param name="newValue"></param>
+        /// <returns>True if the row was successfully updated; otherwise, false.</returns>
         public static bool UpdateTableRow<T>(this MySqlConnection connection, string tableName, string whereClause, Compatibility.Database.SqlParameter newValue)
         {
             if (connection == null)
@@ -1235,6 +1177,15 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Updates an existing row in the MySQL database table associated with the type T.
+        /// The row data is provided as a <see cref="Compatibility.Database.SqlParameter"/>, and the update is performed based on the provided WHERE clause and parameters.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="whereClause"></param>
+        /// <param name="newValue"></param>
+        /// <returns>True if the row was successfully updated; otherwise, false.</returns>
         public static bool UpdateTableRow<T>(this MySqlConnection connection, string whereClause, Compatibility.Database.SqlParameter newValue)
         {
             if (connection == null)
@@ -1265,6 +1216,16 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Updates an existing row in the MySQL database table associated with the type T.
+        /// The row data is provided as a List of <see cref="Compatibility.Database.SqlParameter"/>, and the update is performed based on the provided WHERE clause and parameters.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="tableName"></param>
+        /// <param name="whereClause"></param>
+        /// <param name="newValues"></param>
+        /// <returns>True if the row was successfully updated; otherwise, false.</returns>
         public static bool UpdateTableRow<T>(this MySqlConnection connection, string tableName, string whereClause, List<Compatibility.Database.SqlParameter> newValues)
         {
             if (connection == null)
@@ -1316,6 +1277,15 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
+        /// <summary>
+        /// Updates an existing row in the MySQL database table associated with the type T.
+        /// The row data is provided as a List of <see cref="Compatibility.Database.SqlParameter"/>, and the update is performed based on the provided WHERE clause and parameters.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="whereClause"></param>
+        /// <param name="newValues"></param>
+        /// <returns>True if the row was successfully updated; otherwise, false.</returns>
         public static bool UpdateTableRow<T>(this MySqlConnection connection, string whereClause, List<Compatibility.Database.SqlParameter> newValues)
         {
             if (connection == null)

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Tavstal.TLibrary.Compatibility
 {
+    /// <summary>
+    /// Format for unturned rich chat output.
+    /// </summary>
     public class TextFormat
     {
         public string Key { get; set; }

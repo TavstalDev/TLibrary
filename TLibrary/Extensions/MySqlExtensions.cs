@@ -71,6 +71,11 @@ namespace Tavstal.TLibrary.Extensions
             return Convert.ToDouble(reader.GetString(column).Replace(".", ","));
         }
 
+        /// <summary>
+        /// Safely creates the mysql connection, made because of very long console error that will scare the regular user and they will spam with you "it does not work" instead of checking the config.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <returns></returns>
         public static bool OpenSafe(this MySqlConnection connection)
         {
             if (connection.State == System.Data.ConnectionState.Open)
@@ -111,7 +116,7 @@ namespace Tavstal.TLibrary.Extensions
             }
         }
 
-        internal static bool IsAuthenticationError(MySqlException ex)
+        private static bool IsAuthenticationError(MySqlException ex)
         {
             return ex.ToString().StartsWith("MySql.Data.MySqlClient.MySqlException (0x80004005)") || ex.ToString().Contains("Access denied for user");
         }

@@ -10,8 +10,19 @@ using Newtonsoft.Json.Linq;
 
 namespace Tavstal.TLibrary.Extensions
 {
+    /// <summary>
+    /// Extensions used for RocketPlugins.
+    /// </summary>
     public static class RocketPluginExtensions
     {
+        /// <summary>
+        /// Get field from RocketPluginConfiguration.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="config"></param>
+        /// <param name="name"></param>
+        /// <param name="flags"></param>
+        /// <returns></returns>
         public static T GetField<T>(this IRocketPluginConfiguration config, string name, BindingFlags flags = BindingFlags.Public)
         {
             try
@@ -26,6 +37,14 @@ namespace Tavstal.TLibrary.Extensions
             }
         }
 
+        /// <summary>
+        /// Get property from RocketPluginConfiguration.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="config"></param>
+        /// <param name="name"></param>
+        /// <param name="flags"></param>
+        /// <returns></returns>
         public static T GetProperty<T>(this IRocketPluginConfiguration config, string name, BindingFlags flags = BindingFlags.Public)
         {
             try

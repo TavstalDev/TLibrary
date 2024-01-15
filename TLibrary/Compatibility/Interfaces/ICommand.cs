@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Tavstal.TLibrary.Compatibility.Interfaces
 {
+    /// <summary>
+    /// Base interface for all commands.
+    /// </summary>
     public interface ICommand
     {
         string Name { get; }

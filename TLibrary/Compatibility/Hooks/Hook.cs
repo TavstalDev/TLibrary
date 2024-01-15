@@ -7,11 +7,26 @@ using Tavstal.TLibrary.Compatibility.Interfaces;
 
 namespace Tavstal.TLibrary.Compatibility
 {
+    /// <summary>
+    /// Abstract hook class used for handling functions based on thirdparty plugins.
+    /// </summary>
     public abstract class Hook
     {
+        /// <summary>
+        /// The plugin instance that loads this hook, NOT THE PLUGIN THAT IS BEING HOOKED.
+        /// </summary>
         public IPlugin Plugin { get; set; }
+        /// <summary>
+        /// Name of the plugin that should be hooked
+        /// </summary>
         public string Name { get; private set; }
+        /// <summary>
+        /// If the hook is essential, the plugin will not load if the hook fails to load.
+        /// </summary>
         public bool IsEssential { get; private set; }
+        /// <summary>
+        /// If the hook is loaded
+        /// </summary>
         public bool IsLoaded { get; private set; }
 
         protected Hook() { }
@@ -22,6 +37,9 @@ namespace Tavstal.TLibrary.Compatibility
             IsEssential = isEssential;
         }
 
+        /// <summary>
+        /// Function used to load the hook.
+        /// </summary>
         internal void Load()
         {
             if (!CanBeLoaded())
@@ -40,6 +58,9 @@ namespace Tavstal.TLibrary.Compatibility
             }
         }
 
+        /// <summary>
+        /// Function used to unload the hook.
+        /// </summary>
         internal void Unload()
         {
             IsLoaded = false;
@@ -56,10 +77,20 @@ namespace Tavstal.TLibrary.Compatibility
             }
         }
 
+        /// <summary>
+        /// Abstract function that is called when the hook is loaded.
+        /// </summary>
         public abstract void OnLoad();
 
+        /// <summary>
+        /// Abstract function that is called when the hook is unloaded.
+        /// </summary>
         public abstract void OnUnload();
 
+        /// <summary>
+        /// Abstract function that is called to check if the hook can be loaded.
+        /// </summary>
+        /// <returns></returns>
         public abstract bool CanBeLoaded();
 
     }

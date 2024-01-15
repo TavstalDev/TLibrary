@@ -7,6 +7,9 @@ using Tavstal.TLibrary.Compatibility;
 
 namespace Tavstal.TLibrary.Helpers
 {
+    /// <summary>
+    /// Helper used for formatting rich text.
+    /// </summary>
     public static class FormatHelper
     {
         public readonly static List<TextFormat> DefaultFormats = new List<TextFormat>()

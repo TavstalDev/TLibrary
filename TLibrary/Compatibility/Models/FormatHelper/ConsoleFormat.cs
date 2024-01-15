@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Tavstal.TLibrary.Compatibility
 {
+    /// <summary>
+    /// Format for console output.
+    /// </summary>
     public class ConsoleFormat
     {
         public string Key { get; set; }

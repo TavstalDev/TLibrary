@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace Tavstal.TLibrary.Compatibility
 {
-    public class ConfigurationBase : IConfigurationBase
+    public abstract class ConfigurationBase : IConfigurationBase
     {
         [JsonIgnore]
         public string FilePath { get; set; }

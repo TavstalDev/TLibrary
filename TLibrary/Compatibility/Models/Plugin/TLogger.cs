@@ -12,6 +12,9 @@ using Tavstal.TLibrary.Helpers;
 
 namespace Tavstal.TLibrary.Compatibility
 {
+    /// <summary>
+    /// Logger helper used to log messages to console and log file.
+    /// </summary>
     public class TLogger
     {
         private string _pluginName;

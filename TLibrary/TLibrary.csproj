@@ -137,7 +137,7 @@
     <Compile Include="Compatibility\Models\Economy\Transaction.cs" />
     <Compile Include="Compatibility\Models\Economy\BankCardDetails.cs" />
     <Compile Include="Compatibility\Models\Economy\BankCard.cs" />
-    <Compile Include="Compatibility\Models\FileParameter.cs" />
+    <Compile Include="Compatibility\Models\Discord\FileParameter.cs" />
     <Compile Include="Compatibility\Models\FormatHelper\ConsoleFormat.cs" />
     <Compile Include="Compatibility\Models\FormatHelper\TextFormat.cs" />
     <Compile Include="Compatibility\Models\Commands\CommandBase.cs" />
@@ -153,7 +153,6 @@
     <Compile Include="Compatibility\Interfaces\IPlugin.cs" />
     <Compile Include="Extensions\PluginExtensions.cs" />
     <Compile Include="Extensions\Rocket\RocketPluginExtensions.cs" />
-    <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="Extensions\Unturned\PlayerExtensions.cs" />
     <Compile Include="Extensions\MySqlExtensions.cs" />
     <Compile Include="Extensions\IntegerExtensions.cs" />
