@@ -127,6 +127,13 @@
     <Compile Include="Compatibility\Models\Database\Attributes\SqlIgnoreAttribute.cs" />
     <Compile Include="Compatibility\Models\Database\SqlParameter.cs" />
     <Compile Include="Compatibility\Models\Database\SqlColumn.cs" />
+    <Compile Include="Compatibility\Models\Discord\Embed.cs" />
+    <Compile Include="Compatibility\Models\Discord\EmbedAuthor.cs" />
+    <Compile Include="Compatibility\Models\Discord\EmbedField.cs" />
+    <Compile Include="Compatibility\Models\Discord\EmbedVideo.cs" />
+    <Compile Include="Compatibility\Models\Discord\EmbedThumbnail.cs" />
+    <Compile Include="Compatibility\Models\Discord\EmbedImage.cs" />
+    <Compile Include="Compatibility\Models\Discord\EmbedFooter.cs" />
     <Compile Include="Compatibility\Models\Economy\Transaction.cs" />
     <Compile Include="Compatibility\Models\Economy\BankCardDetails.cs" />
     <Compile Include="Compatibility\Models\Economy\BankCard.cs" />

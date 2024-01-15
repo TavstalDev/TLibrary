@@ -9,26 +9,135 @@ using Tavstal.TLibrary.Compatibility;
 using Newtonsoft.Json.Linq;
 using System.Security.Policy;
 using System.Web.UI.WebControls;
+using Tavstal.TLibrary.Compatibility.Models.Discord;
+using Newtonsoft.Json;
 
 namespace Tavstal.TLibrary.Services
 {
+    /// <summary>
+    /// Discord webhook class used to send messages and images to discord servers
+    /// </summary>
     public class DiscordWebhook
     {
-        public string Url { get; private set; }
-        private static readonly Encoding encoding = Encoding.UTF8;
+        /// <summary>
+        /// Discord Webhook Url
+        /// </summary>
+        private readonly string _webhookUrl;
+        private readonly string _webhookName;
+        private readonly string _webhookAvatarUrl;
+        private static readonly Encoding _encoding = Encoding.UTF8;
 
         public DiscordWebhook(string url)
         {
-            Url = url;
+            _webhookUrl = url;
         }
 
+        public DiscordWebhook(string name, string url)
+        {
+            _webhookName = name;
+            _webhookUrl = url;
+        }
+
+        public DiscordWebhook(string name, string avatar, string url)
+        {
+            _webhookName = name;
+            _webhookAvatarUrl = avatar;
+            _webhookUrl = url;
+        }
+
+        /// <summary>
+        /// Function used to post mixed messages to discord
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="embed"></param>
+        /// <param name="fileName"></param>
+        /// <param name="fileFormat"></param>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public string Post(string message, Embed embed, string fileName, string fileFormat, string filePath)
+        {
+            string url = null;
+            Dictionary<string, object> postParameters = new Dictionary<string, object>
+            {
+                { "username", _webhookName },
+                { "avatar_url", _webhookAvatarUrl},
+                { "content", message },
+                { "embeds", JsonConvert.SerializeObject(new List<Embed> { embed }) },
+                { "filename", fileName },
+                { "fileformat", fileFormat },
+                { "file", new FileParameter(File.ReadAllBytes(filePath), fileName, "application/msexcel") }
+            };
+
+            HttpWebResponse webResponse = MultipartFormDataPost("Test", postParameters);
+
+            StreamReader responseReader = new StreamReader(webResponse.GetResponseStream());
+            string fullResponse = responseReader.ReadToEnd();
+            webResponse.Close();
+
+            JObject obj = JObject.Parse(fullResponse);
+            JArray jArray = (JArray)obj["attachments"];
+            if (jArray.Count > 0)
+                url = jArray[0]["url"].ToString();
+            else
+                url = "empty";
+            return url;
+        }
+
+        /// <summary>
+        /// Function used to post plain text messages to discord
+        /// </summary>
+        /// <returns></returns>
+        public bool PostMessage(string message)
+        {
+            Dictionary<string, object> postParameters = new Dictionary<string, object>
+            {
+                { "username", _webhookName },
+                { "avatar_url", _webhookAvatarUrl},
+                { "content", message }
+            };
+
+            HttpWebResponse webResponse = MultipartFormDataPost("Test", postParameters);
+            webResponse.Close();
+
+            return webResponse.StatusCode == HttpStatusCode.OK || webResponse.StatusCode == HttpStatusCode.Created || webResponse.StatusCode == HttpStatusCode.NoContent;
+        }
+
+        /// <summary>
+        /// Function used to post embeded text messages to discord
+        /// </summary>
+        /// <returns></returns>
+        public bool PostEmbededMessage(Embed embed)
+        {
+            Dictionary<string, object> postParameters = new Dictionary<string, object>
+            {
+                { "username", _webhookName },
+                { "avatar_url", _webhookAvatarUrl},
+                { "embeds", JsonConvert.SerializeObject(new List<Embed> { embed }) }
+            };
+
+            HttpWebResponse webResponse = MultipartFormDataPost("Test", postParameters);
+            webResponse.Close();
+            return webResponse.StatusCode == HttpStatusCode.OK || webResponse.StatusCode == HttpStatusCode.Created || webResponse.StatusCode == HttpStatusCode.NoContent;
+        }
+
+        /// <summary>
+        /// Function used to post files to discord
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="fileFormat"></param>
+        /// <param name="filePath"></param>
+        /// <returns>A <see cref="string"></see> url to the file.</returns>
         public string PostFile(string fileName, string fileFormat, string filePath)
         {
             string url = null;
-            Dictionary<string, object> postParameters = new Dictionary<string, object>();
-            postParameters.Add("filename", fileName);
-            postParameters.Add("fileformat", fileFormat);
-            postParameters.Add("file", new FileParameter(File.ReadAllBytes(filePath), fileName, "application/msexcel"));
+            Dictionary<string, object> postParameters = new Dictionary<string, object>
+            {
+                { "username", _webhookName },
+                { "avatar_url", _webhookAvatarUrl},
+                { "filename", fileName },
+                { "fileformat", fileFormat },
+                { "file", new FileParameter(File.ReadAllBytes(filePath), fileName, "application/msexcel") }
+            };
 
             HttpWebResponse webResponse = MultipartFormDataPost("Test", postParameters);
 
@@ -43,7 +152,13 @@ namespace Tavstal.TLibrary.Services
             return url;
         }
 
-        public HttpWebResponse MultipartFormDataPost(string userAgent, Dictionary<string, object> postParameters)
+        /// <summary>
+        /// Function used to convert stuff for posting the request
+        /// </summary>
+        /// <param name="userAgent"></param>
+        /// <param name="postParameters"></param>
+        /// <returns><see cref="HttpWebResponse"></see></returns>
+        private HttpWebResponse MultipartFormDataPost(string userAgent, Dictionary<string, object> postParameters)
         {
             string formDataBoundary = string.Format("----------{0:N}", Guid.NewGuid());
 
@@ -51,13 +166,21 @@ namespace Tavstal.TLibrary.Services
 
             byte[] formData = GetMultipartFormData(postParameters, formDataBoundary);
 
-            return PostForm(Url, userAgent, contentType, formData);
+            return PostForm(_webhookUrl, userAgent, contentType, formData);
         }
 
+        /// <summary>
+        /// Send a POST request to discord
+        /// </summary>
+        /// <param name="postUrl"></param>
+        /// <param name="userAgent"></param>
+        /// <param name="contentType"></param>
+        /// <param name="formData"></param>
+        /// <returns><see cref="HttpWebRequest"></see></returns>
+        /// <exception cref="NullReferenceException"></exception>
         private HttpWebResponse PostForm(string postUrl, string userAgent, string contentType, byte[] formData)
         {
             HttpWebRequest request = WebRequest.Create(postUrl) as HttpWebRequest;
-
             if (request == null)
             {
                 throw new NullReferenceException("request is not a http request");
@@ -80,6 +203,12 @@ namespace Tavstal.TLibrary.Services
             return request.GetResponse() as HttpWebResponse;
         }
 
+        /// <summary>
+        /// Gets the multipart form data using parameters and boundary
+        /// </summary>
+        /// <param name="postParameters"></param>
+        /// <param name="boundary"></param>
+        /// <returns><see cref="byte[]"></see></returns>
         private byte[] GetMultipartFormData(Dictionary<string, object> postParameters, string boundary)
         {
             Stream formDataStream = new System.IO.MemoryStream();
@@ -88,7 +217,7 @@ namespace Tavstal.TLibrary.Services
             foreach (var param in postParameters)
             {
                 if (needsCLRF)
-                    formDataStream.Write(encoding.GetBytes("\r\n"), 0, encoding.GetByteCount("\r\n"));
+                    formDataStream.Write(_encoding.GetBytes("\r\n"), 0, _encoding.GetByteCount("\r\n"));
 
                 needsCLRF = true;
 
@@ -102,7 +231,7 @@ namespace Tavstal.TLibrary.Services
                         fileToUpload.FileName ?? param.Key,
                         fileToUpload.ContentType ?? "application/octet-stream");
 
-                    formDataStream.Write(encoding.GetBytes(header), 0, encoding.GetByteCount(header));
+                    formDataStream.Write(_encoding.GetBytes(header), 0, _encoding.GetByteCount(header));
                     formDataStream.Write(fileToUpload.File, 0, fileToUpload.File.Length);
                 }
                 else
@@ -111,13 +240,13 @@ namespace Tavstal.TLibrary.Services
                         boundary,
                         param.Key,
                         param.Value);
-                    formDataStream.Write(encoding.GetBytes(postData), 0, encoding.GetByteCount(postData));
+                    formDataStream.Write(_encoding.GetBytes(postData), 0, _encoding.GetByteCount(postData));
                 }
             }
 
             // Add the end of the request.  Start with a newline
             string footer = "\r\n--" + boundary + "--\r\n";
-            formDataStream.Write(encoding.GetBytes(footer), 0, encoding.GetByteCount(footer));
+            formDataStream.Write(_encoding.GetBytes(footer), 0, _encoding.GetByteCount(footer));
 
             // Dump the Stream into a byte[]
             formDataStream.Position = 0;
