@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Tavstal.TLibrary.Extensions;
 using UnityEngine;
 
-namespace Tavstal.TLibrary.Helpers
+namespace Tavstal.TLibrary.Helpers.Unturned
 {
     public static class UAssetHelper
     {

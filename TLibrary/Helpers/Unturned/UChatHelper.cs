@@ -1,9 +1,10 @@
 ﻿using Rocket.Unturned.Player;
 using SDG.Unturned;
 using Tavstal.TLibrary.Compatibility.Interfaces;
+using Tavstal.TLibrary.Helpers.General;
 using UnityEngine;
 
-namespace Tavstal.TLibrary.Helpers
+namespace Tavstal.TLibrary.Helpers.Unturned
 {
     /// <summary>
     /// Unturned chat helper

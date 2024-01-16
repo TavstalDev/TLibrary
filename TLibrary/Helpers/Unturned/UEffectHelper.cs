@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using Tavstal.TLibrary.Compatibility;
 using UnityEngine;
 
-namespace Tavstal.TLibrary.Helpers
+namespace Tavstal.TLibrary.Helpers.Unturned
 {
-    public static class EffectHelper
+    public static class UEffectHelper
     {
         
     }

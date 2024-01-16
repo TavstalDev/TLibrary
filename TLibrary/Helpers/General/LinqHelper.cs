@@ -7,10 +7,15 @@ using System.Threading.Tasks;
 using Tavstal.TLibrary.Compatibility;
 using UnityEngine;
 
-namespace Tavstal.TLibrary.Helpers
+namespace Tavstal.TLibrary.Helpers.General
 {
     public static class LinqHelper
     {
+        /// <summary>
+        /// Gets all expressions from binary expression.
+        /// </summary>
+        /// <param name="binaryExpression"></param>
+        /// <returns></returns>
         public static List<Expression> GetExpressions(BinaryExpression binaryExpression)
         {
             var expressions = new List<Expression>();
@@ -28,6 +33,12 @@ namespace Tavstal.TLibrary.Helpers
             return expressions;
         }
 
+        /// <summary>
+        /// Get member name from expression.
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public static string GetMemberName(Expression expression)
         {
             if (expression is MemberExpression memberExpression)

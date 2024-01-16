@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Tavstal.TLibrary.Compatibility;
 using UnityEngine;
 
-namespace Tavstal.TLibrary.Helpers
+namespace Tavstal.TLibrary.Helpers.General
 {
     public static class MathHelper
     {
@@ -207,6 +207,70 @@ namespace Tavstal.TLibrary.Helpers
         public static float Clamp(float value, float minValue, float maxValue)
         {
             return maxValue < value ? maxValue : (value < minValue ? minValue : value);
+        }
+
+        /// <summary>
+        /// Converts a byte array representing metadata to an integer.
+        /// </summary>
+        /// <param name="metadata">The byte array representing the metadata.</param>
+        /// <returns>The converted <see cref="int"/>.</returns>
+        public static int ConvertByteToInt32(byte[] metadata)
+        {
+            return BitConverter.ToInt32(metadata, 0);
+        }
+
+        /// <summary>
+        /// Converts a byte array representing metadata to an unsigned integer.
+        /// </summary>
+        /// <param name="metadata">The byte array representing the metadata.</param>
+        /// <returns>The converted <see cref="uint"/>.</returns>
+        public static uint ConvertByteToUInt32(byte[] metadata)
+        {
+            return BitConverter.ToUInt32(metadata, 0);
+        }
+
+        /// <summary>
+        /// Converts an integer to a byte array representing metadata.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>The byte array representing the converted <see cref="int"/>.</returns>
+        public static byte[] ConvertInt32ToMetadata(uint value)
+        {
+            return BitConverter.GetBytes(value);
+        }
+
+        /// <summary>
+        /// Converts an unsigned integer to a byte array representing metadata.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>The byte array representing the converted <see cref="uint"/>.</returns>
+        public static byte[] ConvertUInt32ToMetadata(uint value)
+        {
+            return BitConverter.GetBytes(value);
+        }
+
+        /// <summary>
+        /// Generates a random frequency as an unsigned integer.
+        /// </summary>
+        /// <returns>A randomly generated frequency.</returns>
+        public static uint GenerateFrequency(ref List<uint> inUseFrequencies)
+        { 
+            uint freq = Convert.ToUInt32(MathHelper.Next(300000, 900000));
+            if (!inUseFrequencies.Contains(freq))
+                inUseFrequencies.Add(freq);
+            else
+                freq = GenerateFrequency(ref inUseFrequencies);
+
+            return freq;
+        }
+
+        /// <summary>
+        /// Generates a random frequency as an unsigned integer.
+        /// </summary>
+        /// <returns>A randomly generated frequency.</returns>
+        public static uint GenerateFrequency()
+        {
+            return Convert.ToUInt32(MathHelper.Next(300000, 900000)); ;
         }
     }
 }

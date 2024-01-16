@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tavstal.TLibrary.Compatibility;
 
-namespace Tavstal.TLibrary.Helpers
+namespace Tavstal.TLibrary.Helpers.General
 {
     /// <summary>
     /// Helper used for formatting rich text.
@@ -54,6 +54,11 @@ namespace Tavstal.TLibrary.Helpers
             new ConsoleFormat("&f", ConsoleColor.White),
         };
 
+        /// <summary>
+        /// Formats the text with the default formats.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static string FormatTextV2(string text)
         {
             string formated = string.Empty;
@@ -173,6 +178,10 @@ namespace Tavstal.TLibrary.Helpers
             return formated;
         }
 
+        /// <summary>
+        /// Sends the formated text to the console.
+        /// </summary>
+        /// <param name="text"></param>
         public static void SendFormatedConsole(string text)
         {
             string formated = string.Empty;
@@ -255,7 +264,11 @@ namespace Tavstal.TLibrary.Helpers
             }
         }
 
-        // It's for removing formaters from the text. Mostly used in the console.
+        /// <summary>
+        /// Clear formaters from the text. Used by the console.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static string ClearFormaters(string text)
         {
             string formated = string.Empty;

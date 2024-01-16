@@ -20,7 +20,7 @@ using MySqlX.XDevAPI.Common;
 using System.Web.Compilation;
 using System.Web.UI.WebControls;
 
-namespace Tavstal.TLibrary.Helpers
+namespace Tavstal.TLibrary.Helpers.General
 {
     public static class DatabaseHelper
     {

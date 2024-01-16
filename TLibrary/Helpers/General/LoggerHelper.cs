@@ -7,8 +7,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Tavstal.TLibrary.Helpers
+namespace Tavstal.TLibrary.Helpers.General
 {
+    /// <summary>
+    /// Internal helper class for logging.
+    /// </summary>
     internal static class LoggerHelper
     {
         private static string Name = Assembly.GetExecutingAssembly().GetName().Name;
