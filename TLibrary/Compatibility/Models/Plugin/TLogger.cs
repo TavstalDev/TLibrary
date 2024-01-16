@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 using Tavstal.TLibrary.Compatibility.Interfaces;
-using Tavstal.TLibrary.Helpers;
+using Tavstal.TLibrary.Helpers.General;
 
 namespace Tavstal.TLibrary.Compatibility
 {

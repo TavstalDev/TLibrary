@@ -8,7 +8,7 @@ using Tavstal.TLibrary.Compatibility;
 using Newtonsoft.Json.Linq;
 using Rocket.API;
 using System.Reflection;
-using Tavstal.TLibrary.Helpers;
+using Tavstal.TLibrary.Helpers.General;
 using SDG.Unturned;
 using System.Globalization;
 using Newtonsoft.Json;

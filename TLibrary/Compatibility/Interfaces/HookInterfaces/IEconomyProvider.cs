@@ -14,23 +14,23 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         bool HasBuiltInBankCardSystem();
         string GetCurrencyName();
 
-        decimal Withdraw(UnturnedPlayer player, decimal amount, EPaymentMethod method = EPaymentMethod.BANK);
+        decimal Withdraw(UnturnedPlayer player, decimal amount, EPaymentMethod method = EPaymentMethod.BANK_ACCOUNT);
 
-        decimal Deposit(UnturnedPlayer player, decimal amount, EPaymentMethod method = EPaymentMethod.BANK);
+        decimal Deposit(UnturnedPlayer player, decimal amount, EPaymentMethod method = EPaymentMethod.BANK_ACCOUNT);
 
-        decimal GetBalance(UnturnedPlayer player, EPaymentMethod method = EPaymentMethod.BANK);
+        decimal GetBalance(UnturnedPlayer player, EPaymentMethod method = EPaymentMethod.BANK_ACCOUNT);
 
-        bool Has(UnturnedPlayer player, decimal amount, EPaymentMethod method = EPaymentMethod.BANK);
+        bool Has(UnturnedPlayer player, decimal amount, EPaymentMethod method = EPaymentMethod.BANK_ACCOUNT);
 
         void AddTransaction(UnturnedPlayer player, Transaction transaction);
 
-        decimal Withdraw(CSteamID player, decimal amount, EPaymentMethod method = EPaymentMethod.BANK);
+        decimal Withdraw(CSteamID player, decimal amount, EPaymentMethod method = EPaymentMethod.BANK_ACCOUNT);
 
-        decimal Deposit(CSteamID player, decimal amount, EPaymentMethod method = EPaymentMethod.BANK);
+        decimal Deposit(CSteamID player, decimal amount, EPaymentMethod method = EPaymentMethod.BANK_ACCOUNT);
 
-        decimal GetBalance(CSteamID player, EPaymentMethod method = EPaymentMethod.BANK);
+        decimal GetBalance(CSteamID player, EPaymentMethod method = EPaymentMethod.BANK_ACCOUNT);
 
-        bool Has(CSteamID player, decimal amount, EPaymentMethod method = EPaymentMethod.BANK);
+        bool Has(CSteamID player, decimal amount, EPaymentMethod method = EPaymentMethod.BANK_ACCOUNT);
 
         void AddTransaction(CSteamID player, Transaction transaction);
 

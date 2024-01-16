@@ -1,8 +1,11 @@
-﻿using System;
+﻿using SDG.Unturned;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tavstal.TLibrary.Compatibility.Interfaces;
+using Tavstal.TLibrary.Extensions;
 
 namespace Tavstal.TLibrary.Compatibility.Economy
 {
@@ -54,5 +57,71 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         }
 
         public Transaction() { }
+
+
+        /// <summary>
+        /// Gets the transaction operator character based on the transaction type and amount.
+        /// </summary>
+        /// <returns>The transaction operator character.</returns>
+        public char GetTransactionOperator()
+        {
+            if (Amount == 0)
+                return new char();
+
+            switch (Type)
+            {
+                case ETransaction.DEPOSIT:
+                    return '+';
+                case ETransaction.WITHDRAW:
+                    return '-';
+                case ETransaction.REFUND:
+                    return '+';
+                case ETransaction.SALE:
+                    return '-';
+                case ETransaction.PURCHASE:
+                    return '-';
+                case ETransaction.PAYMENT:
+                    return '+';
+                default:
+                    return new char();
+            }
+        }
+
+        /// <summary>
+        /// Gets the transaction operator character based on the transaction type and amount.
+        /// </summary>
+        /// <param name="type">The type of the transaction.</param>
+        /// <param name="amount">The amount involved in the transaction.</param>
+        /// <returns>The transaction operator character.</returns>
+        public static char GetTransactionOperator(ETransaction type, decimal amount)
+        {
+            if (amount == 0)
+                return new char();
+
+            switch (type)
+            {
+                case ETransaction.DEPOSIT:
+                    return '+';
+                case ETransaction.WITHDRAW:
+                    return '-';
+                case ETransaction.REFUND:
+                    return '+';
+                case ETransaction.SALE:
+                    return '-';
+                case ETransaction.PURCHASE:
+                    return '-';
+                case ETransaction.PAYMENT:
+                    return '+';
+                default:
+                    return new char();
+            }
+        }
+
+        public string GetTransactionName(IPlugin plugin)
+        {
+            string name = plugin.Localize("ui_unknown");
+            
+            return "WIP";
+        }
     }
 }

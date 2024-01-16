@@ -10,7 +10,7 @@ using Rocket.Core.Commands;
 using Rocket.Unturned.Player;
 using Tavstal.TLibrary.Compatibility.Interfaces;
 using Tavstal.TLibrary.Extensions;
-using Tavstal.TLibrary.Helpers;
+using Tavstal.TLibrary.Helpers.Unturned;
 
 namespace Tavstal.TLibrary.Compatibility
 {
