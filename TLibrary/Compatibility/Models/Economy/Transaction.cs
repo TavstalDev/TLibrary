@@ -1,7 +1,12 @@
-﻿using SDG.Unturned;
+﻿using Rocket.Core.Steam;
+using Rocket.Unturned.Extensions;
+using Rocket.Unturned.Player;
+using SDG.Unturned;
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Tavstal.TLibrary.Compatibility.Interfaces;
@@ -81,7 +86,7 @@ namespace Tavstal.TLibrary.Compatibility.Economy
                 case ETransaction.PURCHASE:
                     return '-';
                 case ETransaction.PAYMENT:
-                    return '+';
+                    return Amount > 0 ? '+' : '-';
                 default:
                     return new char();
             }
@@ -111,17 +116,58 @@ namespace Tavstal.TLibrary.Compatibility.Economy
                 case ETransaction.PURCHASE:
                     return '-';
                 case ETransaction.PAYMENT:
-                    return '+';
+                    return amount > 0 ? '+' : '-';
                 default:
                     return new char();
             }
         }
 
-        public string GetTransactionName(IPlugin plugin)
+        /// <summary>
+        /// Gets the transaction name based on the transaction type.
+        /// </summary>
+        /// <param name="plugin"></param>
+        /// <param name="player"></param>
+        /// <returns>The transaction name as <see cref="string"/></returns>
+        public string GetTransactionName(IPlugin plugin, UnturnedPlayer player)
         {
             string name = plugin.Localize("ui_unknown");
-            
-            return "WIP";
+            switch (Type)
+            {
+                case ETransaction.DEPOSIT:
+                case ETransaction.WITHDRAW:
+                    {
+                       name = player.CharacterName;
+                       break;
+                    }
+                case ETransaction.REFUND:
+                case ETransaction.SALE:
+                case ETransaction.PURCHASE:
+                    {
+                        name = StoreName;
+                        break;
+                    }
+                case ETransaction.PAYMENT:
+                    {
+                        if (player.CSteamID.m_SteamID == PayeeId)
+                        {
+                            UnturnedPlayer otherPlayer = UnturnedPlayer.FromCSteamID((CSteamID)PayerId);
+                            if (otherPlayer != null)
+                                name = otherPlayer.CharacterName;
+                            else
+                                name = PayerId.ToString();
+                        }
+                        else
+                        {
+                            UnturnedPlayer otherPlayer = UnturnedPlayer.FromCSteamID((CSteamID)PayeeId);
+                            if (otherPlayer != null)
+                                name = otherPlayer.CharacterName;
+                            else
+                                name = PayeeId.ToString();
+                        }
+                        break;
+                    }
+            }
+            return name;
         }
     }
 }
