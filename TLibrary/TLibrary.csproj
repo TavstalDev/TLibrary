@@ -82,12 +82,15 @@
     </Reference>
     <Reference Include="Rocket.API">
       <HintPath>..\..\TPhone\Libraries\Rocket.API.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Rocket.Core">
       <HintPath>..\..\TPhone\Libraries\Rocket.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Rocket.Unturned">
       <HintPath>..\..\TPhone\Libraries\Rocket.Unturned.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="SDG.NetTransport">
       <HintPath>..\Libraries\SDG.NetTransport.dll</HintPath>
