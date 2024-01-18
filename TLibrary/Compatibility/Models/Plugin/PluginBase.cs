@@ -21,6 +21,7 @@ using System.Collections;
 using System.Globalization;
 using Tavstal.TLibrary.Compatibility.Interfaces;
 using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
 namespace Tavstal.TLibrary.Compatibility
 {
@@ -52,8 +53,10 @@ namespace Tavstal.TLibrary.Compatibility
 
         private static readonly System.Version _version = Assembly.GetExecutingAssembly().GetName().Version;
         private static readonly DateTime _buildDate = new DateTime(2000, 1, 1).AddDays(_version.Build).AddSeconds(_version.Revision * 2);
+        private static readonly FileVersionInfo _versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
         public static System.Version Version { get { return _version; } }
         public static DateTime BuildDate { get { return _buildDate; } }
+        public static FileVersionInfo VersionInfo { get { return _versionInfo; } }
 
         /// <summary>
         /// Used when the plugin loads
