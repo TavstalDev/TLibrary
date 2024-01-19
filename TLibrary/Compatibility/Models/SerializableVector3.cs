@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace Tavstal.TLibrary.Compatibility
 {
+    /// <summary>
+    /// Vector3 that can be serialized.
+    /// </summary>
     [Serializable]
     public class SerializableVector3
     {

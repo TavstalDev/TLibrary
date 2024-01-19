@@ -84,8 +84,8 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// <param name="details"></param>
         public void UpdateDetails(BankCardDetails details)
         {
-            if (details.CardBalance >= 0)
-                Balance = details.CardBalance;
+            if (details.Balance >= 0)
+                Balance = details.Balance;
             IsActive = details.IsActive;
             IsInATM = details.IsInATM;
             if (details.Transactions.Count >= 0 && details.Transactions != null)
