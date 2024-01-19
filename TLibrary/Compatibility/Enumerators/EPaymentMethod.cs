@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Tavstal.TLibrary.Compatibility.Economy
 {
+    /// <summary>
+    /// Enum list of the payment methods
+    /// </summary>
     public enum EPaymentMethod
     {
         /// <summary>

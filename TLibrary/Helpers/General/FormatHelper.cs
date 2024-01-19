@@ -121,7 +121,7 @@ namespace Tavstal.TLibrary.Helpers.General
                                     formated += f.EndTag;
                             }
 
-                            TextFormat anotherFormat = activeFormats.Find(x => x.isDecoration != newFormat.isDecoration);
+                            TextFormat anotherFormat = activeFormats.Find(x => x.IsDecoration != newFormat.IsDecoration);
                             if (anotherFormat != null)
                             {
                                 activeFormats = new List<TextFormat>()

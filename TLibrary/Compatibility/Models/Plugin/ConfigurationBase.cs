@@ -10,6 +10,9 @@ using Newtonsoft.Json;
 
 namespace Tavstal.TLibrary.Compatibility
 {
+    /// <summary>
+    /// Abstract class for all configurations.
+    /// </summary>
     public abstract class ConfigurationBase : IConfigurationBase
     {
         [JsonIgnore]

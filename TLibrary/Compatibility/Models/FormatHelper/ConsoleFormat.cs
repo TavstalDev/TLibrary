@@ -11,7 +11,13 @@ namespace Tavstal.TLibrary.Compatibility
     /// </summary>
     public class ConsoleFormat
     {
+        /// <summary>
+        /// Key of the format
+        /// </summary>
         public string Key { get; set; }
+        /// <summary>
+        /// Color of the format
+        /// </summary>
         public ConsoleColor Color { get; set; }
 
         public ConsoleFormat() { }

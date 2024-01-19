@@ -14,7 +14,7 @@ namespace Tavstal.TLibrary.Compatibility
         public string Key { get; set; }
         public string StartTag { get; set; }
         public string EndTag { get; set; }
-        public bool isDecoration { get; set; }
+        public bool IsDecoration { get; set; }
 
         public TextFormat() { }
 
@@ -23,7 +23,7 @@ namespace Tavstal.TLibrary.Compatibility
             Key = key;
             StartTag = start;
             EndTag = end;
-            isDecoration = isdeco;
+            IsDecoration = isdeco;
         }
     }
 }

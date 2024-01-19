@@ -22,6 +22,7 @@ using System.Globalization;
 using Tavstal.TLibrary.Compatibility.Interfaces;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
+using Newtonsoft.Json.Linq;
 
 namespace Tavstal.TLibrary.Compatibility
 {
@@ -48,7 +49,13 @@ namespace Tavstal.TLibrary.Compatibility
         /// </summary>
         public static HookManager HookManager { get; set; }
 
+        /// <summary>
+        /// Rich logger used to replace Rocket's logger
+        /// </summary>
         private static TLogger _logger;
+        /// <summary>
+        /// Rich logger used to replace Rocket's logger
+        /// </summary>
         public static TLogger Logger { get { return _logger; } }
 
         private static readonly System.Version _version = Assembly.GetExecutingAssembly().GetName().Version;
