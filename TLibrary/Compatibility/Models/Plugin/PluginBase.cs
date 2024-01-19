@@ -253,7 +253,7 @@ namespace Tavstal.TLibrary.Compatibility
         protected new string Translate(string translationKey, params object[] placeholder)
         {
             Logger.LogWarning($"OLD TRANSLATION METHOD WAS USED FOR '{translationKey}'");
-            return Localize(false, translationKey, placeholder);
+            throw new Exception("The 'Translate' method was used instead of 'Localize'.");
         }
 
         /// <summary>
