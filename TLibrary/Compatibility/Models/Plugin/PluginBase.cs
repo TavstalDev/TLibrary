@@ -85,6 +85,7 @@ namespace Tavstal.TLibrary.Compatibility
         {
             base.Unload();
             OnUnLoad();
+            Localization = new Dictionary<string, string>(); // Clearing because of /rocket reload caused error
         }
 
         /// <summary>
