@@ -12,6 +12,7 @@ using Tavstal.TLibrary.Helpers.General;
 using SDG.Unturned;
 using System.Globalization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Tavstal.TLibrary.Extensions
 {
@@ -58,30 +59,6 @@ namespace Tavstal.TLibrary.Extensions
                 configuration.SaveConfig();
                 return null;
             }
-        }
-
-        /// <summary>
-        /// Reads and deserializes a configuration object of type <typeparamref name="T"/> from the provided <paramref name="configuration"/> instance.
-        /// The deserialized configuration object is assigned back to the <paramref name="configuration"/> reference.
-        /// </summary>
-        /// <typeparam name="T">The type of the configuration object to read.</typeparam>
-        /// <param name="configuration">The reference to the configuration instance to be updated.</param>
-        public static void ReadConfig<T>(ref ConfigurationBase configuration) where T : ConfigurationBase
-        {
-            string fullPath = Path.Combine(configuration.FilePath, configuration.FileName);
-            if (!File.Exists(fullPath))
-            {
-                configuration.LoadDefaults();
-                configuration.SaveConfig();
-                return;
-            }
-
-
-            string text = File.ReadAllText(fullPath);
-            configuration = JsonConvert.DeserializeObject<T>(text, new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented,
-            });
         }
 
         /// <summary>

@@ -33,12 +33,22 @@ namespace Tavstal.TLibrary.Compatibility
 
         public ConfigurationBase()
         {
-            LoadDefaults();
+
         }
 
         public virtual void LoadDefaults()
         {
 
+        }
+
+        public static T Create<T>() where T : ConfigurationBase
+        {
+            return (T)Activator.CreateInstance<T>(); 
+        }
+
+        public static T Create<T>(string fileName, string path) where T : ConfigurationBase
+        {
+            return (T)Activator.CreateInstance(typeof(T), fileName, path);
         }
     }
 }

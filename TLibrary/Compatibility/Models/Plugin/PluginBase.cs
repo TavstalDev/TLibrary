@@ -23,6 +23,7 @@ using Tavstal.TLibrary.Compatibility.Interfaces;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Tavstal.TLibrary.Compatibility
 {
@@ -146,12 +147,10 @@ namespace Tavstal.TLibrary.Compatibility
                 System.IO.Directory.CreateDirectory(translationsDirectory);
 
             // Handle Configuration
-            _config = Activator.CreateInstance<PluginConfig>();
-            _config.FileName = "Configuration.json";
-            _config.FilePath = this.Directory;
-            Logger.LogWarning($"{_config.CheckConfigFile()}");
+            _config = ConfigurationBase.Create<PluginConfig>("Configuration.json", this.Directory);
+
             if (_config.CheckConfigFile())
-                _config = PluginExtensions.ReadConfig<PluginConfig>(_config) ?? _config;
+                _config = PluginExtensions.ReadConfig<PluginConfig>(_config);
             else
             {
                 CultureInfo ci = CultureInfo.InstalledUICulture;
@@ -183,7 +182,7 @@ namespace Tavstal.TLibrary.Compatibility
             }
 
             if (LanguagePacks != null)
-                if (Config.DownloadLocalePacks && LanguagePacks.Count > 0)
+                if (_config.DownloadLocalePacks && LanguagePacks.Count > 0)
                     foreach (var pack in LanguagePacks)
                     {
                         string path = Path.Combine(translationsDirectory, $"locale.{pack.Key}.json");
@@ -208,7 +207,7 @@ namespace Tavstal.TLibrary.Compatibility
 
             
 
-            string locale = Config.Locale;
+            string locale = _config.Locale;
             if (File.Exists(Path.Combine(translationsDirectory, $"locale.{locale}.json")))
             {
                 var localLocale = PluginExtensions.ReadTranslation(translationsDirectory, $"locale.{locale}.json");
