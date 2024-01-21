@@ -32,10 +32,11 @@ namespace Tavstal.TLibrary.Compatibility
     /// <typeparam name="PluginConfig"></typeparam>
     public abstract class PluginBase<PluginConfig> : RocketPlugin, IPlugin where PluginConfig : ConfigurationBase
     {
+        private PluginConfig _config;
         /// <summary>
         /// Plugin Configuration
         /// </summary>
-        public PluginConfig Config { get; set; }
+        public PluginConfig Config { get { return _config; } }
         /// <summary>
         /// Instance of the Plugin
         /// </summary>
@@ -129,23 +130,28 @@ namespace Tavstal.TLibrary.Compatibility
         /// </summary>
         public virtual void CheckPluginFiles()
         {
+            // Delete Rocket Config
             string rocketConfigFile = Path.Combine(this.Directory, $"{GetPluginName()}.configuration.xml");
             if (File.Exists(rocketConfigFile))
                 File.Delete(rocketConfigFile);
 
+            // Delete Rocket Translation
             string rocketTranslationFile = Path.Combine(this.Directory, $"{GetPluginName()}.en.translation.xml");
             if (File.Exists(rocketTranslationFile))
                 File.Delete(rocketTranslationFile);
 
+            // Create Translations Directory
             string translationsDirectory = Path.Combine(this.Directory, "Translations");
             if (!System.IO.Directory.Exists(translationsDirectory))
                 System.IO.Directory.CreateDirectory(translationsDirectory);
 
-            Config = Activator.CreateInstance<PluginConfig>();
-            Config.FileName = "Configuration.json";
-            Config.FilePath = this.Directory;
-            if (Config.CheckConfigFile())
-                Config = PluginExtensions.ReadConfig<PluginConfig>(Config) ?? Config;
+            // Handle Configuration
+            _config = Activator.CreateInstance<PluginConfig>();
+            _config.FileName = "Configuration.json";
+            _config.FilePath = this.Directory;
+            Logger.LogWarning($"{_config.CheckConfigFile()}");
+            if (_config.CheckConfigFile())
+                _config = PluginExtensions.ReadConfig<PluginConfig>(_config) ?? _config;
             else
             {
                 CultureInfo ci = CultureInfo.InstalledUICulture;
@@ -154,20 +160,26 @@ namespace Tavstal.TLibrary.Compatibility
                 {
                     if (LanguagePacks.ContainsKey(ci.TwoLetterISOLanguageName))
                     {
-                        Config.Locale = langISO;
-                        Config.SaveConfig();
+                        _config.Locale = langISO;
+                        _config.SaveConfig();
                     }
                 }
             }
 
-            Dictionary<string, string> localLocalization = new Dictionary<string, string>();
+            Dictionary<string, string> localLocalization = CommonLocalization ?? new Dictionary<string, string>();
             if (DefaultLocalization != null)
-                localLocalization = DefaultLocalization;
+                foreach (var l in DefaultLocalization)
+                {
+                    if (localLocalization.ContainsKey(l.Key))
+                        localLocalization[l.Key] = l.Value;   
+                    else
+                        localLocalization.Add(l.Key, l.Value);
+                }
 
             string defaultTranslationFile = Path.Combine(translationsDirectory, "locale.en.json");
             if (!File.Exists(defaultTranslationFile))
             {
-                PluginExtensions.SaveTranslation(DefaultLocalization, translationsDirectory, "locale.en.json");
+                PluginExtensions.SaveTranslation(localLocalization, translationsDirectory, "locale.en.json");
             }
 
             if (LanguagePacks != null)
@@ -203,7 +215,22 @@ namespace Tavstal.TLibrary.Compatibility
                 if (localLocale != null)
                 {
                     if (localLocale.Count > 0)
-                        localLocalization = localLocale;
+                    {
+                        if ((DefaultLocalization.Count + CommonLocalization.Count) - localLocale.Count != 0)
+                        {
+                            foreach (var l in localLocale)
+                            {
+                                if (localLocalization.ContainsKey(l.Key))
+                                    localLocalization[l.Key] = l.Value;
+                                else
+                                    localLocalization.Add(l.Key, l.Value);
+                            }
+                            PluginExtensions.SaveTranslation(localLocalization, translationsDirectory, $"locale.{locale}.json");
+                        }
+                        else
+                            localLocalization = localLocale;
+
+                    }
                     else if (localLocale.Count == 0 && locale == "en")
                     {
                         PluginExtensions.SaveTranslation(DefaultLocalization, translationsDirectory, "locale.en.json");
@@ -211,15 +238,7 @@ namespace Tavstal.TLibrary.Compatibility
                 }
             }
 
-            foreach (var l in CommonLocalization)
-            {
-                if (!localLocalization.ContainsKey(l.Key))
-                    Localization.Add(l.Key, l.Value);
-            }
-            foreach (var l in localLocalization)
-            {
-                Localization.Add(l.Key, l.Value);
-            }
+            Localization = localLocalization;
 
         }
 

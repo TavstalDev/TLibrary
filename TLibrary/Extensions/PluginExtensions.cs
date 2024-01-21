@@ -46,7 +46,11 @@ namespace Tavstal.TLibrary.Extensions
             try
             {
                 string text = File.ReadAllText(fullPath);
-                return JsonConvert.DeserializeObject<T>(text);
+                return JsonConvert.DeserializeObject<T>(text, new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.All,
+                    Formatting = Formatting.Indented,
+                });
             }
             catch
             {
@@ -75,7 +79,11 @@ namespace Tavstal.TLibrary.Extensions
 
 
             string text = File.ReadAllText(fullPath);
-            configuration = JsonConvert.DeserializeObject<T>(text);
+            configuration = JsonConvert.DeserializeObject<T>(text, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.All,
+                Formatting = Formatting.Indented,
+            });
         }
 
         /// <summary>
@@ -85,7 +93,11 @@ namespace Tavstal.TLibrary.Extensions
         public static void SaveConfig(this ConfigurationBase configuration)
         {
             string fullPath = Path.Combine(configuration.FilePath, configuration.FileName);
-            File.WriteAllText(fullPath, JsonConvert.SerializeObject(configuration, formatting: Formatting.Indented));
+            File.WriteAllText(fullPath, JsonConvert.SerializeObject(configuration, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.All,
+                Formatting = Formatting.Indented,
+            }));
         }
 
         /// <summary>
@@ -99,7 +111,11 @@ namespace Tavstal.TLibrary.Extensions
             string fullPath = Path.Combine(filePath, fileName);
             string text = File.ReadAllText(fullPath);
 
-            return JsonConvert.DeserializeObject<Dictionary<string, string>>(text);
+            return JsonConvert.DeserializeObject<Dictionary<string, string>>(text, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.All,
+                Formatting = Formatting.Indented,
+            });
         }
 
         /// <summary>
@@ -111,7 +127,11 @@ namespace Tavstal.TLibrary.Extensions
         public static void SaveTranslation(Dictionary<string, string> locale, string filePath, string fileName)
         {
             string fullPath = Path.Combine(filePath, fileName);
-            var yaml = JsonConvert.SerializeObject(locale, formatting: Formatting.Indented);
+            var yaml = JsonConvert.SerializeObject(locale, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.All,
+                Formatting = Formatting.Indented,
+            });
             File.WriteAllText(fullPath, yaml);
         }
 
