@@ -48,7 +48,6 @@ namespace Tavstal.TLibrary.Extensions
                 string text = File.ReadAllText(fullPath);
                 return JsonConvert.DeserializeObject<T>(text, new JsonSerializerSettings
                 {
-                    TypeNameHandling = TypeNameHandling.All,
                     Formatting = Formatting.Indented,
                 });
             }
@@ -81,7 +80,6 @@ namespace Tavstal.TLibrary.Extensions
             string text = File.ReadAllText(fullPath);
             configuration = JsonConvert.DeserializeObject<T>(text, new JsonSerializerSettings
             {
-                TypeNameHandling = TypeNameHandling.All,
                 Formatting = Formatting.Indented,
             });
         }
@@ -95,7 +93,6 @@ namespace Tavstal.TLibrary.Extensions
             string fullPath = Path.Combine(configuration.FilePath, configuration.FileName);
             File.WriteAllText(fullPath, JsonConvert.SerializeObject(configuration, new JsonSerializerSettings
             {
-                TypeNameHandling = TypeNameHandling.All,
                 Formatting = Formatting.Indented,
             }));
         }
@@ -113,7 +110,6 @@ namespace Tavstal.TLibrary.Extensions
 
             return JsonConvert.DeserializeObject<Dictionary<string, string>>(text, new JsonSerializerSettings
             {
-                TypeNameHandling = TypeNameHandling.All,
                 Formatting = Formatting.Indented,
             });
         }
@@ -129,7 +125,6 @@ namespace Tavstal.TLibrary.Extensions
             string fullPath = Path.Combine(filePath, fileName);
             var yaml = JsonConvert.SerializeObject(locale, new JsonSerializerSettings
             {
-                TypeNameHandling = TypeNameHandling.All,
                 Formatting = Formatting.Indented,
             });
             File.WriteAllText(fullPath, yaml);
