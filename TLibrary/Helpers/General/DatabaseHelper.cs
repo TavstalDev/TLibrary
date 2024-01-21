@@ -160,6 +160,25 @@ namespace Tavstal.TLibrary.Helpers.General
             }
             return localEnum;
         }
+        
+        /// <summary>
+        /// Function used to fix where cause related errors
+        /// </summary>
+        /// <param name="clause"></param>
+        /// <returns></returns>
+        private static string FixWhereClause(string clause)
+        {
+            if (clause == null)
+                return string.Empty;
+
+            if (clause.ToLower().Contains("false"))
+                clause = clause.Replace("false", "0").Replace("FALSE", "0").Replace("False", "0");
+
+            if (clause.ToLower().Contains("true"))
+                clause = clause.Replace("true", "1").Replace("TRUE", "1").Replace("True", "1");
+
+            return clause;
+        }
 
         /// <summary>
         /// Converts the current row in the MySqlDataReader to an object of the specified type.
@@ -640,6 +659,8 @@ namespace Tavstal.TLibrary.Helpers.General
                     if (parameters != null)
                         foreach (var param in parameters)
                             command.Parameters.Add(param);
+                    
+                    whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"SELECT * FROM {tableName} {whereClause}{limitClause}";
 
                     MySqlDataReader reader = command.ExecuteReader();
@@ -1061,6 +1082,7 @@ namespace Tavstal.TLibrary.Helpers.General
                         if (whereClause.StartsWith(" WHERE"))
                             whereClause = whereClause.Replace(" WHERE", "");
                     }
+                    whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"UPDATE {tableName} SET {setClause} WHERE {whereClause}";
                     command.ExecuteNonQuery();
                 }
@@ -1148,6 +1170,7 @@ namespace Tavstal.TLibrary.Helpers.General
                     if (whereClause.StartsWith(" WHERE"))
                         whereClause = whereClause.Replace(" WHERE", "");
 
+                    whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"UPDATE {tableName} SET {setClause} WHERE {whereClause}";
                     command.ExecuteNonQuery();
                 }
@@ -1248,6 +1271,7 @@ namespace Tavstal.TLibrary.Helpers.General
                     if (whereClause.StartsWith(" WHERE"))
                         whereClause = whereClause.Replace(" WHERE", "");
 
+                    whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"UPDATE {tableName} SET {setClause} WHERE {whereClause}";
                     command.ExecuteNonQuery();
                 }
@@ -1330,6 +1354,7 @@ namespace Tavstal.TLibrary.Helpers.General
                         if (whereClause.StartsWith(" WHERE"))
                             whereClause = whereClause.Replace(" WHERE", "");
                     }
+                    whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"DELETE FROM {tableName} WHERE {whereClause}";
                     command.ExecuteNonQuery();
                 }
