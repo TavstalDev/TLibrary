@@ -60,7 +60,7 @@ namespace Tavstal.TLibrary.Compatibility
 
         private static readonly System.Version _version = Assembly.GetExecutingAssembly().GetName().Version;
         private static readonly DateTime _buildDate = new DateTime(2000, 1, 1).AddDays(_version.Build).AddSeconds(_version.Revision * 2);
-        private static readonly FileVersionInfo _versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
+        private static FileVersionInfo _versionInfo;
         public static System.Version Version { get { return _version; } }
         public static DateTime BuildDate { get { return _buildDate; } }
         public static FileVersionInfo VersionInfo { get { return _versionInfo; } }
@@ -71,6 +71,7 @@ namespace Tavstal.TLibrary.Compatibility
         protected override void Load()
         {
             _logger = TLogger.CreateInstance(this, false);
+            _versionInfo = FileVersionInfo.GetVersionInfo(this.Assembly.Location);
             base.Load();
             Instance = this;
             CheckPluginFiles();
