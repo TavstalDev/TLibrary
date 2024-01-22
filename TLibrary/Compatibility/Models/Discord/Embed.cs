@@ -34,7 +34,9 @@ namespace Tavstal.TLibrary.Compatibility.Models.Discord
         [JsonProperty("fields")]
         public EmbedField[] Fields { get; set; }
 
-        public Embed(string title, string type, string description, string url, DateTime timeStamp, int color, EmbedFooter footer, EmbedImage image, EmbedThumbnail thumbnail, EmbedVideo video, EmbedAuthor author, EmbedField[] fields)
+        public Embed() { }
+
+        public Embed(string title = null, string type = null, string description = null, string url = null, DateTime timeStamp = default, int color = 0, EmbedFooter footer = null, EmbedImage image = null, EmbedThumbnail thumbnail = null, EmbedVideo video = null, EmbedAuthor author = null, EmbedField[] fields = null)
         {
             Title = title;
             Type = type;
