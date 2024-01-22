@@ -124,6 +124,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compatibility\Interfaces\IPlayerComponent.cs" />
     <Compile Include="Compatibility\Models\DatabaseSettingsBase.cs" />
     <Compile Include="Compatibility\Models\Database\Attributes\SqlMemberAttribute.cs" />
     <Compile Include="Compatibility\Models\Database\Attributes\SqlNameAttribute.cs" />
