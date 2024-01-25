@@ -19,32 +19,16 @@ namespace Tavstal.TLibrary.Compatibility.Models.Discord
         [JsonProperty("AvatarUrl")]
         public string AvatarUrl { get; set; }
         [JsonProperty("Color")]
-        public int Color { get; set; }
+        public string Color { get; set; }
 
         public WebhookSettings() { }
-
-        public WebhookSettings(string webhookUrl, string name = null, string avatarUrl = null, int color = 0)
-        {
-            WebhookUrl = webhookUrl;
-            Name = name;
-            AvatarUrl = avatarUrl;
-            Color = color;
-        }
 
         public WebhookSettings(string webhookUrl, string name = null, string avatarUrl = null, string color = null)
         {
             WebhookUrl = webhookUrl;
             Name = name;
             AvatarUrl = avatarUrl;
-            Color = StringHelper.ColorToDecimal(color);
-        }
-
-        public WebhookSettings(string webhookUrl, string name = null, string avatarUrl = null, Color color = default)
-        {
-            WebhookUrl = webhookUrl;
-            Name = name;
-            AvatarUrl = avatarUrl;
-            Color = StringHelper.ColorToDecimal(color);
+            Color = color;
         }
     }
 }
