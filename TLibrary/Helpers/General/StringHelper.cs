@@ -142,13 +142,44 @@ namespace Tavstal.TLibrary.Helpers.General
         }
 
         /// <summary>
-        /// Converts hex string to color.
+        /// Converts color to hex string.
         /// </summary>
         /// <param name="color"></param>
         /// <returns></returns>
         public static string HexConverter(Color color)
         {
             return "#" + ((int)color.r).ToString("X2") + ((int)color.g).ToString("X2") + ((int)color.b).ToString("X2");
+        }
+
+        /// <summary>
+        /// Converts hex string to color.
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static Color HexConverter(string color)
+        {
+            ColorUtility.TryParseHtmlString(color, out Color result);
+            return result;
+        }
+
+        /// <summary>
+        /// Convert hex to decimal
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static int ColorToDecimal(string color)
+        {
+            return Convert.ToInt32(color, 16);
+        }
+
+        /// <summary>
+        /// Convert unity color to decimal
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static int ColorToDecimal(Color color)
+        {
+            return ColorToDecimal(HexConverter(color));
         }
     }
 }
