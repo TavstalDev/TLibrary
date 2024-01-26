@@ -1,6 +1,8 @@
 ﻿using Rocket.Unturned.Player;
+using SDG.NetTransport;
 using SDG.Unturned;
 using Tavstal.TLibrary.Compatibility.Interfaces;
+using Tavstal.TLibrary.Helpers.General;
 
 namespace Tavstal.TLibrary.Helpers.Unturned
 {
@@ -312,6 +314,11 @@ namespace Tavstal.TLibrary.Helpers.Unturned
                     comp.PageIndexes[arrayIndex][4] = maxPage;
                 }
             }
+        }
+    
+        public static void SendRichUIText(short effectId, ITransportConnection connection, bool reliable, string uiName, string value)
+        {
+            EffectManager.sendUIEffectText(effectId, connection, reliable, uiName, FormatHelper.FormatTextV2(value));
         }
     }
 }
