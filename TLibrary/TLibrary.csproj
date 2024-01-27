@@ -138,6 +138,7 @@
     <Compile Include="Compatibility\Models\Discord\EmbedThumbnail.cs" />
     <Compile Include="Compatibility\Models\Discord\EmbedImage.cs" />
     <Compile Include="Compatibility\Models\Discord\EmbedFooter.cs" />
+    <Compile Include="Compatibility\Models\Discord\JsonParameter.cs" />
     <Compile Include="Compatibility\Models\Discord\WebhookSettings.cs" />
     <Compile Include="Compatibility\Models\Economy\Transaction.cs" />
     <Compile Include="Compatibility\Models\Economy\BankCardDetails.cs" />

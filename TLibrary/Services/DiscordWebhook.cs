@@ -75,8 +75,7 @@ namespace Tavstal.TLibrary.Services
             string url = null;
             Dictionary<string, object> postParameters = new Dictionary<string, object>
             {
-                { "content", message },
-                { "embeds", new List<object> { embed } },
+                { "payload_json", new JsonParameter(new { content = message, embeds = new List<object> { embed } }, "application/json") },
                 { "filename", fileName },
                 { "fileformat", fileFormat },
                 { "file", new FileParameter(fileData, fileName, "application/msexcel") }
@@ -240,7 +239,6 @@ namespace Tavstal.TLibrary.Services
             string contentType = "multipart/form-data; boundary=" + formDataBoundary;
 
             byte[] formData = GetMultipartFormData(postParameters, formDataBoundary);
-            LoggerHelper.LogWarning(Encoding.UTF8.GetString(formData));
             return PostForm(_webhookUrl, userAgent, contentType, formData);
         }
 
@@ -323,10 +321,8 @@ namespace Tavstal.TLibrary.Services
 
                 needsCLRF = true;
 
-                if (param.Value is FileParameter)
+                if (param.Value is FileParameter fileToUpload)
                 {
-                    FileParameter fileToUpload = (FileParameter)param.Value;
-
                     string header = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"; filename=\"{2}\"\r\nContent-Type: {3}\r\n\r\n",
                         boundary,
                         param.Key,
@@ -335,6 +331,15 @@ namespace Tavstal.TLibrary.Services
 
                     formDataStream.Write(_encoding.GetBytes(header), 0, _encoding.GetByteCount(header));
                     formDataStream.Write(fileToUpload.File, 0, fileToUpload.File.Length);
+                }
+                else if (param.Value is JsonParameter jsonParam)
+                {
+                    string postData = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"\r\nContent-Type: {3}\r\n\r\n{2}\r\n\r\n",
+                        boundary,
+                        param.Key,
+                        jsonParam.Content,
+                        jsonParam.ContentType ?? "application/json");
+                    formDataStream.Write(_encoding.GetBytes(postData), 0, _encoding.GetByteCount(postData));
                 }
                 else
                 {
