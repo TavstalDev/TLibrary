@@ -58,6 +58,20 @@ namespace Tavstal.TLibrary.Services
         /// <returns></returns>
         public string Post(string message, Embed embed, string fileName, string fileFormat, string filePath)
         {
+            return Post(message, embed, fileName, fileFormat, File.ReadAllBytes(filePath));
+        }
+
+        /// <summary>
+        /// Function used to post mixed messages to discord
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="embed"></param>
+        /// <param name="fileName"></param>
+        /// <param name="fileFormat"></param>
+        /// <param name="fileData"></param>
+        /// <returns></returns>
+        public string Post(string message, Embed embed, string fileName, string fileFormat, byte[] fileData)
+        {
             string url = null;
             Dictionary<string, object> postParameters = new Dictionary<string, object>
             {
@@ -65,7 +79,7 @@ namespace Tavstal.TLibrary.Services
                 { "embeds", new List<object> { embed } },
                 { "filename", fileName },
                 { "fileformat", fileFormat },
-                { "file", new FileParameter(File.ReadAllBytes(filePath), fileName, "application/msexcel") }
+                { "file", new FileParameter(fileData, fileName, "application/msexcel") }
             };
             if (!_webhookName.IsNullOrEmpty())
                 postParameters.Add("username", _webhookName);
