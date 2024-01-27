@@ -1,8 +1,10 @@
 ﻿using MySql.Data.MySqlClient;
+using MySql.Data.Types;
 using Newtonsoft.Json;
 using Rocket.Core.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -72,11 +74,11 @@ namespace Tavstal.TLibrary.Extensions
         }
 
         /// <summary>
-        /// Safely creates the mysql connection, made because of very long console error that will scare the regular user and they will spam with you "it does not work" instead of checking the config.
+        /// Safely creates the mysql connection, made because of very long console error that will scare the regular user and they will spam you with "it does not work" instead of checking the config.
         /// </summary>
         /// <param name="connection"></param>
         /// <returns></returns>
-        public static bool OpenSafe(this MySqlConnection connection)
+        public static async Task<bool> OpenSafe(this MySqlConnection connection)
         {
             if (connection.State == System.Data.ConnectionState.Open)
                 return true;
@@ -86,7 +88,7 @@ namespace Tavstal.TLibrary.Extensions
 
             try
             {
-                connection.Open();
+                await connection.OpenAsync();
                 return true;
             }
             catch (MySqlException myex)
@@ -96,14 +98,14 @@ namespace Tavstal.TLibrary.Extensions
                     LoggerHelper.LogWarning("# Failed to connect to the database due to authentication error. Please check the plugin's config file.");
                     LoggerHelper.LogError($"{myex}");
                     if (connection.State != System.Data.ConnectionState.Closed)
-                        connection.Close();
+                        await connection.CloseAsync();
                     return false;
                 }
 
                 LoggerHelper.LogException($"Mysql error in TLibrary:");
                 LoggerHelper.LogError(myex);
                 if (connection.State != System.Data.ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
             catch (Exception ex)
@@ -111,7 +113,7 @@ namespace Tavstal.TLibrary.Extensions
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != System.Data.ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -119,6 +121,72 @@ namespace Tavstal.TLibrary.Extensions
         private static bool IsAuthenticationError(MySqlException ex)
         {
             return ex.ToString().StartsWith("MySql.Data.MySqlClient.MySqlException (0x80004005)") || ex.ToString().Contains("Access denied for user");
+        }
+    
+    
+        public static string GetString(this DbDataReader reader, string key)
+        {
+            return reader.GetString(reader.GetOrdinal(key));
+        }
+
+        public static DateTime GetDateTime(this DbDataReader reader, string column)
+        {
+            return reader.GetDateTime(reader.GetOrdinal(column));
+        }
+
+        public static decimal GetDecimal(this DbDataReader reader, string column)
+        {
+            return reader.GetDecimal(reader.GetOrdinal(column));
+        }
+
+        public static double GetDouble(this DbDataReader reader, string column)
+        {
+            return reader.GetDouble(reader.GetOrdinal(column));
+        }
+
+        public static Type GetFieldType(this DbDataReader reader, string column)
+        {
+            return reader.GetFieldType(reader.GetOrdinal(column));
+        }
+
+        public static float GetFloat(this DbDataReader reader, string column)
+        {
+            return reader.GetFloat(reader.GetOrdinal(column));
+        }
+
+        public static Guid GetGuid(this DbDataReader reader, string column)
+        {
+            return reader.GetGuid(reader.GetOrdinal(column));
+        }
+
+        public static short GetInt16(this DbDataReader reader, string column)
+        {
+            return reader.GetInt16(reader.GetOrdinal(column));
+        }
+
+        public static int GetInt32(this DbDataReader reader, string column)
+        {
+            return reader.GetInt32(reader.GetOrdinal(column));
+        }
+
+        public static long GetInt64(this DbDataReader reader, string column)
+        {
+            return reader.GetInt64(reader.GetOrdinal(column));
+        }
+
+        public static ushort GetUInt16(this DbDataReader reader, string column)
+        {
+            return (ushort)reader.GetInt16(reader.GetOrdinal(column));
+        }
+
+        public static uint GetUInt32(this DbDataReader reader, string column)
+        {
+            return (uint)reader.GetInt32(reader.GetOrdinal(column));
+        }
+
+        public static ulong GetUInt64(this DbDataReader reader, string column)
+        {
+            return (ulong)reader.GetInt64(reader.GetOrdinal(column));
         }
     }
 }

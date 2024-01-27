@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Reflection;
 using Tavstal.TLibrary.Compatibility.Database;
 using Tavstal.TLibrary.Extensions;
+using System.Data.Common;
 
 namespace Tavstal.TLibrary.Helpers.General
 {
@@ -243,13 +245,75 @@ namespace Tavstal.TLibrary.Helpers.General
         }
 
         /// <summary>
+        /// Converts the current row in the MySqlDataReader to an object of the specified type.
+        /// </summary>
+        /// <typeparam name="T">The type of object to be converted.</typeparam>
+        /// <param name="reader">The MySqlDataReader to read data from.</param>
+        /// <returns>An object of the specified type representing the current row data, or default(T) if the conversion fails.</returns>
+        public static T ConvertToObject<T>(this DbDataReader reader) where T : class
+        {
+            try
+            {
+                if (!reader.HasRows)
+                    return default;
+
+                T obj = Activator.CreateInstance<T>();
+
+                foreach (var prop in typeof(T).GetProperties())
+                {
+                    if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                        continue;
+
+                    string propName = prop.Name;
+                    var memberAtt = prop.GetCustomAttribute<SqlMemberAttribute>();
+                    if (memberAtt != null)
+                    {
+                        if (!memberAtt.ColumnName.IsNullOrEmpty())
+                            propName = memberAtt.ColumnName;
+                    }
+
+                    int ordinal = reader.GetOrdinal(propName);
+                    var value = reader.GetValue(ordinal);
+
+                    if (prop.PropertyType.IsEnum)
+                        prop.SetValue(obj, Enum.ToObject(prop.PropertyType, value));
+                    else
+                    {
+                        if (prop.PropertyType == typeof(string))
+                        {
+                            if (prop.PropertyType.Name == value.GetType().Name)
+                                prop.SetValue(obj, ConvertSqlToIllegalChars((string)value));
+                            else
+                                prop.SetValue(obj, ConvertSqlToIllegalChars((string)Convert.ChangeType(value, prop.PropertyType)));
+                        }
+                        else
+                        {
+                            if (prop.PropertyType.Name == value.GetType().Name)
+                                prop.SetValue(obj, value);
+                            else
+                                prop.SetValue(obj, Convert.ChangeType(value, prop.PropertyType));
+                        }
+                    }
+                }
+
+                return obj;
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                return default;
+            }
+        }
+
+        /// <summary>
         /// Checks if a table with the specified name exists in the database.
         /// </summary>
         /// <typeparam name="T">The type associated with the table.</typeparam>
         /// <param name="connection">The MySQL database connection.</param>
         /// <param name="tableName">The name of the table to check.</param>
         /// <returns><c>true</c> if the table exists, otherwise <c>false</c>.</returns>
-        public static bool DoesTableExist<T>(this MySqlConnection connection, string tableName) where T : class
+        public static async Task<bool> DoesTableExistAsync<T>(this MySqlConnection connection, string tableName) where T : class
         {
             if (connection == null)
                 return false;
@@ -257,20 +321,20 @@ namespace Tavstal.TLibrary.Helpers.General
             try
             {
                 var schemaType = typeof(T);
-                connection.OpenSafe();
+                await connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     command.Parameters.AddWithValue("@TableName", tableName);
                     command.CommandText = $"SHOW TABLES LIKE @TableName;";
 
-                    object result = command.ExecuteScalar();
+                    object result = await command.ExecuteScalarAsync();
                     if (result != null)
                     {
-                        connection.Close();
+                        await connection.CloseAsync();
                         return true;
                     }
                 }
-                connection.Close();
+                await connection.CloseAsync();
                 return false;
             }
             catch (Exception ex)
@@ -278,7 +342,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -289,7 +353,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <typeparam name="T">The type associated with the table.</typeparam>
         /// <param name="connection">The MySQL database connection.</param>
         /// <returns><c>true</c> if the table exists, otherwise <c>false</c>.</returns>
-        public static bool DoesTableExist<T>(this MySqlConnection connection) where T : class
+        public static async Task<bool> DoesTableExistAsync<T>(this MySqlConnection connection) where T : class
         {
             if (connection == null)
                 return false;
@@ -300,14 +364,14 @@ namespace Tavstal.TLibrary.Helpers.General
                 var attribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
                 if (attribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-                return DoesTableExist<T>(connection, attribute.Name);
+                return await DoesTableExistAsync<T>(connection, attribute.Name);
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -319,7 +383,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="connection">The MySqlConnection to the MySQL database.</param>
         /// <param name="tableName">The name of the table to be created.</param>
         /// <returns>True if the table creation is successful, otherwise false.</returns>
-        public static bool CreateTable<T>(this MySqlConnection connection, string tableName) where T : class
+        public static async Task<bool> CreateTableAsync<T>(this MySqlConnection connection, string tableName) where T : class
         {
             if (connection == null)
                 return false;
@@ -328,7 +392,7 @@ namespace Tavstal.TLibrary.Helpers.General
             {
                 var schemaType = typeof(T);
 
-                connection.OpenSafe();
+                await connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     command.Parameters.AddWithValue("@TableName", tableName);
@@ -385,9 +449,9 @@ namespace Tavstal.TLibrary.Helpers.General
                 {
                     command.CommandText = $"CREATE TABLE {tableName} ({schemaParams}{keyParams})";
                     command.CommandText = command.CommandText.Remove(command.CommandText.LastIndexOf(','), 1);
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                 }
-                connection.Close();
+                await connection.CloseAsync();
                 return true;
             }
             catch (Exception ex)
@@ -395,7 +459,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -406,7 +470,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <typeparam name="T">The type of object for which the table is created.</typeparam>
         /// <param name="connection">The MySqlConnection to the MySQL database.</param>
         /// <returns>True if the table creation is successful, otherwise false.</returns>
-        public static bool CreateTable<T>(this MySqlConnection connection) where T : class
+        public static async Task<bool> CreateTableAsync<T>(this MySqlConnection connection) where T : class
         {
             if (connection == null)
                 return false;
@@ -418,14 +482,14 @@ namespace Tavstal.TLibrary.Helpers.General
                 if (attribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
 
-                return CreateTable<T>(connection, attribute.Name);
+                return await CreateTableAsync<T>(connection, attribute.Name);
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -439,7 +503,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="connection">The MySqlConnection to the MySQL database.</param>
         /// <param name="tableName">The name of the table to check and update.</param>
         /// <returns>True if the table structure was successfully checked and updated, otherwise false.</returns>
-        public static bool CheckTable<T>(this MySqlConnection connection, string tableName) where T : class
+        public static async Task<bool> CheckTableAsync<T>(this MySqlConnection connection, string tableName) where T : class
         {
             if (connection == null)
                 return false;
@@ -474,7 +538,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 }
                 #endregion
 
-                connection.OpenSafe();
+                await connection.OpenSafe();
                 List<SqlColumn> liveColumns = new List<SqlColumn>();
                 List<SqlColumn> columnsToRemove = new List<SqlColumn>();
                 using (var command = connection.CreateCommand())
@@ -482,14 +546,14 @@ namespace Tavstal.TLibrary.Helpers.General
                     command.Parameters.AddWithValue("@TableName", tableName);
                     command.CommandText = $"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE @TableName;";
 
-                    object result = command.ExecuteScalar();
+                    object result = await command.ExecuteScalarAsync();
                     if (result == null)
                         return false;
 
                     command.CommandText = $"SHOW COLUMNS FROM `{tableName}`;";
-                    using (var reader = command.ExecuteReader())
+                    using (var reader = await command.ExecuteReaderAsync())
                     {
-                        while (reader.Read())
+                        while (await reader.ReadAsync())
                         {
                             string columnKey = reader.GetString("Key");
                             string columnExtra = reader.GetString("Extra");
@@ -578,11 +642,11 @@ namespace Tavstal.TLibrary.Helpers.General
                     }
 
                     command.CommandText = command.CommandText.Remove(command.CommandText.LastIndexOf(','), 1);
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                 }
                 #endregion
 
-                connection.Close();
+                await connection.CloseAsync();
                 return true;
             }
             catch (Exception ex)
@@ -590,7 +654,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -603,7 +667,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <typeparam name="T">The type of object associated with the table.</typeparam>
         /// <param name="connection">The MySqlConnection to the MySQL database.</param>
         /// <returns>True if the table structure was successfully checked and updated, otherwise false.</returns>
-        public static bool CheckTable<T>(this MySqlConnection connection) where T : class
+        public static async Task<bool> CheckTableAsync<T>(this MySqlConnection connection) where T : class
         {
             if (connection == null)
                 return false;
@@ -615,14 +679,14 @@ namespace Tavstal.TLibrary.Helpers.General
                 if (attribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
 
-                return CheckTable<T>(connection, attribute.Name);
+                return await CheckTableAsync<T>(connection, attribute.Name);
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -638,7 +702,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
         /// <param name="limit">The maximum number of rows to retrieve (default is -1, which means no limit).</param>
         /// <returns>A list of objects of type T containing the retrieved rows from the table.</returns>
-        public static List<T> GetTableRows<T>(this MySqlConnection connection, string tableName, string whereClause, List<MySqlParameter> parameters, int limit = -1) where T : class
+        public static async Task<List<T>> GetTableRowsAsync<T>(this MySqlConnection connection, string tableName, string whereClause, List<MySqlParameter> parameters, int limit = -1) where T : class
         {
             if (connection == null)
                 return null;
@@ -653,7 +717,7 @@ namespace Tavstal.TLibrary.Helpers.General
                     if (!whereClause.StartsWith("WHERE "))
                         whereClause = "WHERE " + whereClause;
                 }
-                connection.OpenSafe();
+                await connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     if (parameters != null)
@@ -663,10 +727,10 @@ namespace Tavstal.TLibrary.Helpers.General
                     whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"SELECT * FROM {tableName} {whereClause}{limitClause}";
 
-                    MySqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
+                    var reader = await command.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
                     {
-                        localList.Add(ConvertToObject<T>(reader));
+                        localList.Add(reader.ConvertToObject<T>());
                     }
                 }
                 connection.Close();
@@ -677,7 +741,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return null;
             }
         }
@@ -692,7 +756,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
         /// <param name="limit">The maximum number of rows to retrieve (default is -1, which means no limit).</param>
         /// <returns>A list of objects of type T containing the retrieved rows from the table.</returns>
-        public static List<T> GetTableRows<T>(this MySqlConnection connection, string whereClause, List<MySqlParameter> parameters, int limit = -1) where T : class
+        public static async Task<List<T>> GetTableRowsAsync<T>(this MySqlConnection connection, string whereClause, List<MySqlParameter> parameters, int limit = -1) where T : class
         {
             if (connection == null)
                 return null;
@@ -703,14 +767,14 @@ namespace Tavstal.TLibrary.Helpers.General
                 if (attribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
 
-                return connection.GetTableRows<T>(attribute.Name, whereClause, parameters, limit);
+                return await connection.GetTableRowsAsync<T>(attribute.Name, whereClause, parameters, limit);
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return null;
             }
         }
@@ -725,14 +789,14 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="whereClause">The WHERE clause used to filter the row (e.g., "Column1 = @param1 AND Column2 > @param2").</param>
         /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
         /// <returns>An object of type T representing the retrieved row from the table.</returns>
-        public static T GetTableRow<T>(this MySqlConnection connection, string tableName, string whereClause, List<MySqlParameter> parameters) where T : class
+        public static async Task<T> GetTableRowAsync<T>(this MySqlConnection connection, string tableName, string whereClause, List<MySqlParameter> parameters) where T : class
         {
             if (connection == null)
                 return null;
 
             try
             {
-                var list = connection.GetTableRows<T>(tableName: tableName, whereClause: whereClause, parameters: parameters, limit: 1);
+                var list = await connection.GetTableRowsAsync<T>(tableName: tableName, whereClause: whereClause, parameters: parameters, limit: 1);
                 if (list == null)
                     return null;
 
@@ -746,7 +810,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return null;
             }
         }
@@ -760,7 +824,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="whereClause">The WHERE clause used to filter the row (e.g., "Column1 = @param1 AND Column2 > @param2").</param>
         /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
         /// <returns>An object of type T representing the retrieved row from the table.</returns>
-        public static T GetTableRow<T>(this MySqlConnection connection, string whereClause, List<MySqlParameter> parameters) where T : class
+        public static async Task<T> GetTableRowAsync<T>(this MySqlConnection connection, string whereClause, List<MySqlParameter> parameters) where T : class
         {
             if (connection == null)
                 return null;
@@ -771,7 +835,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 if (attribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
 
-                var list = connection.GetTableRows<T>(tableName: attribute.Name, whereClause: whereClause, parameters: parameters, limit: 1);
+                var list = await connection.GetTableRowsAsync<T>(tableName: attribute.Name, whereClause: whereClause, parameters: parameters, limit: 1);
                 if (list == null)
                     return null;
 
@@ -785,7 +849,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return null;
             }
         }
@@ -799,7 +863,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="tableName">The name of the table to which the row will be added.</param>
         /// <param name="value">The object representing the row data to be added.</param>
         /// <returns>True if the row was successfully added; otherwise, false.</returns>
-        public static bool AddTableRow<T>(this MySqlConnection connection, string tableName, T value)
+        public static async Task<bool> AddTableRowAsync<T>(this MySqlConnection connection, string tableName, T value)
         {
             if (connection == null)
                 return false;
@@ -852,13 +916,13 @@ namespace Tavstal.TLibrary.Helpers.General
                 paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
                 keyString = keyString.Remove(keyString.LastIndexOf(','), 1);
 
-                connection.OpenSafe();
+                await connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = $"INSERT INTO {tableName} ({keyString}) VALUES({paramString});";
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                 }
-                connection.Close();
+                await connection.CloseAsync();
                 return true;
             }
             catch (Exception ex)
@@ -866,7 +930,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -879,7 +943,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="connection">The MySqlConnection to the MySQL database.</param>
         /// <param name="value">The object representing the row data to be added.</param>
         /// <returns>True if the row was successfully added; otherwise, false.</returns>
-        public static bool AddTableRow<T>(this MySqlConnection connection, T value)
+        public static async Task<bool> AddTableRowAsync<T>(this MySqlConnection connection, T value)
         {
             if (connection == null)
                 return false;
@@ -891,14 +955,14 @@ namespace Tavstal.TLibrary.Helpers.General
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
 
-                return AddTableRow<T>(connection, tableAttribute.Name, value);
+                return await AddTableRowAsync<T>(connection, tableAttribute.Name, value);
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -912,7 +976,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="tableName">The name of the table to which the row will be added.</param>
         /// <param name="value">The object representing the row data to be added.</param>
         /// <returns>True if the row was successfully added; otherwise, false.</returns>
-        public static bool AddTableRows<T>(this MySqlConnection connection, string tableName, List<T> values)
+        public static async Task<bool> AddTableRowsAsync<T>(this MySqlConnection connection, string tableName, List<T> values)
         {
             if (connection == null)
                 return false;
@@ -982,13 +1046,13 @@ namespace Tavstal.TLibrary.Helpers.General
                 if (keyString.LastIndexOf(',') > 0)
                     keyString = keyString.Remove(keyString.LastIndexOf(','), 1);
 
-                connection.OpenSafe();
+                await connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = $"INSERT INTO {tableName} ({keyString}) VALUES{paramString};";
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                 }
-                connection.Close();
+                await connection.CloseAsync();
                 return true;
             }
             catch (Exception ex)
@@ -996,7 +1060,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -1012,7 +1076,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="whereClause">The WHERE clause used to locate the row to update.</param>
         /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
         /// <returns>True if the row was successfully updated; otherwise, false.</returns>
-        public static bool UpdateTableRow<T>(this MySqlConnection connection, string tableName, T newValue, string whereClause, List<MySqlParameter> parameters)
+        public static async Task<bool> UpdateTableRowAsync<T>(this MySqlConnection connection, string tableName, T newValue, string whereClause, List<MySqlParameter> parameters)
         {
             if (connection == null)
                 return false;
@@ -1020,7 +1084,7 @@ namespace Tavstal.TLibrary.Helpers.General
             if (whereClause.IsNullOrEmpty())
             {
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
 
@@ -1067,7 +1131,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 }
 
                 setClause = setClause.Remove(setClause.LastIndexOf(','), 1);
-                connection.OpenSafe();
+                await connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     if (parameters != null)
@@ -1084,9 +1148,9 @@ namespace Tavstal.TLibrary.Helpers.General
                     }
                     whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"UPDATE {tableName} SET {setClause} WHERE {whereClause}";
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                 }
-                connection.Close();
+                await connection.CloseAsync();
                 return true;
             }
             catch (Exception ex)
@@ -1094,7 +1158,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -1109,7 +1173,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="whereClause">The WHERE clause used to locate the row to update.</param>
         /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
         /// <returns>True if the row was successfully updated; otherwise, false.</returns>
-        public static bool UpdateTableRow<T>(this MySqlConnection connection, T newValue, string whereClause, List<MySqlParameter> parameters)
+        public static async Task<bool> UpdateTableRowAsync<T>(this MySqlConnection connection, T newValue, string whereClause, List<MySqlParameter> parameters)
         {
             if (connection == null)
                 return false;
@@ -1121,14 +1185,14 @@ namespace Tavstal.TLibrary.Helpers.General
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
 
-                return UpdateTableRow<T>(connection, tableAttribute.Name, newValue, whereClause, parameters);
+                return await UpdateTableRowAsync<T>(connection, tableAttribute.Name, newValue, whereClause, parameters);
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -1143,7 +1207,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="whereClause"></param>
         /// <param name="newValue"></param>
         /// <returns>True if the row was successfully updated; otherwise, false.</returns>
-        public static bool UpdateTableRow<T>(this MySqlConnection connection, string tableName, string whereClause, Compatibility.Database.SqlParameter newValue)
+        public static async Task<bool> UpdateTableRowAsync<T>(this MySqlConnection connection, string tableName, string whereClause, Compatibility.Database.SqlParameter newValue)
         {
             if (connection == null)
                 return false;
@@ -1159,7 +1223,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 var schemaType = typeof(T);
                 string setClause = $"{newValue.ColumnName}={newValue.Value.ParameterName}";
 
-                connection.OpenSafe();
+                await connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     command.Parameters.Add(newValue.Value);
@@ -1172,9 +1236,9 @@ namespace Tavstal.TLibrary.Helpers.General
 
                     whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"UPDATE {tableName} SET {setClause} WHERE {whereClause}";
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                 }
-                connection.Close();
+                await connection.CloseAsync();
                 return true;
             }
             catch (Exception ex)
@@ -1182,7 +1246,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -1196,7 +1260,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="whereClause"></param>
         /// <param name="newValue"></param>
         /// <returns>True if the row was successfully updated; otherwise, false.</returns>
-        public static bool UpdateTableRow<T>(this MySqlConnection connection, string whereClause, Compatibility.Database.SqlParameter newValue)
+        public static async Task<bool> UpdateTableRowAsync<T>(this MySqlConnection connection, string whereClause, Compatibility.Database.SqlParameter newValue)
         {
             if (connection == null)
                 return false;
@@ -1214,14 +1278,14 @@ namespace Tavstal.TLibrary.Helpers.General
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
 
-                return UpdateTableRow<T>(connection, tableName: tableAttribute.Name, whereClause: whereClause, newValue: newValue);
+                return await UpdateTableRowAsync<T>(connection, tableName: tableAttribute.Name, whereClause: whereClause, newValue: newValue);
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -1236,7 +1300,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="whereClause"></param>
         /// <param name="newValues"></param>
         /// <returns>True if the row was successfully updated; otherwise, false.</returns>
-        public static bool UpdateTableRow<T>(this MySqlConnection connection, string tableName, string whereClause, List<Compatibility.Database.SqlParameter> newValues)
+        public static async Task<bool> UpdateTableRowAsync<T>(this MySqlConnection connection, string tableName, string whereClause, List<Compatibility.Database.SqlParameter> newValues)
         {
             if (connection == null)
                 return false;
@@ -1255,7 +1319,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 var schemaType = typeof(T);
                 string setClause = string.Empty;
 
-                connection.OpenSafe();
+                await connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     foreach (var par in newValues)
@@ -1273,9 +1337,9 @@ namespace Tavstal.TLibrary.Helpers.General
 
                     whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"UPDATE {tableName} SET {setClause} WHERE {whereClause}";
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                 }
-                connection.Close();
+                await connection.CloseAsync();
                 return true;
             }
             catch (Exception ex)
@@ -1283,7 +1347,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -1297,7 +1361,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="whereClause"></param>
         /// <param name="newValues"></param>
         /// <returns>True if the row was successfully updated; otherwise, false.</returns>
-        public static bool UpdateTableRow<T>(this MySqlConnection connection, string whereClause, List<Compatibility.Database.SqlParameter> newValues)
+        public static async Task<bool> UpdateTableRowAsync<T>(this MySqlConnection connection, string whereClause, List<Compatibility.Database.SqlParameter> newValues)
         {
             if (connection == null)
                 return false;
@@ -1309,14 +1373,14 @@ namespace Tavstal.TLibrary.Helpers.General
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
 
-                return UpdateTableRow<T>(connection, tableAttribute.Name, whereClause, newValues);
+                return await UpdateTableRowAsync<T>(connection, tableAttribute.Name, whereClause, newValues);
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -1331,7 +1395,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="whereClause">The WHERE clause used to locate the row to remove.</param>
         /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
         /// <returns>True if the row was successfully removed; otherwise, false.</returns>
-        public static bool RemoveTableRow<T>(this MySqlConnection connection, string tableName, string whereClause, List<MySqlParameter> parameters)
+        public static async Task<bool> RemoveTableRowAsync<T>(this MySqlConnection connection, string tableName, string whereClause, List<MySqlParameter> parameters)
         {
             if (connection == null)
                 return false;
@@ -1339,7 +1403,7 @@ namespace Tavstal.TLibrary.Helpers.General
             try
             {
                 var schemaType = typeof(T);
-                connection.OpenSafe();
+                await connection.OpenSafe();
                 using (var command = connection.CreateCommand())
                 {
                     if (parameters != null)
@@ -1356,9 +1420,9 @@ namespace Tavstal.TLibrary.Helpers.General
                     }
                     whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"DELETE FROM {tableName} WHERE {whereClause}";
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                 }
-                connection.Close();
+                await connection.CloseAsync();
                 return true;
             }
             catch (Exception ex)
@@ -1366,7 +1430,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
@@ -1380,7 +1444,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="whereClause">The WHERE clause used to locate the row to remove.</param>
         /// <param name="parameters">The list of MySqlParameters used in the WHERE clause.</param>
         /// <returns>True if the row was successfully removed; otherwise, false.</returns>
-        public static bool RemoveTableRow<T>(this MySqlConnection connection, string whereClause, List<MySqlParameter> parameters)
+        public static async Task<bool> RemoveTableRowAsync<T>(this MySqlConnection connection, string whereClause, List<MySqlParameter> parameters)
         {
             if (connection == null)
                 return false;
@@ -1392,14 +1456,14 @@ namespace Tavstal.TLibrary.Helpers.General
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
 
-                return RemoveTableRow<T>(connection, tableAttribute.Name, whereClause, parameters);
+                return await RemoveTableRowAsync<T>(connection, tableAttribute.Name, whereClause, parameters);
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
-                    connection.Close();
+                    await connection.CloseAsync();
                 return false;
             }
         }
