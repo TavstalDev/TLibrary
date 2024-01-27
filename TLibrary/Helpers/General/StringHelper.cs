@@ -169,7 +169,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <returns></returns>
         public static int ColorToDecimal(string color)
         {
-            return Convert.ToInt32(color, 16);
+            return Convert.ToInt32(color.Replace("#", ""), 16);
         }
 
         /// <summary>
