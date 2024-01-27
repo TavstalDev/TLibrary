@@ -11,6 +11,8 @@ using System.Security.Policy;
 using System.Web.UI.WebControls;
 using Tavstal.TLibrary.Compatibility.Models.Discord;
 using Newtonsoft.Json;
+using Tavstal.TLibrary.Helpers.General;
+using Tavstal.TLibrary.Extensions;
 
 namespace Tavstal.TLibrary.Services
 {
@@ -59,16 +61,31 @@ namespace Tavstal.TLibrary.Services
             string url = null;
             Dictionary<string, object> postParameters = new Dictionary<string, object>
             {
-                { "username", _webhookName },
-                { "avatar_url", _webhookAvatarUrl},
                 { "content", message },
-                { "embeds", JsonConvert.SerializeObject(new List<Embed> { embed }) },
+                { "embeds", new List<object> { embed } },
                 { "filename", fileName },
                 { "fileformat", fileFormat },
                 { "file", new FileParameter(File.ReadAllBytes(filePath), fileName, "application/msexcel") }
             };
+            if (!_webhookName.IsNullOrEmpty())
+                postParameters.Add("username", _webhookName);
+            if (!_webhookAvatarUrl.IsNullOrEmpty())
+                postParameters.Add("avatar_url", _webhookAvatarUrl);
 
-            HttpWebResponse webResponse = MultipartFormDataPost("Test", postParameters);
+            HttpWebResponse webResponse = null;
+            try
+            {
+                webResponse = MultipartFormDataPost("Test", postParameters);
+            }
+            catch (WebException ex)
+            {
+                using (var stream = ex.Response.GetResponseStream())
+                using (var reader = new StreamReader(stream))
+                {
+                    LoggerHelper.LogError(reader.ReadToEnd());
+                }
+                return null;
+            }
 
             StreamReader responseReader = new StreamReader(webResponse.GetResponseStream());
             string fullResponse = responseReader.ReadToEnd();
@@ -91,14 +108,28 @@ namespace Tavstal.TLibrary.Services
         {
             Dictionary<string, object> postParameters = new Dictionary<string, object>
             {
-                { "username", _webhookName },
-                { "avatar_url", _webhookAvatarUrl},
                 { "content", message }
             };
+            if (!_webhookName.IsNullOrEmpty())
+                postParameters.Add("username", _webhookName);
+            if (!_webhookAvatarUrl.IsNullOrEmpty())
+                postParameters.Add("avatar_url", _webhookAvatarUrl);
 
-            HttpWebResponse webResponse = MultipartFormDataPost("Test", postParameters);
-            webResponse.Close();
-
+            HttpWebResponse webResponse = null;
+            try
+            {
+                webResponse = MultipartFormDataPost("Test", postParameters);
+                webResponse.Close();
+            }
+            catch (WebException ex)
+            {
+                using (var stream = ex.Response.GetResponseStream())
+                using (var reader = new StreamReader(stream))
+                {
+                    LoggerHelper.LogError(reader.ReadToEnd());
+                }
+                return false;
+            }
             return webResponse.StatusCode == HttpStatusCode.OK || webResponse.StatusCode == HttpStatusCode.Created || webResponse.StatusCode == HttpStatusCode.NoContent;
         }
 
@@ -110,13 +141,28 @@ namespace Tavstal.TLibrary.Services
         {
             Dictionary<string, object> postParameters = new Dictionary<string, object>
             {
-                { "username", _webhookName },
-                { "avatar_url", _webhookAvatarUrl},
-                { "embeds", JsonConvert.SerializeObject(new List<Embed> { embed }) }
+                { "embeds", new List<object> { embed } }
             };
+            if (!_webhookName.IsNullOrEmpty())
+                postParameters.Add("username", _webhookName);
+            if (!_webhookAvatarUrl.IsNullOrEmpty())
+                postParameters.Add("avatar_url", _webhookAvatarUrl);
 
-            HttpWebResponse webResponse = MultipartFormDataPost("Test", postParameters);
-            webResponse.Close();
+            HttpWebResponse webResponse = null;
+            try
+            {
+                webResponse = JsonPost("Test", postParameters);
+                webResponse.Close();
+            }
+            catch (WebException ex)
+            {
+                using (var stream = ex.Response.GetResponseStream())
+                using (var reader = new StreamReader(stream))
+                {
+                    LoggerHelper.LogError(reader.ReadToEnd());
+                }
+                return false;
+            }
             return webResponse.StatusCode == HttpStatusCode.OK || webResponse.StatusCode == HttpStatusCode.Created || webResponse.StatusCode == HttpStatusCode.NoContent;
         }
 
@@ -132,14 +178,29 @@ namespace Tavstal.TLibrary.Services
             string url = null;
             Dictionary<string, object> postParameters = new Dictionary<string, object>
             {
-                { "username", _webhookName },
-                { "avatar_url", _webhookAvatarUrl},
                 { "filename", fileName },
                 { "fileformat", fileFormat },
                 { "file", new FileParameter(File.ReadAllBytes(filePath), fileName, "application/msexcel") }
             };
+            if (!_webhookName.IsNullOrEmpty())
+                postParameters.Add("username", _webhookName);
+            if (!_webhookAvatarUrl.IsNullOrEmpty())
+                postParameters.Add("avatar_url", _webhookAvatarUrl);
 
-            HttpWebResponse webResponse = MultipartFormDataPost("Test", postParameters);
+            HttpWebResponse webResponse = null;
+            try
+            {
+                webResponse = MultipartFormDataPost("Test", postParameters);
+            }
+            catch (WebException ex)
+            {
+                using (var stream = ex.Response.GetResponseStream())
+                using (var reader = new StreamReader(stream))
+                {
+                    LoggerHelper.LogError(reader.ReadToEnd());
+                }
+                return null;
+            }
 
             StreamReader responseReader = new StreamReader(webResponse.GetResponseStream());
             string fullResponse = responseReader.ReadToEnd();
@@ -165,8 +226,35 @@ namespace Tavstal.TLibrary.Services
             string contentType = "multipart/form-data; boundary=" + formDataBoundary;
 
             byte[] formData = GetMultipartFormData(postParameters, formDataBoundary);
-
+            LoggerHelper.LogWarning(Encoding.UTF8.GetString(formData));
             return PostForm(_webhookUrl, userAgent, contentType, formData);
+        }
+
+        private HttpWebResponse JsonPost(string userAgent, Dictionary<string, object> postParameters)
+        {
+            HttpWebRequest request = WebRequest.Create(_webhookUrl) as HttpWebRequest;
+            if (request == null)
+            {
+                throw new NullReferenceException("request is not a http request");
+            }
+
+            byte[] formData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(postParameters));
+
+            // Set up the request properties.
+            request.Method = "POST";
+            request.ContentType = "application/json";
+            request.UserAgent = userAgent;
+            request.CookieContainer = new CookieContainer();
+            request.ContentLength = formData.Length;
+
+            // Send the form data to the request.
+            using (Stream requestStream = request.GetRequestStream())
+            {
+                requestStream.Write(formData, 0, formData.Length);
+                requestStream.Close();
+            }
+
+            return request.GetResponse() as HttpWebResponse;
         }
 
         /// <summary>
