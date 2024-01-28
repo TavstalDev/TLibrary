@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Tavstal.TLibrary.Compatibility.Database;
 using Tavstal.TLibrary.Compatibility.Interfaces;
 using Tavstal.TLibrary.Extensions;
 
@@ -20,34 +21,43 @@ namespace Tavstal.TLibrary.Compatibility.Economy
     [Serializable]
     public class Transaction
     {
+        [SqlMember(isPrimaryKey: true)]
+        public Guid Id { get; set; }
         /// <summary>
         /// Type of the transaction to check the transaction was sent or recieved by the payee
         /// <br/>For values check <see cref="ETransaction"/>
         /// </summary>
+        [SqlMember(columnType: "tinyint(1)")]
         public ETransaction Type { get; set; }
         /// <summary>
         /// Type of the payment method, used to check the type of the money
         /// </summary>
+        [SqlMember(columnType: "tinyint(1)")]
         public EPaymentMethod PaymentMethod { get; set; }
         /// <summary>
         /// Name of the store, can be used as displayName if the transaction was made between a player and a plugin, like TShop
         /// </summary>
+        [SqlMember(isNullable: true, columnType: "varchar(64)")]
         public string StoreName { get; set; }
         /// <summary>
         /// SteamId of the payer, the player who sends the money
         /// </summary>
+        [SqlMember(isUnsigned: true)]
         public ulong PayerId { get; set; }
         /// <summary>
         /// SteamId of the payer, the player who recieves the money
         /// </summary>
+        [SqlMember(isUnsigned: true)]
         public ulong PayeeId { get; set; }
         /// <summary>
         /// Amout of the transaction
         /// </summary>
+        [SqlMember(columnType: "decimal(18,2)")]
         public decimal Amount { get; set; }
         /// <summary>
         /// Date when the transaction was created
         /// </summary>
+        [SqlMember]
         public DateTime TransactionDate { get; set; }
 
         public Transaction(ETransaction type, EPaymentMethod method, string storename, ulong payer, ulong payee, decimal amount, DateTime date) 

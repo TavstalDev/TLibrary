@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tavstal.TLibrary.Compatibility.Database;
 
 namespace Tavstal.TLibrary.Compatibility.Economy
 {
@@ -15,36 +16,39 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// <summary>
         /// Id of the card
         /// </summary>
+        [SqlMember(columnType: "varchar(32)", isPrimaryKey: true)]
         public string Id { get; set; }
         /// <summary>
         /// Pincode of the card
         /// </summary>
+        [SqlMember(columnType: "varchar(8)")]
         public string PinCode { get; set; }
         /// <summary>
         /// SteamId of the card owner
         /// </summary>
+        [SqlMember(isUnsigned: true)]
         public ulong OwnerId { get; set; }
         /// <summary>
         /// Balance of the card
         /// </summary>
+        [SqlMember(columnType: "decimal(18,2)")]
         public decimal Balance { get; set; }
         /// <summary>
         /// Balance limit of the card
         /// </summary>
+        [SqlMember(columnType: "decimal(18,2)")]
         public decimal BalanceLimit { get; set; }
         /// <summary>
         /// This variable is used to enable / disable the card
         /// </summary>
+        [SqlMember(columnType: "tinyint(1)")]
         public bool IsActive { get; set; }
         /// <summary>
         /// This variable is used to check if the card is in an ATM or not
         /// <br/>Note: If it's true then the card shouldn't be able to be used outside of that specific ATM
         /// </summary>
+        [SqlMember(columnType: "tinyint(1)")]
         public bool IsInATM { get; set; }
-        /// <summary>
-        /// Transactions list of the card
-        /// </summary>
-        public List<Transaction> Transactions { get; set; }
         /// <summary>
         /// The date when the card expires and can not be used anymore
         /// </summary>
@@ -60,10 +64,9 @@ namespace Tavstal.TLibrary.Compatibility.Economy
             ExpireDate = expireDate;
             IsInATM = false;
             IsActive = false;
-            Transactions = new List<Transaction>();
         }
 
-        public BankCard(string code, string pincode, ulong owner, decimal balance, decimal maxbalance, DateTime expireDate, bool isactive, bool isinatm, List<Transaction> transactions)
+        public BankCard(string code, string pincode, ulong owner, decimal balance, decimal maxbalance, DateTime expireDate, bool isactive, bool isinatm)
         {
             Id = code;
             PinCode = pincode;
@@ -73,23 +76,8 @@ namespace Tavstal.TLibrary.Compatibility.Economy
             ExpireDate = expireDate;
             IsInATM = isinatm;
             IsActive = isactive;
-            Transactions = transactions;
         }
 
         public BankCard() { }
-
-        /// <summary>
-        /// Function used to update the details of the card and make more maintanable
-        /// </summary>
-        /// <param name="details"></param>
-        public void UpdateDetails(BankCardDetails details)
-        {
-            if (details.Balance >= 0)
-                Balance = details.Balance;
-            IsActive = details.IsActive;
-            IsInATM = details.IsInATM;
-            if (details.Transactions.Count >= 0 && details.Transactions != null)
-                Transactions = details.Transactions;
-        }
     }
 }

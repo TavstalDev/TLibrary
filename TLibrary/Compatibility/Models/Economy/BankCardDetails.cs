@@ -29,19 +29,19 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// </summary>
         public List<Transaction> Transactions { get; set; }
 
-        public BankCardDetails(BankCard card)
+        public BankCardDetails(BankCard card, List<Transaction> transactions)
         {
             Balance = card.Balance;
             IsActive = card.IsActive;
             IsInATM = card.IsInATM;
-            Transactions = card.Transactions;
+            Transactions = transactions;
         }
 
-        public BankCardDetails(decimal balance)
+        public BankCardDetails(decimal balance, List<Transaction> transactions)
         {
             Balance = balance;
             IsInATM = false;
-            Transactions = new List<Transaction>();
+            Transactions = transactions;
         }
 
         public BankCardDetails(decimal balance, bool isactive, bool isinatm, List<Transaction> transactions)
