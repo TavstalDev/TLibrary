@@ -58,6 +58,7 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// <summary>
         /// The date when the card expires and can not be used anymore
         /// </summary>
+        [SqlMember]
         public DateTime ExpireDate { get; set; }
 
         public BankCard(string cardId, string securityCode, string pinCode, ulong holderId, decimal balance, decimal maxBalance, DateTime expireDate)
