@@ -60,8 +60,9 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         [SqlMember]
         public DateTime TransactionDate { get; set; }
 
-        public Transaction(ETransaction type, EPaymentMethod method, string storename, ulong payer, ulong payee, decimal amount, DateTime date) 
-        { 
+        public Transaction(Guid id, ETransaction type, EPaymentMethod method, string storename, ulong payer, ulong payee, decimal amount, DateTime date) 
+        {
+            Id = id;
             Type = type; 
             PaymentMethod = method; 
             StoreName = storename; 
