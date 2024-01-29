@@ -1,5 +1,6 @@
 ﻿using Steamworks;
 using System.Collections.Generic;
+using Tavstal.TLibrary.Compatibility.Interfaces.Economy;
 
 namespace Tavstal.TLibrary.Compatibility.Economy
 {
@@ -64,21 +65,21 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// </summary>
         /// <param name="player"></param>
         /// <param name="transaction"></param>
-        void AddTransaction(CSteamID player, Transaction transaction);
+        void AddTransaction(CSteamID player, ITransaction transaction);
 
         /// <summary>
         /// Gets the player's transaction list
         /// </summary>
         /// <param name="player"></param>
         /// <returns></returns>
-        List<Transaction> GetTransactions(CSteamID player);
+        List<ITransaction> GetTransactions(CSteamID player);
 
         /// <summary>
         /// Creates a new bank card for the player
         /// </summary>
         /// <param name="steamID"></param>
         /// <param name="newCard"></param>
-        void AddBankCard(CSteamID steamID, BankCard newCard);
+        void AddBankCard(CSteamID steamID, IBankCard newCard);
 
         /// <summary>
         /// Updates the player's bank card
@@ -86,7 +87,7 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// <param name="steamID"></param>
         /// <param name="id"></param>
         /// <param name="newData"></param>
-        void UpdateBankCard(CSteamID steamID, string id, BankCard newData);
+        void UpdateBankCard(CSteamID steamID, string id, IBankCard newData);
 
         /// <summary>
         /// Deletes the player's bank card
@@ -101,7 +102,7 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// </summary>
         /// <param name="steamID"></param>
         /// <returns></returns>
-        List<BankCard> GetPlayerCards(CSteamID steamID);
+        List<IBankCard> GetPlayerCards(CSteamID steamID);
 
         /// <summary>
         /// Gets the player's bank card based on index
@@ -109,7 +110,7 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// <param name="steamID"></param>
         /// <param name="index"></param>
         /// <returns></returns>
-        BankCard GetPlayerCard(CSteamID steamID, int index);
+        IBankCard GetPlayerCard(CSteamID steamID, int index);
 
         /// <summary>
         /// Gets the player's bank card based on id
@@ -117,6 +118,6 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// <param name="steamID"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        BankCard GetPlayerCard(CSteamID steamID, string id);
+        IBankCard GetPlayerCard(CSteamID steamID, string id);
     }
 }

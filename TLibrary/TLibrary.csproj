@@ -124,6 +124,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compatibility\Interfaces\Economy\IBankCard.cs" />
     <Compile Include="Compatibility\Interfaces\Economy\ITransaction.cs" />
     <Compile Include="Compatibility\Interfaces\Economy\IEconomyCard.cs" />
     <Compile Include="Compatibility\Interfaces\IPlayerComponent.cs" />

@@ -12,7 +12,7 @@ namespace Tavstal.TLibrary.Compatibility.Economy
     /// BankCard object used to make economy related plugins more compatible
     /// </summary>
     [Serializable]
-    public class BankCard : IEconomyCard
+    public class BankCard : IBankCard
     {
         /// <summary>
         /// Id of the card
