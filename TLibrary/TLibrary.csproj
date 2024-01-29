@@ -124,6 +124,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compatibility\Interfaces\Economy\ITransaction.cs" />
+    <Compile Include="Compatibility\Interfaces\Economy\IEconomyCard.cs" />
     <Compile Include="Compatibility\Interfaces\IPlayerComponent.cs" />
     <Compile Include="Compatibility\Models\DatabaseSettingsBase.cs" />
     <Compile Include="Compatibility\Models\Database\Attributes\SqlMemberAttribute.cs" />
@@ -141,7 +143,6 @@
     <Compile Include="Compatibility\Models\Discord\JsonParameter.cs" />
     <Compile Include="Compatibility\Models\Discord\WebhookSettings.cs" />
     <Compile Include="Compatibility\Models\Economy\Transaction.cs" />
-    <Compile Include="Compatibility\Models\Economy\BankCardDetails.cs" />
     <Compile Include="Compatibility\Models\Economy\BankCard.cs" />
     <Compile Include="Compatibility\Models\Discord\FileParameter.cs" />
     <Compile Include="Compatibility\Models\FormatHelper\ConsoleFormat.cs" />

@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tavstal.TLibrary.Compatibility.Database;
 using Tavstal.TLibrary.Compatibility.Interfaces;
+using Tavstal.TLibrary.Compatibility.Interfaces.Economy;
 using Tavstal.TLibrary.Extensions;
 
 namespace Tavstal.TLibrary.Compatibility.Economy
@@ -19,7 +20,7 @@ namespace Tavstal.TLibrary.Compatibility.Economy
     /// Transaction
     /// </summary>
     [Serializable]
-    public class Transaction
+    public class Transaction : ITransaction
     {
         [SqlMember(isPrimaryKey: true)]
         public Guid Id { get; set; }
@@ -58,7 +59,7 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// Date when the transaction was created
         /// </summary>
         [SqlMember]
-        public DateTime TransactionDate { get; set; }
+        public DateTime Date { get; set; }
 
         public Transaction(Guid id, ETransaction type, EPaymentMethod method, string storename, ulong payer, ulong payee, decimal amount, DateTime date) 
         {
@@ -69,7 +70,7 @@ namespace Tavstal.TLibrary.Compatibility.Economy
             PayerId = payer; 
             PayeeId = payee;
             Amount = amount; 
-            TransactionDate = date; 
+            Date = date; 
         }
 
         public Transaction() { }

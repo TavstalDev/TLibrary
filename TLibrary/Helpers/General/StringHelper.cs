@@ -1,11 +1,86 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using UnityEngine;
 
 namespace Tavstal.TLibrary.Helpers.General
 {
     public static class StringHelper
     {
+        private static readonly string _chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+        public static char GetRandomChar()
+        {
+            return _chars.ElementAt(MathHelper.Next(_chars.Length - 1)));
+        }
+
+        public static string Generate(int length = 32)
+        {
+            string key = "";
+
+            for (int i = 0; i < length; i++)
+            {
+                char c = _chars.ElementAt(MathHelper.Next(_chars.Length - 1));
+
+
+                if (key.Contains(c))
+                    i--;
+                else
+                    key += c;
+            }
+
+            return key;
+        }
+
+        public static string GenerateLowercase(int length = 32)
+        {
+            string key = "";
+
+            for (int i = 0; i < length; i++)
+            {
+                char c = _chars.ToLower().ElementAt(MathHelper.Next(_chars.Length - 1));
+                if (key.Contains(c))
+                    i--;
+                else
+                    key += c;
+            }
+
+            return key;
+        }
+
+        public static string GenerateUppercase(int length = 32)
+        {
+            string key = "";
+
+            for (int i = 0; i < length; i++)
+            {
+                char c = _chars.ToUpper().ElementAt(MathHelper.Next(_chars.Length - 1));
+                if (key.Contains(c))
+                    i--;
+                else
+                    key += c;
+            }
+
+            return key;
+        }
+
+        public static string GenerateNumbers(int length = 32)
+        {
+            string charSet = "0123456789";
+            string key = "";
+
+            for (int i = 0; i < length; i++)
+            {
+                char c = charSet.ToUpper().ElementAt(MathHelper.Next(charSet.Length - 1));
+                if (key.Contains(c))
+                    i--;
+                else
+                    key += c;
+            }
+
+            return key;
+        }
+
         /// <summary>
         /// Get date time string by format and culture.
         /// </summary>
