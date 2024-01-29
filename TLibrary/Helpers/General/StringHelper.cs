@@ -11,7 +11,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
         public static char GetRandomChar()
         {
-            return _chars.ElementAt(MathHelper.Next(_chars.Length - 1)));
+            return _chars.ElementAt(MathHelper.Next(_chars.Length - 1));
         }
 
         public static string Generate(int length = 32)

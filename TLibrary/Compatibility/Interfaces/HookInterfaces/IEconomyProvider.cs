@@ -1,10 +1,5 @@
-﻿using Rocket.Unturned.Player;
-using Steamworks;
-using System;
+﻿using Steamworks;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tavstal.TLibrary.Compatibility.Economy
 {
@@ -28,48 +23,6 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// </summary>
         /// <returns></returns>
         string GetCurrencyName();
-
-        /// <summary>
-        /// Deducts money from the player's balance based on method
-        /// </summary>
-        /// <param name="player"></param>
-        /// <param name="amount"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        decimal Withdraw(UnturnedPlayer player, decimal amount, EPaymentMethod method = EPaymentMethod.BANK_ACCOUNT);
-
-        /// <summary>
-        /// Adds money to the player's balance based on method
-        /// </summary>
-        /// <param name="player"></param>
-        /// <param name="amount"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        decimal Deposit(UnturnedPlayer player, decimal amount, EPaymentMethod method = EPaymentMethod.BANK_ACCOUNT);
-
-        /// <summary>
-        /// Gets the player's balance based on method
-        /// </summary>
-        /// <param name="player"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        decimal GetBalance(UnturnedPlayer player, EPaymentMethod method = EPaymentMethod.BANK_ACCOUNT);
-
-        /// <summary>
-        /// Checks the player's balance based on method
-        /// </summary>
-        /// <param name="player"></param>
-        /// <param name="amount"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        bool Has(UnturnedPlayer player, decimal amount, EPaymentMethod method = EPaymentMethod.BANK_ACCOUNT);
-
-        /// <summary>
-        /// Adds a transaction to the player's transaction list
-        /// </summary>
-        /// <param name="player"></param>
-        /// <param name="transaction"></param>
-        void AddTransaction(UnturnedPlayer player, Transaction transaction);
 
         /// <summary>
         /// Deducts money from the player's balance based on method
@@ -118,14 +71,14 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// </summary>
         /// <param name="player"></param>
         /// <returns></returns>
-        List<Transaction> GetTransactions(UnturnedPlayer player);
+        List<Transaction> GetTransactions(CSteamID player);
 
         /// <summary>
         /// Creates a new bank card for the player
         /// </summary>
         /// <param name="steamID"></param>
         /// <param name="newCard"></param>
-        void AddPlayerCard(CSteamID steamID, BankCard newCard);
+        void AddBankCard(CSteamID steamID, BankCard newCard);
 
         /// <summary>
         /// Updates the player's bank card
@@ -133,7 +86,7 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// <param name="steamID"></param>
         /// <param name="id"></param>
         /// <param name="newData"></param>
-        void UpdatePlayerCard(CSteamID steamID, string id, BankCardDetails newData);
+        void UpdateBankCard(CSteamID steamID, string id, BankCard newData);
 
         /// <summary>
         /// Deletes the player's bank card
@@ -141,7 +94,7 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// <param name="steamID"></param>
         /// <param name="index"></param>
         /// <param name="isReversed"></param>
-        void RemovePlayerCard(CSteamID steamID, int index, bool isReversed = false);
+        void RemoveBankCard(CSteamID steamID, int index, bool isReversed = false);
 
         /// <summary>
         /// Gets the player's bank card list
