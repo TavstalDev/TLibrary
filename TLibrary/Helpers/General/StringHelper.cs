@@ -8,20 +8,24 @@ namespace Tavstal.TLibrary.Helpers.General
     public static class StringHelper
     {
         private static readonly string _chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        private static readonly string _charsNoNums = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
         public static char GetRandomChar()
         {
             return _chars.ElementAt(MathHelper.Next(_chars.Length - 1));
         }
 
-        public static string Generate(int length = 32)
+        public static string Generate(int length = 32, bool includeNums = true)
         {
             string key = "";
 
             for (int i = 0; i < length; i++)
             {
-                char c = _chars.ElementAt(MathHelper.Next(_chars.Length - 1));
-
+                char c = ' ';
+                if (includeNums)
+                    c = _chars.ElementAt(MathHelper.Next(_chars.Length - 1));
+                else
+                    c = _charsNoNums.ElementAt(MathHelper.Next(_charsNoNums.Length - 1));
 
                 if (key.Contains(c))
                     i--;
