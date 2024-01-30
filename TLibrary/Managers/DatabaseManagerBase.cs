@@ -1,16 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
-using Newtonsoft.Json.Linq;
-using Steamworks;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Rocket.API;
-using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Compatibility;
-using System.Web.Management;
 using Tavstal.TLibrary.Compatibility.Interfaces;
+using Tavstal.TLibrary.Extensions;
 
 namespace Tavstal.TLibrary.Managers
 {

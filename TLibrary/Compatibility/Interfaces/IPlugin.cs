@@ -1,20 +1,4 @@
-﻿using SDG.Unturned;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.UI.WebControls;
-using Tavstal.TLibrary.Extensions;
-using Tavstal.TLibrary.Helpers;
-using UnityEngine.Networking;
-using UnityEngine;
-using Newtonsoft.Json.Linq;
-
-namespace Tavstal.TLibrary.Compatibility.Interfaces
+﻿namespace Tavstal.TLibrary.Compatibility.Interfaces
 {
     public interface IPlugin
     {

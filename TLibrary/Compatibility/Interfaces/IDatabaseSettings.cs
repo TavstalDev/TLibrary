@@ -1,12 +1,4 @@
-﻿using MySql.Data.MySqlClient;
-using Rocket.API;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Tavstal.TLibrary.Compatibility
+﻿namespace Tavstal.TLibrary.Compatibility
 {
     /// <summary>
     /// Base database settings interface used in plugin configurations

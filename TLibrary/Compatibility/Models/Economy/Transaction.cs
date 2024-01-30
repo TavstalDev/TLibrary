@@ -1,18 +1,9 @@
-﻿using Rocket.Core.Steam;
-using Rocket.Unturned.Extensions;
-using Rocket.Unturned.Player;
-using SDG.Unturned;
+﻿using Rocket.Unturned.Player;
 using Steamworks;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using Tavstal.TLibrary.Compatibility.Database;
 using Tavstal.TLibrary.Compatibility.Interfaces;
 using Tavstal.TLibrary.Compatibility.Interfaces.Economy;
-using Tavstal.TLibrary.Extensions;
 
 namespace Tavstal.TLibrary.Compatibility.Economy
 {

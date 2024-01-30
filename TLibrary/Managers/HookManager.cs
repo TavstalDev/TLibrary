@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Tavstal.TLibrary.Compatibility;
 using System.Reflection;
+using Tavstal.TLibrary.Compatibility;
 using Tavstal.TLibrary.Compatibility.Interfaces;
 
 namespace Tavstal.TLibrary.Managers

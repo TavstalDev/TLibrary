@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
 
 namespace Tavstal.TLibrary.Compatibility.Models.Discord
 {
     public class EmbedFooter
     {
+        [JsonProperty("text")]
         public string Text { get; set; }
+        [JsonProperty("icon_url")]
         public string IconUrl { get; set; }
+        [JsonProperty("proxy_icon_url")]
         public string ProxyIconUrl { get; set; }
 
         public EmbedFooter(string text, string iconUrl, string proxyIconUrl)
