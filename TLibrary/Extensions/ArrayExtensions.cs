@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,9 @@ namespace Tavstal.TLibrary.Extensions
         /// <returns>True if the index is valid, false otherwise.</returns>
         public static bool IsValidIndex<T>(this T[] self, int index)
         {
+            if (self == null)
+                return false;
+
             return self.Length - 1 >= index;
         }
 
@@ -30,6 +34,9 @@ namespace Tavstal.TLibrary.Extensions
         /// <returns>True if the index is valid, false otherwise.</returns>
         public static bool IsValidIndex<T>(this List<T> self, int index)
         {
+            if (self == null)
+                return false;
+
             return self.Count - 1 >= index;
         }
 
@@ -42,6 +49,9 @@ namespace Tavstal.TLibrary.Extensions
         /// <returns>True if the index is valid, false otherwise.</returns>
         public static bool IsValidIndex<TKey, TValue>(this Dictionary<TKey, TValue> self, int index)
         {
+            if (self == null)
+                return false;
+
             return self.Count - 1 >= index;
         }
 
@@ -173,6 +183,9 @@ namespace Tavstal.TLibrary.Extensions
         /// <param name="list">The list to be shuffled.</param>
         public static void Shuffle<T>(this List<T> list)
         {
+            if (list == null)
+                throw new ArgumentNullException();
+
             int count = list.Count;
             while (count > 0)
             {
