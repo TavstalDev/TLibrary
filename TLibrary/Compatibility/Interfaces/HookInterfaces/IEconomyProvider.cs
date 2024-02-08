@@ -87,7 +87,7 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// <param name="steamID"></param>
         /// <param name="id"></param>
         /// <param name="newData"></param>
-        void UpdateBankCard(CSteamID steamID, string id, IBankCard newData);
+        void UpdateBankCard(string cardId, decimal limitUsed, bool isActive);
 
         /// <summary>
         /// Deletes the player's bank card
@@ -95,29 +95,20 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// <param name="steamID"></param>
         /// <param name="index"></param>
         /// <param name="isReversed"></param>
-        void RemoveBankCard(CSteamID steamID, int index, bool isReversed = false);
+        void RemoveBankCard(string cardId);
 
         /// <summary>
         /// Gets the player's bank card list
         /// </summary>
         /// <param name="steamID"></param>
         /// <returns></returns>
-        List<IBankCard> GetPlayerCards(CSteamID steamID);
+        List<IBankCard> GetBankCardsByPlayer(CSteamID steamID);
 
         /// <summary>
         /// Gets the player's bank card based on index
         /// </summary>
-        /// <param name="steamID"></param>
-        /// <param name="index"></param>
+        /// <param name="cardId"></param>
         /// <returns></returns>
-        IBankCard GetPlayerCard(CSteamID steamID, int index);
-
-        /// <summary>
-        /// Gets the player's bank card based on id
-        /// </summary>
-        /// <param name="steamID"></param>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        IBankCard GetPlayerCard(CSteamID steamID, string id);
+        IBankCard GetBankCardById(string cardId);
     }
 }
