@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace Tavstal.TLibrary.Extensions
 {
-    public static class SystemExtensions
+    public static class ReflectionExtensions
     {
         public static MethodInfo GetMethod(this Type self, string name, BindingFlags flags, Type[] types)
         {
