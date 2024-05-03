@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 using Tavstal.TLibrary.Helpers.General;
 
 namespace Tavstal.TLibrary.Extensions

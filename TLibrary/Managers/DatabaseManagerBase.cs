@@ -6,6 +6,9 @@ using Tavstal.TLibrary.Extensions;
 
 namespace Tavstal.TLibrary.Managers
 {
+    /// <summary>
+    /// Base class for database managers.
+    /// </summary>
     public abstract class DatabaseManagerBase : IDatabaseManager
     {
         public IPlugin _plugin { get; }
@@ -19,6 +22,10 @@ namespace Tavstal.TLibrary.Managers
             CheckSchema();
         }
 
+        /// <summary>
+        /// Creates a MySqlConnection object for connecting to the database.
+        /// </summary>
+        /// <returns>A MySqlConnection object.</returns>
         public MySqlConnection CreateConnection()
         {
             MySqlConnection mySqlConnection = null;
@@ -39,6 +46,9 @@ namespace Tavstal.TLibrary.Managers
             return mySqlConnection;
         }
 
+        /// <summary>
+        /// Checks the database schema and performs necessary updates if required.
+        /// </summary>
         protected virtual void CheckSchema()
         {
             
