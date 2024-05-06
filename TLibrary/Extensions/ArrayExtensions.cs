@@ -196,5 +196,35 @@ namespace Tavstal.TLibrary.Extensions
                 list[count] = value;
             }
         }
+
+        /// <summary>
+        /// Determines whether the specified list of strings contains a specific string, ignoring case considerations.
+        /// </summary>
+        /// <param name="stringList">The list of strings to search.</param>
+        /// <param name="text">The string to locate in the list.</param>
+        /// <returns>True if the list contains the specified string, ignoring case; otherwise, false.</returns>
+        public static bool ContainsIgnoreCase(this List<string> stringList, string text)
+        {
+            foreach (string s in stringList)
+                if (s.EqualsIgnoreCase(text))
+                    return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether the specified array of strings contains a specific string, ignoring case considerations.
+        /// </summary>
+        /// <param name="stringArray">The array of strings to search.</param>
+        /// <param name="text">The string to locate in the array.</param>
+        /// <returns>True if the array contains the specified string, ignoring case; otherwise, false.</returns>
+        public static bool ContainsIgnoreCase(this string[] stringArray, string text)
+        {
+            foreach (string s in stringArray)
+                if (s.EqualsIgnoreCase(text))
+                    return true;
+
+            return false;
+        }
     }
 }
