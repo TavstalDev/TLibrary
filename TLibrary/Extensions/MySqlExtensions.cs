@@ -1,16 +1,10 @@
 ﻿using MySql.Data.MySqlClient;
-using MySql.Data.Types;
 using Newtonsoft.Json;
-using Rocket.Core.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Tavstal.TLibrary.Compatibility;
 using Tavstal.TLibrary.Helpers.General;
-using Tavstal.TLibrary.Managers;
 
 namespace Tavstal.TLibrary.Extensions
 {

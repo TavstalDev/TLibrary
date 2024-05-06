@@ -7,6 +7,9 @@ using Tavstal.TLibrary.Compatibility.Interfaces;
 
 namespace Tavstal.TLibrary.Managers
 {
+    /// <summary>
+    /// Manages hooks for plugins.
+    /// </summary>
     public class HookManager
     {
         private readonly IPlugin _plugin;
@@ -19,6 +22,10 @@ namespace Tavstal.TLibrary.Managers
             _logger = _plugin.GetLogger();
         }
 
+        /// <summary>
+        /// Loads hooks for the specified type.
+        /// </summary>
+        /// <param name="type">The type of hooks to load.</param>
         public void Load(Type type)
         {
             if (!typeof(Hook).IsAssignableFrom(type))
@@ -44,6 +51,10 @@ namespace Tavstal.TLibrary.Managers
             hook.Load();
         }
 
+        /// <summary>
+        /// Loads all hooks from the specified plugin assembly.
+        /// </summary>
+        /// <param name="pluginAssembly">The assembly containing the plugin hooks to load.</param>
         public void LoadAll(Assembly pluginAssembly)
         {
             foreach (Type t in pluginAssembly.GetTypes().ToList().FindAll(x => !x.IsAbstract && typeof(Hook).IsAssignableFrom(x)))
@@ -68,6 +79,10 @@ namespace Tavstal.TLibrary.Managers
             }
         }
 
+        /// <summary>
+        /// Unloads the hooks of the specified type.
+        /// </summary>
+        /// <param name="type">The type of hooks to unload.</param>
         public void Unload(Type type)
         {
             if (type != typeof(Hook))
@@ -75,7 +90,6 @@ namespace Tavstal.TLibrary.Managers
                 _logger.LogException(string.Format("'{0}' is not a hook.", type.Name));
                 return;
             }
-
 
             if (!_hooks.Any(x => x.Value.GetType() == type))
             {
@@ -95,7 +109,10 @@ namespace Tavstal.TLibrary.Managers
             _hooks.Remove(hook.Name);
         }
 
-        public void UnLoadAll()
+        /// <summary>
+        /// Unloads all hooks.
+        /// </summary>
+        public void UnloadAll()
         {
             foreach (var value in _hooks.Values)
             {
@@ -104,6 +121,11 @@ namespace Tavstal.TLibrary.Managers
             _hooks.Clear();
         }
 
+        /// <summary>
+        /// Checks if a hook of the specified type is found.
+        /// </summary>
+        /// <typeparam name="T">The type of hook to check for.</typeparam>
+        /// <returns>True if a hook of the specified type is found; otherwise, false.</returns>
         public bool IsHookFound<T>()
         {
             foreach (var hook in _hooks)
@@ -114,6 +136,11 @@ namespace Tavstal.TLibrary.Managers
             return false;
         }
 
+        /// <summary>
+        /// Checks if a hook of the specified type is loadable.
+        /// </summary>
+        /// <typeparam name="T">The type of hook to check.</typeparam>
+        /// <returns>True if a hook of the specified type is loadable; otherwise, false.</returns>
         public bool IsHookLoadable<T>()
         {
             foreach (var hook in _hooks)
@@ -124,6 +151,11 @@ namespace Tavstal.TLibrary.Managers
             return false;
         }
 
+        /// <summary>
+        /// Gets the hook instance of the specified type.
+        /// </summary>
+        /// <typeparam name="T">The type of hook to retrieve.</typeparam>
+        /// <returns>The hook instance of the specified type if found; otherwise, null.</returns>
         public T GetHook<T>()
         {
             foreach (var hook in _hooks)
@@ -134,6 +166,12 @@ namespace Tavstal.TLibrary.Managers
             return default;
         }
 
+        /// <summary>
+        /// Creates an instance of the specified type.
+        /// </summary>
+        /// <typeparam name="T">The type of instance to create.</typeparam>
+        /// <param name="type">The type of the instance to create.</param>
+        /// <returns>An instance of the specified type if creation is successful; otherwise, null.</returns>
         private T CreateInstance<T>(Type type)
         {
             try
@@ -146,7 +184,6 @@ namespace Tavstal.TLibrary.Managers
                 _logger.LogError(ex);
                 return default;
             }
-
         }
     }
 }

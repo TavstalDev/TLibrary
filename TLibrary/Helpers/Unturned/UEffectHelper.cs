@@ -8,9 +8,29 @@ namespace Tavstal.TLibrary.Helpers.Unturned
 {
     public static class UEffectHelper
     {
+        /// <summary>
+        /// Updates pagination for a specified UI element with rich UI text, applying the specified effect ID, on the player's client.
+        /// </summary>
+        /// <typeparam name="T">The type of player component implementing the pagination.</typeparam>
+        /// <param name="effectId">The ID of the effect to apply to the rich UI text.</param>
+        /// <param name="player">The player whose client will receive the pagination update.</param>
+        /// <param name="uiName">The name of the UI element to update with pagination.</param>
+        /// <param name="arrayIndex">The index within the array or list being paginated.</param>
+        /// <param name="page">The current page number.</param>
+        /// <param name="maxPage">The maximum page number.</param>
         public static void UpdatePagination<T>(ushort effectId, UnturnedPlayer player, string uiName, int arrayIndex, int page, int maxPage) where T : IPlayerComponent =>
             UpdatePagination<T>((short)effectId, player, uiName, arrayIndex, page, maxPage);
 
+        /// <summary>
+        /// Updates pagination for a specified UI element with rich UI text, applying the specified effect ID, on the player's client.
+        /// </summary>
+        /// <typeparam name="T">The type of player component implementing the pagination.</typeparam>
+        /// <param name="effectId">The ID of the effect to apply to the rich UI text.</param>
+        /// <param name="player">The player whose client will receive the pagination update.</param>
+        /// <param name="uiName">The name of the UI element to update with pagination.</param>
+        /// <param name="arrayIndex">The index within the array or list being paginated.</param>
+        /// <param name="page">The current page number.</param>
+        /// <param name="maxPage">The maximum page number.</param>
         public static void UpdatePagination<T>(short effectId, UnturnedPlayer player, string uiName, int arrayIndex, int page, int maxPage) where T : IPlayerComponent
         {
             T comp = player.GetComponent<T>();
@@ -315,7 +335,15 @@ namespace Tavstal.TLibrary.Helpers.Unturned
                 }
             }
         }
-    
+
+        /// <summary>
+        /// Sends rich UI text with the specified effect ID over the specified connection.
+        /// </summary>
+        /// <param name="effectId">The ID of the effect to apply to the rich UI text.</param>
+        /// <param name="connection">The transport connection through which to send the text.</param>
+        /// <param name="reliable">Determines whether the transmission should be reliable.</param>
+        /// <param name="uiName">The name of the UI element to which the text belongs.</param>
+        /// <param name="value">The rich UI text value to send.</param>
         public static void SendRichUIText(short effectId, ITransportConnection connection, bool reliable, string uiName, string value)
         {
             EffectManager.sendUIEffectText(effectId, connection, reliable, uiName, FormatHelper.FormatTextV2(value));
