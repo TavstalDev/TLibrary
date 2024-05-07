@@ -72,7 +72,7 @@ namespace Tavstal.TLibrary.Extensions
         /// </summary>
         /// <param name="connection"></param>
         /// <returns></returns>
-        public static async Task<bool> OpenSafe(this MySqlConnection connection)
+        public static async Task<bool> OpenSafeAsync(this MySqlConnection connection)
         {
             if (connection.State == System.Data.ConnectionState.Open)
                 return true;

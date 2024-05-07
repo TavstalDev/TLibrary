@@ -321,7 +321,7 @@ namespace Tavstal.TLibrary.Helpers.General
             try
             {
                 var schemaType = typeof(T);
-                await connection.OpenSafe();
+                await connection.OpenSafeAsync();
                 using (var command = connection.CreateCommand())
                 {
                     command.Parameters.AddWithValue("@TableName", tableName);
@@ -392,12 +392,12 @@ namespace Tavstal.TLibrary.Helpers.General
             {
                 var schemaType = typeof(T);
 
-                await connection.OpenSafe();
+                await connection.OpenSafeAsync();
                 using (var command = connection.CreateCommand())
                 {
                     command.Parameters.AddWithValue("@TableName", tableName);
                     command.CommandText = $"SHOW TABLES LIKE @TableName;";
-                    object result = command.ExecuteScalar();
+                    object result = await command.ExecuteScalarAsync();
                     if (result != null)
                         return false;
                 }
@@ -538,7 +538,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 }
                 #endregion
 
-                await connection.OpenSafe();
+                await connection.OpenSafeAsync();
                 List<SqlColumn> liveColumns = new List<SqlColumn>();
                 List<SqlColumn> columnsToRemove = new List<SqlColumn>();
                 using (var command = connection.CreateCommand())
@@ -717,7 +717,7 @@ namespace Tavstal.TLibrary.Helpers.General
                     if (!whereClause.StartsWith("WHERE "))
                         whereClause = "WHERE " + whereClause;
                 }
-                await connection.OpenSafe();
+                await connection.OpenSafeAsync();
                 using (var command = connection.CreateCommand())
                 {
                     if (parameters != null)
@@ -916,7 +916,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
                 keyString = keyString.Remove(keyString.LastIndexOf(','), 1);
 
-                await connection.OpenSafe();
+                await connection.OpenSafeAsync();
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = $"INSERT INTO {tableName} ({keyString}) VALUES({paramString});";
@@ -1046,7 +1046,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 if (keyString.LastIndexOf(',') > 0)
                     keyString = keyString.Remove(keyString.LastIndexOf(','), 1);
 
-                await connection.OpenSafe();
+                await connection.OpenSafeAsync();
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = $"INSERT INTO {tableName} ({keyString}) VALUES{paramString};";
@@ -1131,7 +1131,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 }
 
                 setClause = setClause.Remove(setClause.LastIndexOf(','), 1);
-                await connection.OpenSafe();
+                await connection.OpenSafeAsync();
                 using (var command = connection.CreateCommand())
                 {
                     if (parameters != null)
@@ -1223,7 +1223,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 var schemaType = typeof(T);
                 string setClause = $"{newValue.ColumnName}={newValue.Value.ParameterName}";
 
-                await connection.OpenSafe();
+                await connection.OpenSafeAsync();
                 using (var command = connection.CreateCommand())
                 {
                     command.Parameters.Add(newValue.Value);
@@ -1319,7 +1319,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 var schemaType = typeof(T);
                 string setClause = string.Empty;
 
-                await connection.OpenSafe();
+                await connection.OpenSafeAsync();
                 using (var command = connection.CreateCommand())
                 {
                     foreach (var par in newValues)
@@ -1403,7 +1403,7 @@ namespace Tavstal.TLibrary.Helpers.General
             try
             {
                 var schemaType = typeof(T);
-                await connection.OpenSafe();
+                await connection.OpenSafeAsync();
                 using (var command = connection.CreateCommand())
                 {
                     if (parameters != null)
