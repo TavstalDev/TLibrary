@@ -1467,5 +1467,87 @@ namespace Tavstal.TLibrary.Helpers.General
                 return false;
             }
         }
+
+        /// <summary>
+        /// Asynchronously removes rows from the specified table in the database based on the provided WHERE clause and parameters.
+        /// </summary>
+        /// <typeparam name="T">The type parameter representing the type of the object (not used in the method implementation).</typeparam>
+        /// <param name="connection">The MySqlConnection object representing the connection to the database.</param>
+        /// <param name="tableName">The name of the table from which rows will be removed.</param>
+        /// <param name="whereClause">The WHERE clause to filter which rows to remove.</param>
+        /// <param name="parameters">A list of MySqlParameter objects containing the parameters for the WHERE clause.</param>
+        /// <returns>A task representing the asynchronous operation. The task result contains a boolean indicating whether the operation was successful.</returns>
+        public static async Task<bool> RemoveTableRowsAsync<T>(this MySqlConnection connection, string tableName, string whereClause, List<MySqlParameter> parameters)
+        {
+            if (connection == null)
+                return false;
+
+            try
+            {
+                var schemaType = typeof(T);
+                await connection.OpenSafeAsync();
+                using (var command = connection.CreateCommand())
+                {
+                    if (parameters != null)
+                        foreach (var parameter in parameters)
+                            command.Parameters.Add(parameter);
+
+                    if (!whereClause.IsNullOrEmpty())
+                    {
+                        if (whereClause.StartsWith("WHERE"))
+                            whereClause = whereClause.Replace("WHERE", "");
+
+                        if (whereClause.StartsWith(" WHERE"))
+                            whereClause = whereClause.Replace(" WHERE", "");
+                    }
+                    whereClause = FixWhereClause(whereClause);
+                    command.CommandText = $"DELETE * FROM {tableName} WHERE {whereClause}";
+                    await command.ExecuteNonQueryAsync();
+                }
+                await connection.CloseAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    await connection.CloseAsync();
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously removes rows from a table in the database based on the provided WHERE clause and parameters.
+        /// The table name is inferred from the type parameter T.
+        /// </summary>
+        /// <typeparam name="T">The type parameter representing the table name (inferred from the type name).</typeparam>
+        /// <param name="connection">The MySqlConnection object representing the connection to the database.</param>
+        /// <param name="whereClause">The WHERE clause to filter which rows to remove.</param>
+        /// <param name="parameters">A list of MySqlParameter objects containing the parameters for the WHERE clause.</param>
+        /// <returns>A task representing the asynchronous operation. The task result contains a boolean indicating whether the operation was successful.</returns>
+        public static async Task<bool> RemoveTableRowsAsync<T>(this MySqlConnection connection, string whereClause, List<MySqlParameter> parameters)
+        {
+            if (connection == null)
+                return false;
+
+            try
+            {
+                var schemaType = typeof(T);
+                var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
+                if (tableAttribute == null)
+                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
+
+                return await RemoveTableRowsAsync<T>(connection, tableAttribute.Name, whereClause, parameters);
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    await connection.CloseAsync();
+                return false;
+            }
+        }
     }
 }
