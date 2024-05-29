@@ -11,7 +11,7 @@ namespace Tavstal.TLibrary.Compatibility
         /// <summary>
         /// The plugin instance that loads this hook, NOT THE PLUGIN THAT IS BEING HOOKED.
         /// </summary>
-        public IPlugin Plugin { get; set; }
+        public IPlugin Plugin { get; private set; }
         /// <summary>
         /// Name of the plugin that should be hooked
         /// </summary>
@@ -27,8 +27,9 @@ namespace Tavstal.TLibrary.Compatibility
 
         protected Hook() { }
 
-        protected Hook(string name, bool isEssential)
+        protected Hook(IPlugin loaderPluginInstance, string name, bool isEssential)
         {
+            Plugin = loaderPluginInstance;
             Name = name;
             IsEssential = isEssential;
         }
