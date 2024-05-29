@@ -16,9 +16,13 @@ namespace Tavstal.TLibrary.Compatibility
         /// </summary>
         private readonly string _pluginName;
         /// <summary>
-        /// Shpould show debug messages?
+        /// Should show debug messages?
         /// </summary>
-        private readonly bool _isDebugEnabled;
+        private bool _isDebugEnabled;
+        /// <summary>
+        /// Should show debug messages?
+        /// </summary>
+        public bool IsDebugEnabled { get { return _isDebugEnabled; } }
 
         public TLogger(string pluginName, bool isDebugEnabled)
         {
@@ -52,6 +56,15 @@ namespace Tavstal.TLibrary.Compatibility
         public static TLogger CreateInstance(IPlugin plugin, bool isDebugEnabled)
         {
             return new TLogger(plugin.GetPluginName(), isDebugEnabled);
+        }
+
+        /// <summary>
+        /// Sets the debug mode for the application.
+        /// </summary>
+        /// <param name="isActive">A boolean value indicating whether the debug mode should be active or not.</param>
+        public void SetDebugMode(bool isActive)
+        {
+            _isDebugEnabled = isActive;
         }
 
         /// <summary>

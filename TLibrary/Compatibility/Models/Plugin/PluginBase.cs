@@ -152,6 +152,8 @@ namespace Tavstal.TLibrary.Compatibility
                 }
             }
 
+            _logger.SetDebugMode(_config.DebugMode);
+
             Dictionary<string, string> localLocalization = CommonLocalization ?? new Dictionary<string, string>();
             if (DefaultLocalization != null)
                 foreach (var l in DefaultLocalization)

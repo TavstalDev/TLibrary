@@ -12,7 +12,11 @@ namespace Tavstal.TLibrary.Compatibility
         public string FilePath { get; set; }
         [JsonIgnore]
         public string FileName { get; set; }
+        [JsonProperty(Order = 0)]
+        public bool DebugMode { get; set; }
+        [JsonProperty(Order = 1)]
         public string Locale { get; set; }
+        [JsonProperty(Order = 2)]
         public bool DownloadLocalePacks { get; set; }
 
         /// <param name="filename">Example: myfile.txt</param>
