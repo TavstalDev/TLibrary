@@ -182,7 +182,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         {
             PlayerInventory playerInv = player.Inventory;
 
-            if (player.Player.equipment.isEquipped)
+            if (player.Player.equipment.itemID != 0)
                 player.Player.equipment.dequip();
 
             for (byte page = 0; page < PlayerInventory.PAGES; page++)

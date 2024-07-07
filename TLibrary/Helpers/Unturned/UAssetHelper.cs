@@ -12,15 +12,8 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <returns>A list of ItemAsset objects representing the item assets in the game.</returns>
         public static List<ItemAsset> GetItemAssets()
         {
-            Asset[] assets = null;
             List<ItemAsset> values = new List<ItemAsset>();
-
-            assets = Assets.find(EAssetType.ITEM);
-
-            foreach (Asset a in assets)
-            {
-                values.Add((ItemAsset)a);
-            }
+            Assets.find(values);
             return values;
         }
 
@@ -30,15 +23,8 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <returns>A list of VehicleAsset objects representing the vehicle assets in the game.</returns>
         public static List<VehicleAsset> GetVehicleAssets()
         {
-            Asset[] assets = null;
             List<VehicleAsset> values = new List<VehicleAsset>();
-
-            assets = Assets.find(EAssetType.VEHICLE);
-
-            foreach (Asset a in assets)
-            {
-                values.Add((VehicleAsset)a);
-            }
+            Assets.find(values);
             return values;
         }
 
