@@ -1,4 +1,5 @@
 ﻿using SDG.Unturned;
+using System;
 using System.Collections.Generic;
 using Tavstal.TLibrary.Extensions;
 
@@ -86,6 +87,6 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// </summary>
         /// <param name="id">The ID of the vehicle asset to find.</param>
         /// <returns>A VehicleAsset object representing the vehicle asset with the specified ID, or null if not found.</returns>
-        public static VehicleAsset FindVehicleAsset(ushort id) => (VehicleAsset)Assets.find(EAssetType.VEHICLE, id);
+        public static VehicleAsset FindVehicleAsset(ushort id) => Assets.FindVehicleAssetByGuidOrLegacyId(Guid.Empty, id);
     }
 }
