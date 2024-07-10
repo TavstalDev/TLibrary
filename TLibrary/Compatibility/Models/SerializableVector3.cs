@@ -13,6 +13,8 @@ namespace Tavstal.TLibrary.Compatibility
         public float Y { get; set; }
         public float Z { get; set; }
 
+        public SerializableVector3() { }
+
         public SerializableVector3(Vector3 p)
         {
             X = p.x;
