@@ -114,7 +114,9 @@ namespace Tavstal.TLibrary.Extensions
             if (index != -1)
             {
                 localArray.RemoveAt(index);
+#pragma warning disable IDE0059 // Won't use tuple
                 array = localArray.ToArray();
+#pragma warning restore IDE0059 //
                 return true;
             }
             else
