@@ -33,13 +33,13 @@ namespace Tavstal.TLibrary.Compatibility.Database
 
             MemberExpression memberExpression = null;
 
-            if (expression.Body is MemberExpression)
+            if (expression.Body is MemberExpression expression1)
             {
-                memberExpression = (MemberExpression)expression.Body;
+                memberExpression = expression1;
             }
-            else if (expression.Body is UnaryExpression unaryExpression && unaryExpression.Operand is MemberExpression)
+            else if (expression.Body is UnaryExpression unaryExpression && unaryExpression.Operand is MemberExpression expression2)
             {
-                memberExpression = (MemberExpression)unaryExpression.Operand;
+                memberExpression = expression2;
             }
 
             if (memberExpression == null)

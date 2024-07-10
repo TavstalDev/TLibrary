@@ -21,7 +21,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
             for (int i = 0; i < length; i++)
             {
-                char c = ' ';
+                char c;
                 if (includeNums)
                     c = _chars.ElementAt(MathHelper.Next(_chars.Length - 1));
                 else
@@ -168,7 +168,7 @@ namespace Tavstal.TLibrary.Helpers.General
                     suffix = "AM";
             }
 
-            string newHourString = string.Empty;
+            string newHourString;
             if (time.Hour > 12)
                 newHourString = MakeClockInt(time.Hour - 12);
             else

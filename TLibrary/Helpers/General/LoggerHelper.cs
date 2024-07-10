@@ -10,8 +10,8 @@ namespace Tavstal.TLibrary.Helpers.General
     /// </summary>
     internal static class LoggerHelper
     {
-        private static string Name = Assembly.GetExecutingAssembly().GetName().Name;
-        private static bool IsDebug = false;
+        private static readonly string Name = Assembly.GetExecutingAssembly().GetName().Name;
+        private static readonly bool IsDebug = false;
 
         public static void LogRich(object message, string prefix = "&a[INFO] >&f")
         {

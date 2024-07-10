@@ -123,7 +123,9 @@ namespace Tavstal.TLibrary.Extensions
             {
                 n--;
                 int k = MathHelper.Next(n + 1);
+#pragma warning disable IDE0180 // Not going to use tuple
                 var value = array[k];
+#pragma warning restore IDE0180 // Enable
                 array[k] = array[n];
                 array[n] = value;
             }

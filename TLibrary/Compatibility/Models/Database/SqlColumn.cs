@@ -67,16 +67,16 @@ namespace Tavstal.TLibrary.Compatibility.Database
         {
             if (ReferenceEquals(column1, column2))
                 return true;
-            if (ReferenceEquals(column1, null))
+            if (column1 is null)
                 return false;
-            if (ReferenceEquals(column2, null))
+            if (column2 is null)
                 return false;
             return column1.Equals(column2);
         }
         public static bool operator !=(SqlColumn column1, SqlColumn column2) => !(column1 == column2);
         public bool Equals(SqlColumn otherColumn)
         {
-            if (ReferenceEquals(otherColumn, null))
+            if (otherColumn is null)
                 return false;
             if (ReferenceEquals(this, otherColumn))
                 return true;

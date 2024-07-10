@@ -167,7 +167,9 @@ namespace Tavstal.TLibrary.Extensions
             {
                 count--;
                 int index = MathHelper.Next(count + 1);
+#pragma warning disable IDE0180 // Not going to use tuple
                 T value = list[index];
+#pragma warning restore IDE0180 // Enable
                 list[index] = list[count];
                 list[count] = value;
             }
@@ -188,7 +190,9 @@ namespace Tavstal.TLibrary.Extensions
             {
                 count--;
                 int index = MathHelper.Next(count + 1);
+#pragma warning disable IDE0180 // Not going to use tuple;
                 T value = list[index];
+#pragma warning restore IDE0180 // Enable
                 list[index] = list[count];
                 list[count] = value;
             }

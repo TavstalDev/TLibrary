@@ -138,30 +138,6 @@ namespace Tavstal.TLibrary.Helpers.General
         {
             return value.Replace("U+0027", "'");
         }
-
-        /// <summary>
-        /// Enum parser
-        /// </summary>
-        /// <typeparam name="TEnum"></typeparam>
-        /// <param name="enumType"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        private static TEnum ParseEnum<TEnum>(Type enumType, int value)
-        {
-            Array enumValues = Enum.GetValues(enumType);
-            TEnum localEnum = default;
-
-            foreach (object enumValue in enumValues)
-            {
-                int enumIntValue = (int)enumValue;
-                if (enumIntValue == value)
-                {
-                    localEnum = (TEnum)enumValue;
-                    break;
-                }
-            }
-            return localEnum;
-        }
         
         /// <summary>
         /// Function used to fix where cause related errors
@@ -361,9 +337,7 @@ namespace Tavstal.TLibrary.Helpers.General
             try
             {
                 var schemaType = typeof(T);
-                var attribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
-                if (attribute == null)
-                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
+                var attribute = schemaType.GetCustomAttribute<SqlNameAttribute>() ?? throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
                 return await DoesTableExistAsync<T>(connection, attribute.Name);
             }
             catch (Exception ex)
@@ -478,10 +452,7 @@ namespace Tavstal.TLibrary.Helpers.General
             try
             {
                 var schemaType = typeof(T);
-                var attribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
-                if (attribute == null)
-                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-
+                var attribute = schemaType.GetCustomAttribute<SqlNameAttribute>() ?? throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
                 return await CreateTableAsync<T>(connection, attribute.Name);
             }
             catch (Exception ex)
@@ -520,9 +491,11 @@ namespace Tavstal.TLibrary.Helpers.General
                         continue;
 
                     var sqlMember = prop.GetCustomAttribute<SqlMemberAttribute>();
-                    SqlColumn localColumn = new SqlColumn();
-                    localColumn.ColumnName = prop.Name;
-                    localColumn.ColumnType = ConvertToSqlDataType(prop.PropertyType);
+                    SqlColumn localColumn = new SqlColumn
+                    {
+                        ColumnName = prop.Name,
+                        ColumnType = ConvertToSqlDataType(prop.PropertyType)
+                    };
 
                     if (sqlMember != null)
                     {
@@ -675,10 +648,7 @@ namespace Tavstal.TLibrary.Helpers.General
             try
             {
                 var schemaType = typeof(T);
-                var attribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
-                if (attribute == null)
-                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-
+                var attribute = schemaType.GetCustomAttribute<SqlNameAttribute>() ?? throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
                 return await CheckTableAsync<T>(connection, attribute.Name);
             }
             catch (Exception ex)
@@ -763,10 +733,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
             try
             {
-                var attribute = typeof(T).GetCustomAttribute<SqlNameAttribute>();
-                if (attribute == null)
-                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-
+                var attribute = typeof(T).GetCustomAttribute<SqlNameAttribute>() ?? throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
                 return await connection.GetTableRowsAsync<T>(attribute.Name, whereClause, parameters, limit);
             }
             catch (Exception ex)
@@ -831,10 +798,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
             try
             { 
-                var attribute = typeof(T).GetCustomAttribute<SqlNameAttribute>();
-                if (attribute == null)
-                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-
+                var attribute = typeof(T).GetCustomAttribute<SqlNameAttribute>() ?? throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
                 var list = await connection.GetTableRowsAsync<T>(tableName: attribute.Name, whereClause: whereClause, parameters: parameters, limit: 1);
                 if (list == null)
                     return null;
@@ -905,7 +869,7 @@ namespace Tavstal.TLibrary.Helpers.General
                         if (prop.PropertyType == typeof(bool) || prop.PropertyType.IsEnum)
                             paramString += $"'{Convert.ToInt32(prop.GetValue(value))}',";
                         else if (prop.PropertyType == typeof(DateTime))
-                            paramString += $"'{((DateTime)prop.GetValue(value)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
+                            paramString += $"'{(DateTime)prop.GetValue(value):yyyy-MM-dd HH:mm:ss.fff}',";
                         else if (prop.PropertyType == typeof(string))
                             paramString += $"'{ConvertIllegalCharsToSql((string)prop.GetValue(value))}',";
                         else
@@ -954,8 +918,8 @@ namespace Tavstal.TLibrary.Helpers.General
                 var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-
-                return await AddTableRowAsync<T>(connection, tableAttribute.Name, value);
+                else
+                    return await AddTableRowAsync<T>(connection, tableAttribute.Name, value);
             }
             catch (Exception ex)
             {
@@ -1029,7 +993,7 @@ namespace Tavstal.TLibrary.Helpers.General
                             if (prop.PropertyType == typeof(bool) || prop.PropertyType.IsEnum)
                                 paramString += $"'{Convert.ToInt32(prop.GetValue(value))}',";
                             else if (prop.PropertyType == typeof(DateTime))
-                                paramString += $"'{((DateTime)prop.GetValue(value)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
+                                paramString += $"'{(DateTime)prop.GetValue(value):yyyy-MM-dd HH:mm:ss.fff}',";
                             else if (prop.PropertyType == typeof(string))
                                 paramString += $"'{ConvertIllegalCharsToSql((string)prop.GetValue(value))}',";
                             else
@@ -1122,7 +1086,7 @@ namespace Tavstal.TLibrary.Helpers.General
                         if (prop.PropertyType == typeof(bool) || prop.PropertyType.IsEnum)
                             setClause += $"{propName}={Convert.ToInt32(prop.GetValue(newValue))},";
                         else if (prop.PropertyType == typeof(DateTime))
-                            setClause += $"{propName}='{((DateTime)prop.GetValue(newValue)).ToString("yyyy-MM-dd HH:mm:ss.fff")}',";
+                            setClause += $"{propName}='{(DateTime)prop.GetValue(newValue):yyyy-MM-dd HH:mm:ss.fff}',";
                         else if (prop.PropertyType == typeof(string))
                             setClause += $"{propName}='{ConvertIllegalCharsToSql((string)prop.GetValue(newValue))}',";
                         else
@@ -1184,8 +1148,8 @@ namespace Tavstal.TLibrary.Helpers.General
                 var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-
-                return await UpdateTableRowAsync<T>(connection, tableAttribute.Name, newValue, whereClause, parameters);
+                else
+                    return await UpdateTableRowAsync<T>(connection, tableAttribute.Name, newValue, whereClause, parameters);
             }
             catch (Exception ex)
             {
@@ -1277,8 +1241,8 @@ namespace Tavstal.TLibrary.Helpers.General
                 var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-
-                return await UpdateTableRowAsync<T>(connection, tableName: tableAttribute.Name, whereClause: whereClause, newValue: newValue);
+                else
+                    return await UpdateTableRowAsync<T>(connection, tableName: tableAttribute.Name, whereClause: whereClause, newValue: newValue);
             }
             catch (Exception ex)
             {
@@ -1372,8 +1336,8 @@ namespace Tavstal.TLibrary.Helpers.General
                 var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-
-                return await UpdateTableRowAsync<T>(connection, tableAttribute.Name, whereClause, newValues);
+                else
+                    return await UpdateTableRowAsync<T>(connection, tableAttribute.Name, whereClause, newValues);
             }
             catch (Exception ex)
             {
@@ -1455,8 +1419,8 @@ namespace Tavstal.TLibrary.Helpers.General
                 var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-
-                return await RemoveTableRowAsync<T>(connection, tableAttribute.Name, whereClause, parameters);
+                else
+                    return await RemoveTableRowAsync<T>(connection, tableAttribute.Name, whereClause, parameters);
             }
             catch (Exception ex)
             {
@@ -1537,8 +1501,8 @@ namespace Tavstal.TLibrary.Helpers.General
                 var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-
-                return await RemoveTableRowsAsync<T>(connection, tableAttribute.Name, whereClause, parameters);
+                else
+                    return await RemoveTableRowsAsync<T>(connection, tableAttribute.Name, whereClause, parameters);
             }
             catch (Exception ex)
             {

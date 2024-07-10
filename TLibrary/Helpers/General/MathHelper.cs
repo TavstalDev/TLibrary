@@ -7,7 +7,7 @@ namespace Tavstal.TLibrary.Helpers.General
     public static class MathHelper
     {
         private static System.Random _random;
-        private static object syncObj = new object();
+        private static readonly object syncObj = new object();
 
         /// <summary>
         /// Calculates the center point of an array of Vector3 points.

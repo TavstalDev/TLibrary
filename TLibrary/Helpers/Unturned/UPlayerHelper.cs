@@ -90,7 +90,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
                         ItemJar itemJar = items[b];
                         if (itemJar.item.amount > 0 || findEmpty)
                         {
-                            ItemAsset itemAsset = Assets.find(EAssetType.ITEM, itemJar.item.id) as ItemAsset;
+                            ItemAsset itemAsset = UAssetHelper.FindItemAsset(itemJar.item.id);
                             if (itemAsset != null && itemAsset.type == type)
                             {
                                 search.Add(new InventorySearch(_items.page, itemJar));
@@ -163,9 +163,15 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="player">The player whose barricades will be destroyed.</param>
         public static void DestroyPlayerBarricades(UnturnedPlayer player)
         {
+            if (player == null)
+                return;
+
+            if (player.CSteamID == CSteamID.Nil)
+                return;
+
             foreach (var region in BarricadeManager.regions)
             {
-                var drops = region.drops.FindAll(x => UnturnedPlayer.FromCSteamID((CSteamID)x.GetServersideData().owner) != null);
+                var drops = region.drops.FindAll(x => (CSteamID)x.GetServersideData().owner == player.CSteamID);
                 foreach (var drop in drops)
                 {
                     BarricadeManager.tryGetRegion(drop.model, out var x, out var y, out var plant, out var _);
@@ -259,15 +265,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
 
         internal static uint GenerateFrequency()
         {
-            uint freq = 0;
-
-            freq = Convert.ToUInt32(MathHelper.Next(300000, 900000));
-            /*if (!InUseFrequencies.Contains(freq))
-                InUseFrequencies.Add(freq);
-            else
-                freq = GenerateFrequency();*/
-
-            return freq;
+            return Convert.ToUInt32(MathHelper.Next(300000, 900000));
         }
     }
 }

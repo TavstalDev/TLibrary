@@ -69,7 +69,6 @@ namespace Tavstal.TLibrary.Services
         /// <returns></returns>
         public string Post(string message, Embed embed, string fileName, string fileFormat, byte[] fileData)
         {
-            string url = null;
             Dictionary<string, object> postParameters = new Dictionary<string, object>
             {
                 { "payload_json", new JsonParameter(new { username = _webhookName, avatar_url = _webhookAvatarUrl, content = message, embeds = new List<object> { embed } }, "application/json") },
@@ -78,7 +77,7 @@ namespace Tavstal.TLibrary.Services
                 { "file", new FileParameter(fileData, fileName, "application/msexcel") }
             };
 
-            HttpWebResponse webResponse = null;
+            HttpWebResponse webResponse;
             try
             {
                 webResponse = MultipartFormDataPost("Test", postParameters);
@@ -99,6 +98,7 @@ namespace Tavstal.TLibrary.Services
 
             JObject obj = JObject.Parse(fullResponse);
             JArray jArray = (JArray)obj["attachments"];
+            string url;
             if (jArray.Count > 0)
                 url = jArray[0]["url"].ToString();
             else
@@ -121,7 +121,7 @@ namespace Tavstal.TLibrary.Services
             if (!_webhookAvatarUrl.IsNullOrEmpty())
                 postParameters.Add("avatar_url", _webhookAvatarUrl);
 
-            HttpWebResponse webResponse = null;
+            HttpWebResponse webResponse;
             try
             {
                 webResponse = MultipartFormDataPost("Test", postParameters);
@@ -154,7 +154,7 @@ namespace Tavstal.TLibrary.Services
             if (!_webhookAvatarUrl.IsNullOrEmpty())
                 postParameters.Add("avatar_url", _webhookAvatarUrl);
 
-            HttpWebResponse webResponse = null;
+            HttpWebResponse webResponse;
             try
             {
                 webResponse = JsonPost("Test", postParameters);
@@ -193,7 +193,7 @@ namespace Tavstal.TLibrary.Services
             if (!_webhookAvatarUrl.IsNullOrEmpty())
                 postParameters.Add("avatar_url", _webhookAvatarUrl);
 
-            HttpWebResponse webResponse = null;
+            HttpWebResponse webResponse;
             try
             {
                 webResponse = MultipartFormDataPost("Test", postParameters);
@@ -237,8 +237,7 @@ namespace Tavstal.TLibrary.Services
 
         private HttpWebResponse JsonPost(string userAgent, Dictionary<string, object> postParameters)
         {
-            HttpWebRequest request = WebRequest.Create(_webhookUrl) as HttpWebRequest;
-            if (request == null)
+            if (!(WebRequest.Create(_webhookUrl) is HttpWebRequest request))
             {
                 throw new NullReferenceException("request is not a http request");
             }
@@ -273,8 +272,7 @@ namespace Tavstal.TLibrary.Services
         /// <exception cref="NullReferenceException"></exception>
         private HttpWebResponse PostForm(string postUrl, string userAgent, string contentType, byte[] formData)
         {
-            HttpWebRequest request = WebRequest.Create(postUrl) as HttpWebRequest;
-            if (request == null)
+            if (!(WebRequest.Create(postUrl) is HttpWebRequest request))
             {
                 throw new NullReferenceException("request is not a http request");
             }
@@ -384,7 +382,6 @@ namespace Tavstal.TLibrary.Services
         /// <returns></returns>
         public async Task<string> PostAsync(string message, Embed embed, string fileName, string fileFormat, byte[] fileData)
         {
-            string url = null;
             Dictionary<string, object> postParameters = new Dictionary<string, object>
             {
                 { "payload_json", new JsonParameter(new { username = _webhookName, avatar_url = _webhookAvatarUrl, content = message, embeds = new List<object> { embed } }, "application/json") },
@@ -393,7 +390,7 @@ namespace Tavstal.TLibrary.Services
                 { "file", new FileParameter(fileData, fileName, "application/msexcel") }
             };
 
-            HttpWebResponse webResponse = null;
+            HttpWebResponse webResponse;
             try
             {
                 webResponse = await MultipartFormDataPostAsync("Test", postParameters);
@@ -414,6 +411,7 @@ namespace Tavstal.TLibrary.Services
 
             JObject obj = JObject.Parse(fullResponse);
             JArray jArray = (JArray)obj["attachments"];
+            string url;
             if (jArray.Count > 0)
                 url = jArray[0]["url"].ToString();
             else
@@ -436,7 +434,7 @@ namespace Tavstal.TLibrary.Services
             if (!_webhookAvatarUrl.IsNullOrEmpty())
                 postParameters.Add("avatar_url", _webhookAvatarUrl);
 
-            HttpWebResponse webResponse = null;
+            HttpWebResponse webResponse;
             try
             {
                 webResponse = await MultipartFormDataPostAsync("Test", postParameters);
@@ -469,7 +467,7 @@ namespace Tavstal.TLibrary.Services
             if (!_webhookAvatarUrl.IsNullOrEmpty())
                 postParameters.Add("avatar_url", _webhookAvatarUrl);
 
-            HttpWebResponse webResponse = null;
+            HttpWebResponse webResponse;
             try
             {
                 webResponse = await JsonPostAsync("Test", postParameters);
@@ -508,7 +506,7 @@ namespace Tavstal.TLibrary.Services
             if (!_webhookAvatarUrl.IsNullOrEmpty())
                 postParameters.Add("avatar_url", _webhookAvatarUrl);
 
-            HttpWebResponse webResponse = null;
+            HttpWebResponse webResponse;
             try
             {
                 webResponse = await MultipartFormDataPostAsync("Test", postParameters);
@@ -552,8 +550,7 @@ namespace Tavstal.TLibrary.Services
 
         private async Task<HttpWebResponse> JsonPostAsync(string userAgent, Dictionary<string, object> postParameters)
         {
-            HttpWebRequest request = WebRequest.Create(_webhookUrl) as HttpWebRequest;
-            if (request == null)
+            if (!(WebRequest.Create(_webhookUrl) is HttpWebRequest request))
             {
                 throw new NullReferenceException("request is not a http request");
             }
@@ -588,8 +585,7 @@ namespace Tavstal.TLibrary.Services
         /// <exception cref="NullReferenceException"></exception>
         private async Task<HttpWebResponse> PostFormAsync(string postUrl, string userAgent, string contentType, byte[] formData)
         {
-            HttpWebRequest request = WebRequest.Create(postUrl) as HttpWebRequest;
-            if (request == null)
+            if (!(WebRequest.Create(postUrl) is HttpWebRequest request))
             {
                 throw new NullReferenceException("request is not a http request");
             }
