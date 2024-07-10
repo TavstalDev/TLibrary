@@ -20,6 +20,19 @@ namespace Tavstal.TLibrary.Compatibility
             Z = p.z;
         }
 
+        public SerializableVector3(float x, float y, float z) {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+
+        public SerializableVector3(string rawValue) {
+            string[] parts = rawValue.Split(';');
+            X = float.Parse(parts[0]);
+            Y = float.Parse(parts[1]);
+            Z = float.Parse(parts[2]);
+        }
+
         public override bool Equals(object obj)
         {
             if (obj is SerializableVector3 other && X == other.X && Y == other.Y && Z == other.Z)
@@ -35,7 +48,7 @@ namespace Tavstal.TLibrary.Compatibility
 
         public override string ToString()
         {
-            return base.ToString();
+            return $"{X};{Y};{Z}";
         }
 
         public override int GetHashCode()
