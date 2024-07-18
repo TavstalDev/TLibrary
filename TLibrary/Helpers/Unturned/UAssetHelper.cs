@@ -87,6 +87,17 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// </summary>
         /// <param name="id">The ID of the vehicle asset to find.</param>
         /// <returns>A VehicleAsset object representing the vehicle asset with the specified ID, or null if not found.</returns>
-        public static VehicleAsset FindVehicleAsset(ushort id) => Assets.FindVehicleAssetByGuidOrLegacyId(Guid.Empty, id);
+        public static VehicleAsset FindVehicleAsset(ushort id) {
+            VehicleAsset asset = null;
+
+            foreach (VehicleAsset a in GetVehicleAssets()) {
+                if (a.id == id) {
+                    asset = a;
+                    break;
+                }
+            }
+
+            return asset;
+        }
     }
 }
