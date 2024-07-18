@@ -24,9 +24,22 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <returns>A list of VehicleAsset objects representing the vehicle assets in the game.</returns>
         public static List<VehicleAsset> GetVehicleAssets()
         {
-            List<VehicleAsset> values = new List<VehicleAsset>();
+            List<Asset> values = new List<Asset>();
+            List<VehicleAsset> vehicles = new List<VehicleAsset>();
             Assets.find(values);
-            return values;
+            values = values.FindAll(x => x.assetCategory == EAssetType.VEHICLE);
+            
+            foreach (Asset a in values) {
+                if (a is VehicleAsset va) {
+                    vehicles.Add(va);
+                }
+
+                if (a is VehicleRedirectorAsset vra) {
+                    vehicles.Add(vra.TargetVehicle.Find());
+                }
+            }
+            
+            return vehicles;
         }
 
         /// <summary>
@@ -89,10 +102,18 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <returns>A VehicleAsset object representing the vehicle asset with the specified ID, or null if not found.</returns>
         public static VehicleAsset FindVehicleAsset(ushort id) {
             Asset asset = Assets.FindBaseVehicleAssetByGuidOrLegacyId(Guid.Empty, id) ?? Assets.FindVehicleAssetByGuidOrLegacyId(Guid.Empty, id);
-            if (asset != null)
-                return (VehicleAsset)asset;
-            else
+            if (asset == null)
                 return null;
+            
+            if (asset is VehicleAsset va) {
+                return va;
+            }
+
+            if (asset is VehicleRedirectorAsset vra) {
+                return vra.TargetVehicle.Find();
+            }
+
+            return null;
         }
     }
 }
