@@ -7,7 +7,7 @@ namespace Tavstal.TLibrary.Models.Commands
     /// <summary>
     /// Class used to help in creating subcommands
     /// </summary>
-    public abstract class SubCommand : ICommand
+    public class SubCommand : ICommand
     {
         /// <summary>
         /// Name of the subcommand
