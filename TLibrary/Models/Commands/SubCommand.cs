@@ -46,9 +46,9 @@ namespace Tavstal.TLibrary.Models.Commands
             ActionToExecute.Invoke(caller, args);
         }
 
-        protected SubCommand() { }
+        public SubCommand() { }
 
-        protected SubCommand(string name, string help, string syntax, List<string> aliases, List<string> permissions, Action<IRocketPlayer, string[]> codeToExecute)
+        public SubCommand(string name, string help, string syntax, List<string> aliases, List<string> permissions, Action<IRocketPlayer, string[]> codeToExecute)
         {
             Name = name;
             Help = help;
