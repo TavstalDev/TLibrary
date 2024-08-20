@@ -1,4 +1,4 @@
-﻿namespace Tavstal.TLibrary.Compatibility
+﻿namespace Tavstal.TLibrary.Compatibility.Interfaces
 {
     /// <summary>
     /// Base database settings interface used in plugin configurations

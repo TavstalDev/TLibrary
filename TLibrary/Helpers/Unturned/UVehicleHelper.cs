@@ -20,7 +20,8 @@ namespace Tavstal.TLibrary.Helpers.Unturned
             try
             {
                 if (VehicleManager.vehicles == null) return result;
-                var rayResult = Physics.SphereCastAll(center, sqrRadius, Vector3.forward, RayMasks.VEHICLE);
+                RaycastHit[] rayResult = new RaycastHit[] { };
+                Physics.SphereCastNonAlloc(center, sqrRadius, Vector3.forward, rayResult, RayMasks.VEHICLE);
                 foreach (RaycastHit ray in rayResult)
                 {
                     var vehicle = ray.transform.GetComponent<InteractableVehicle>();

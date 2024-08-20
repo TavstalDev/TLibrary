@@ -115,6 +115,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// Gets the name of the day for the specified date and time.
         /// </summary>
         /// <param name="time">The DateTime object representing the date and time.</param>
+        /// <param name="locale"></param>
         /// <returns>The name of the day for the specified date and time.</returns>
         public static string GetDayName(this DateTime time, string locale)
         {
@@ -125,6 +126,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// Gets the name of the month for the specified date and time.
         /// </summary>
         /// <param name="time">The DateTime object representing the date and time.</param>
+        /// <param name="locale"></param>
         /// <returns>The name of the month for the specified date and time.</returns>
         public static string GetMonthName(this DateTime time, string locale)
         {
@@ -156,6 +158,8 @@ namespace Tavstal.TLibrary.Helpers.General
         /// </summary>
         /// <param name="format">The custom format string for date and time formatting.</param>
         /// <param name="time">The DateTime object representing the date and time.</param>
+        /// <param name="locale"></param>
+        /// <param name="isAnalogue"></param>
         /// <returns>The formatted date and time string based on the provided format.</returns>
         public static string GetDateTimeStringByFormat(this DateTime time, string locale, bool isAnalogue, string format)
         {

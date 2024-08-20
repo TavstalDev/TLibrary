@@ -40,7 +40,8 @@ namespace Tavstal.TLibrary.Extensions
         /// <summary>
         /// Checks if the provided index is a valid index within the Dictionary.
         /// </summary>
-        /// <typeparam name="T">The type of elements in the Dictionary.</typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
         /// <param name="self">The Dictionary to check.</param>
         /// <param name="index">The index to check for validity.</param>
         /// <returns>True if the index is valid, false otherwise.</returns>
@@ -144,7 +145,7 @@ namespace Tavstal.TLibrary.Extensions
         /// Returns the last element of an array.
         /// </summary>
         /// <typeparam name="T">The type of elements in the array.</typeparam>
-        /// <param name="array">The array from which to retrieve the last element.</param>
+        /// <param name="list">The array from which to retrieve the last element.</param>
         /// <returns>The last element in the array.</returns>
         public static T GetLast<T>(this T[] list)
         {
@@ -223,11 +224,7 @@ namespace Tavstal.TLibrary.Extensions
         /// <returns>True if the array contains the specified string, ignoring case; otherwise, false.</returns>
         public static bool ContainsIgnoreCase(this string[] stringArray, string text)
         {
-            foreach (string s in stringArray)
-                if (s.EqualsIgnoreCase(text))
-                    return true;
-
-            return false;
+            return stringArray.Any(s => s.EqualsIgnoreCase(text));
         }
     }
 }

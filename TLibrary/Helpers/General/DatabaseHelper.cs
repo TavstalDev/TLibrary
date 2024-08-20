@@ -5,12 +5,14 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Reflection;
-using Tavstal.TLibrary.Compatibility.Database;
 using Tavstal.TLibrary.Extensions;
 using System.Data.Common;
+using Tavstal.TLibrary.Compatibility.Models.Database;
+using Tavstal.TLibrary.Compatibility.Models.Database.Attributes;
 
 namespace Tavstal.TLibrary.Helpers.General
 {
+    // ReSharper disable once NotResolvedInText
     public static class DatabaseHelper
     {
         /// <summary>
@@ -296,7 +298,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
             try
             {
-                var schemaType = typeof(T);
+                //var schemaType = typeof(T);
                 await connection.OpenSafeAsync();
                 using (var command = connection.CreateCommand())
                 {
@@ -573,7 +575,6 @@ namespace Tavstal.TLibrary.Helpers.General
                         ConvertSqlToCSharpDataType(lcolumn.ColumnType) != ConvertSqlToCSharpDataType(column.ColumnType))
                     {
                         columnsToUpdate.Add(column);
-                        continue;
                     }
                 }
                 #endregion
@@ -681,7 +682,7 @@ namespace Tavstal.TLibrary.Helpers.General
             {
                 List<T> localList = new List<T>();
                 string limitClause = limit > 0 ? $" LIMIT {limit}" : "";
-                string whereClauseExp = string.Empty;
+                //string whereClauseExp = string.Empty;
                 if (!whereClause.IsNullOrEmpty())
                 {
                     if (!whereClause.StartsWith("WHERE "))
@@ -703,7 +704,7 @@ namespace Tavstal.TLibrary.Helpers.General
                         localList.Add(reader.ConvertToObject<T>());
                     }
                 }
-                connection.Close();
+                await connection.CloseAsync();
                 return localList;
             }
             catch (Exception ex)
@@ -767,10 +768,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 if (list == null)
                     return null;
 
-                if (list.Count <= 0)
-                    return null;
-
-                return list.ElementAt(0);
+                return list.Count <= 0 ? null : list.ElementAt(0);
             }
             catch (Exception ex)
             {
@@ -803,10 +801,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 if (list == null)
                     return null;
 
-                if (list.Count <= 0)
-                    return null;
-
-                return list.ElementAt(0);
+                return list.Count <= 0 ? null : list.ElementAt(0);
             }
             catch (Exception ex)
             {
@@ -919,7 +914,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
                 else
-                    return await AddTableRowAsync<T>(connection, tableAttribute.Name, value);
+                    return await AddTableRowAsync(connection, tableAttribute.Name, value);
             }
             catch (Exception ex)
             {
@@ -938,7 +933,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <typeparam name="T">The type of object associated with the table.</typeparam>
         /// <param name="connection">The MySqlConnection to the MySQL database.</param>
         /// <param name="tableName">The name of the table to which the row will be added.</param>
-        /// <param name="value">The object representing the row data to be added.</param>
+        /// <param name="values">The object representing the row data to be added.</param>
         /// <returns>True if the row was successfully added; otherwise, false.</returns>
         public static async Task<bool> AddTableRowsAsync<T>(this MySqlConnection connection, string tableName, List<T> values)
         {
@@ -1149,7 +1144,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
                 else
-                    return await UpdateTableRowAsync<T>(connection, tableAttribute.Name, newValue, whereClause, parameters);
+                    return await UpdateTableRowAsync(connection, tableAttribute.Name, newValue, whereClause, parameters);
             }
             catch (Exception ex)
             {
@@ -1163,7 +1158,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
         /// <summary>
         /// Updates an existing row in the MySQL database table associated with the type T.
-        /// The row data is provided as a <see cref="Compatibility.Database.SqlParameter"/>, and the update is performed based on the provided WHERE clause and parameters.
+        /// The row data is provided as a <see cref="SqlParameter"/>, and the update is performed based on the provided WHERE clause and parameters.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="connection"></param>
@@ -1171,7 +1166,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="whereClause"></param>
         /// <param name="newValue"></param>
         /// <returns>True if the row was successfully updated; otherwise, false.</returns>
-        public static async Task<bool> UpdateTableRowAsync<T>(this MySqlConnection connection, string tableName, string whereClause, Compatibility.Database.SqlParameter newValue)
+        public static async Task<bool> UpdateTableRowAsync<T>(this MySqlConnection connection, string tableName, string whereClause, SqlParameter newValue)
         {
             if (connection == null)
                 return false;
@@ -1184,7 +1179,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
             try
             {
-                var schemaType = typeof(T);
+                //var schemaType = typeof(T);
                 string setClause = $"{newValue.ColumnName}={newValue.Value.ParameterName}";
 
                 await connection.OpenSafeAsync();
@@ -1217,14 +1212,14 @@ namespace Tavstal.TLibrary.Helpers.General
 
         /// <summary>
         /// Updates an existing row in the MySQL database table associated with the type T.
-        /// The row data is provided as a <see cref="Compatibility.Database.SqlParameter"/>, and the update is performed based on the provided WHERE clause and parameters.
+        /// The row data is provided as a <see cref="SqlParameter"/>, and the update is performed based on the provided WHERE clause and parameters.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="connection"></param>
         /// <param name="whereClause"></param>
         /// <param name="newValue"></param>
         /// <returns>True if the row was successfully updated; otherwise, false.</returns>
-        public static async Task<bool> UpdateTableRowAsync<T>(this MySqlConnection connection, string whereClause, Compatibility.Database.SqlParameter newValue)
+        public static async Task<bool> UpdateTableRowAsync<T>(this MySqlConnection connection, string whereClause, SqlParameter newValue)
         {
             if (connection == null)
                 return false;
@@ -1256,7 +1251,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
         /// <summary>
         /// Updates an existing row in the MySQL database table associated with the type T.
-        /// The row data is provided as a List of <see cref="Compatibility.Database.SqlParameter"/>, and the update is performed based on the provided WHERE clause and parameters.
+        /// The row data is provided as a List of <see cref="SqlParameter"/>, and the update is performed based on the provided WHERE clause and parameters.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="connection"></param>
@@ -1264,7 +1259,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="whereClause"></param>
         /// <param name="newValues"></param>
         /// <returns>True if the row was successfully updated; otherwise, false.</returns>
-        public static async Task<bool> UpdateTableRowAsync<T>(this MySqlConnection connection, string tableName, string whereClause, List<Compatibility.Database.SqlParameter> newValues)
+        public static async Task<bool> UpdateTableRowAsync<T>(this MySqlConnection connection, string tableName, string whereClause, List<SqlParameter> newValues)
         {
             if (connection == null)
                 return false;
@@ -1280,7 +1275,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
             try
             {
-                var schemaType = typeof(T);
+                //var schemaType = typeof(T);
                 string setClause = string.Empty;
 
                 await connection.OpenSafeAsync();
@@ -1318,14 +1313,14 @@ namespace Tavstal.TLibrary.Helpers.General
 
         /// <summary>
         /// Updates an existing row in the MySQL database table associated with the type T.
-        /// The row data is provided as a List of <see cref="Compatibility.Database.SqlParameter"/>, and the update is performed based on the provided WHERE clause and parameters.
+        /// The row data is provided as a List of <see cref="SqlParameter"/>, and the update is performed based on the provided WHERE clause and parameters.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="connection"></param>
         /// <param name="whereClause"></param>
         /// <param name="newValues"></param>
         /// <returns>True if the row was successfully updated; otherwise, false.</returns>
-        public static async Task<bool> UpdateTableRowAsync<T>(this MySqlConnection connection, string whereClause, List<Compatibility.Database.SqlParameter> newValues)
+        public static async Task<bool> UpdateTableRowAsync<T>(this MySqlConnection connection, string whereClause, List<SqlParameter> newValues)
         {
             if (connection == null)
                 return false;
@@ -1366,7 +1361,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
             try
             {
-                var schemaType = typeof(T);
+                //var schemaType = typeof(T);
                 await connection.OpenSafeAsync();
                 using (var command = connection.CreateCommand())
                 {
@@ -1448,7 +1443,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
             try
             {
-                var schemaType = typeof(T);
+                //var schemaType = typeof(T);
                 await connection.OpenSafeAsync();
                 using (var command = connection.CreateCommand())
                 {

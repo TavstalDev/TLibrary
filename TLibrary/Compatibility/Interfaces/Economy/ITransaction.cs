@@ -1,5 +1,5 @@
 ﻿using System;
-using Tavstal.TLibrary.Compatibility.Economy;
+using Tavstal.TLibrary.Compatibility.Enumerators;
 
 namespace Tavstal.TLibrary.Compatibility.Interfaces.Economy
 {

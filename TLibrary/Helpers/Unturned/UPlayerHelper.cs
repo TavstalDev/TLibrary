@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Tavstal.TLibrary.Extensions;
+using Tavstal.TLibrary.Extensions.Unturned;
 using Tavstal.TLibrary.Helpers.General;
 using UnityEngine;
 
@@ -46,11 +47,6 @@ namespace Tavstal.TLibrary.Helpers.Unturned
                         if (maxlocal <= 0)
                             break;
                     }
-                }
-
-                if (!success || maxlocal > 0)
-                {
-                    searchResult = inventory.Search(EItemType.GUN, true);
                 }
             }
             catch (Exception ex)
@@ -202,25 +198,25 @@ namespace Tavstal.TLibrary.Helpers.Unturned
                     playerInv.removeItem(page, 0);
             }
 
-            player.Player.clothing.askWearBackpack(0, 0, new byte[0], true);
+            player.Player.clothing.askWearBackpack(0, 0, Array.Empty<byte>(), true);
             RemoveUnequipped(playerInv);
 
-            player.Player.clothing.askWearGlasses(0, 0, new byte[0], true);
+            player.Player.clothing.askWearGlasses(0, 0, Array.Empty<byte>(), true);
             RemoveUnequipped(playerInv);
 
-            player.Player.clothing.askWearHat(0, 0, new byte[0], true);
+            player.Player.clothing.askWearHat(0, 0, Array.Empty<byte>(), true);
             RemoveUnequipped(playerInv);
 
-            player.Player.clothing.askWearPants(0, 0, new byte[0], true);
+            player.Player.clothing.askWearPants(0, 0, Array.Empty<byte>(), true);
             RemoveUnequipped(playerInv);
 
-            player.Player.clothing.askWearMask(0, 0, new byte[0], true);
+            player.Player.clothing.askWearMask(0, 0, Array.Empty<byte>(), true);
             RemoveUnequipped(playerInv);
 
-            player.Player.clothing.askWearShirt(0, 0, new byte[0], true);
+            player.Player.clothing.askWearShirt(0, 0, Array.Empty<byte>(), true);
             RemoveUnequipped(playerInv);
 
-            player.Player.clothing.askWearVest(0, 0, new byte[0], true);
+            player.Player.clothing.askWearVest(0, 0, Array.Empty<byte>(), true);
             RemoveUnequipped(playerInv);
         }
 

@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace Tavstal.TLibrary.Compatibility.Database
+namespace Tavstal.TLibrary.Compatibility.Models.Database.Attributes
 {
     /// <summary>
     /// SQL Attribute used to ignore variables by the database manager
     /// </summary>
-    [System.AttributeUsage(System.AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true, Inherited = false)]
-    public class SqlIgnoreAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true, Inherited = false)]
+    public abstract class SqlIgnoreAttribute : Attribute
     {
     }
 }

@@ -1,12 +1,12 @@
-﻿using Rocket.Unturned.Player;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Rocket.Unturned.Player;
 using SDG.Unturned;
 using Steamworks;
-using System.Collections.Generic;
-using System.Linq;
 using Tavstal.TLibrary.Helpers.Unturned;
 using UnityEngine;
 
-namespace Tavstal.TLibrary.Extensions
+namespace Tavstal.TLibrary.Extensions.Unturned
 {
     public static class PlayerExtensions
     {
@@ -33,7 +33,7 @@ namespace Tavstal.TLibrary.Extensions
         /// <summary>
         /// Gets a list of Unturned players who are nearby a given position within a specified distance.
         /// </summary>
-        /// <param name="position">The position to check for nearby players.</param>
+        /// <param name="uplayer">The position of the player to check for nearby players.</param>
         /// <param name="distance">The maximum distance within which players are considered nearby.</param>
         /// <returns>A list of Unturned players who are nearby the given position.</returns>
         public static List<UnturnedPlayer> GetNearbyPlayers(this UnturnedPlayer uplayer, float distance)

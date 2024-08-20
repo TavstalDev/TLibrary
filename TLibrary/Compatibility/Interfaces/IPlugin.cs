@@ -1,4 +1,6 @@
-﻿namespace Tavstal.TLibrary.Compatibility.Interfaces
+﻿using Tavstal.TLibrary.Compatibility.Models.Plugin;
+
+namespace Tavstal.TLibrary.Compatibility.Interfaces
 {
     public interface IPlugin
     {

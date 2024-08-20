@@ -95,7 +95,6 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <summary>
         /// Returns a random integer between 0 (inclusive) and the specified maximum value (exclusive).
         /// </summary>
-        /// <param name="max">The exclusive maximum value of the random range.</param>
         /// <returns>A random integer between 0 (inclusive) and the specified maximum value (exclusive).</returns>
         public static uint Next()
         {
@@ -266,7 +265,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <returns>A randomly generated frequency.</returns>
         public static uint GenerateFrequency()
         {
-            return Convert.ToUInt32(MathHelper.Next(300000, 900000)); ;
+            return Convert.ToUInt32(MathHelper.Next(300000, 900000));
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Tavstal.TLibrary.Compatibility
+namespace Tavstal.TLibrary.Compatibility.Models
 {
     /// <summary>
     /// Vector3 that can be serialized.
@@ -37,13 +37,10 @@ namespace Tavstal.TLibrary.Compatibility
 
         public override bool Equals(object obj)
         {
-            if (obj is SerializableVector3 other && X == other.X && Y == other.Y && Z == other.Z)
+            if (obj is SerializableVector3 other && Mathf.Approximately(X, other.X) && Mathf.Approximately(Y, other.Y) && Mathf.Approximately(Z, other.Z))
                 return true;
 
-            if (obj is Vector3 other3 && X == other3.x && Y == other3.y && Z == other3.z)
-                return true;
-
-            return false;
+            return obj is Vector3 other3 && Mathf.Approximately(X, other3.x) && Mathf.Approximately(Y, other3.y) && Mathf.Approximately(Z, other3.z);
         }
 
         public Vector3 GetVector3() => new Vector3(X, Y, Z);
@@ -55,6 +52,7 @@ namespace Tavstal.TLibrary.Compatibility
 
         public override int GetHashCode()
         {
+            // ReSharper disable once BaseObjectGetHashCodeCallInGetHashCode
             return base.GetHashCode();
         }
     }

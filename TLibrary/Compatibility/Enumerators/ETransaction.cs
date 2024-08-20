@@ -1,4 +1,4 @@
-﻿namespace Tavstal.TLibrary.Compatibility.Economy
+﻿namespace Tavstal.TLibrary.Compatibility.Enumerators
 {
     /// <summary>
     /// Enum list of the transaction types

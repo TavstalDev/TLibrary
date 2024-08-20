@@ -1,7 +1,7 @@
 ﻿using System;
 using Tavstal.TLibrary.Compatibility.Interfaces;
 
-namespace Tavstal.TLibrary.Compatibility
+namespace Tavstal.TLibrary.Compatibility.Hooks
 {
     /// <summary>
     /// Abstract hook class used for handling functions based on thirdparty plugins.

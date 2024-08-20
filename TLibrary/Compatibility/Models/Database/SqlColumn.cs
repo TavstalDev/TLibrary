@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Tavstal.TLibrary.Extensions;
 
-namespace Tavstal.TLibrary.Compatibility.Database
+namespace Tavstal.TLibrary.Compatibility.Models.Database
 {
     /// <summary>
     /// Class used to help in handling SQL columns
@@ -94,6 +94,7 @@ namespace Tavstal.TLibrary.Compatibility.Database
         public override int GetHashCode()
         {
             int hashCode = 1349296267;
+            // ReSharper disable NonReadonlyMemberInGetHashCode
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ColumnName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ColumnType);
             hashCode = hashCode * -1521134295 + IsNullable.GetHashCode();

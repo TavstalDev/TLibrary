@@ -24,7 +24,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         public static void SendPlainChatMessage(SteamPlayer toPlayer, string text)
         {
             string icon = "";
-            ServerSendChatMessage(text, icon, null, toPlayer, EChatMode.GLOBAL);
+            ServerSendChatMessage(text, icon, null, toPlayer);
         }
 
         /// <summary>
@@ -38,9 +38,9 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         {
             string icon = "";
             if (toPlayer is SteamPlayer steamPlayer)
-                ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, steamPlayer, EChatMode.GLOBAL);
+                ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, steamPlayer);
             else if (toPlayer is UnturnedPlayer player)
-                ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, player.SteamPlayer(), EChatMode.GLOBAL);
+                ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, player.SteamPlayer());
             else
                 plugin.GetLogger().LogRichCommand(plugin.Localize(false, translation, args));
         }
@@ -56,9 +56,9 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         {
             string icon = "";
             if (toPlayer is SteamPlayer steamPlayer)
-                ServerSendChatMessage(FormatHelper.FormatTextV2(string.Format(translation, args)), icon, null, steamPlayer, EChatMode.GLOBAL);
+                ServerSendChatMessage(FormatHelper.FormatTextV2(string.Format(translation, args)), icon, null, steamPlayer);
             else if (toPlayer is UnturnedPlayer player)
-                ServerSendChatMessage(FormatHelper.FormatTextV2(string.Format(translation, args)), icon, null, player.SteamPlayer(), EChatMode.GLOBAL);
+                ServerSendChatMessage(FormatHelper.FormatTextV2(string.Format(translation, args)), icon, null, player.SteamPlayer());
             else
                 plugin.GetLogger().LogRichCommand(string.Format(translation, args));
         }
@@ -73,7 +73,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         public static void SendChatMessage(this IPlugin plugin, SteamPlayer toPlayer, string translation, params object[] args)
         {
             string icon = "";
-            ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, toPlayer, EChatMode.GLOBAL);
+            ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, toPlayer);
         }
 
 
@@ -86,7 +86,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         public static void SendChatMessage(this IPlugin plugin, string translation, params object[] args)
         {
             string icon = "";
-            ServerSendChatMessage(plugin.Localize(true, translation, args), icon, null, null, EChatMode.GLOBAL);
+            ServerSendChatMessage(plugin.Localize(true, translation, args), icon);
         }
     }
 }

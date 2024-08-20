@@ -15,7 +15,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
         public static void LogRich(object message, string prefix = "&a[INFO] >&f")
         {
-            string text = string.Format("&b[{0}] {1} {2}", Name, prefix, message.ToString());
+            string text = $"&b[{Name}] {prefix} {message}";
             try
             {
                 ConsoleColor oldColor = Console.ForegroundColor;
@@ -62,7 +62,7 @@ namespace Tavstal.TLibrary.Helpers.General
         public static void Log(object message, ConsoleColor color = ConsoleColor.Green, string prefix = "[INFO] >")
         {
 
-            string text = string.Format("[{0}] {1} {2}", Name, prefix, message.ToString());
+            string text = $"[{Name}] {prefix} {message}";
             try
             {
                 ConsoleColor oldColor = Console.ForegroundColor;
@@ -113,7 +113,7 @@ namespace Tavstal.TLibrary.Helpers.General
             {
                 using (StreamWriter streamWriter = File.AppendText(Path.Combine(Rocket.Core.Environment.LogsDirectory, Rocket.Core.Environment.LogFile)))
                 {
-                    streamWriter.WriteLine(string.Concat("[", DateTime.Now, "] ", string.Format("[{0}] {1}", Name, text)));
+                    streamWriter.WriteLine(string.Concat("[", DateTime.Now, "] ", $"[{Name}] {text}"));
                     streamWriter.Close();
                 }
                 Console.WriteLine(text);
@@ -132,7 +132,7 @@ namespace Tavstal.TLibrary.Helpers.General
             int amount = msg.Split('{').Length;
             for (int i = 0; i < amount; i++)
             {
-                Regex regex = new Regex(string.Format("{0}(.*?){1}", Regex.Escape("{"), Regex.Escape("}")), RegexOptions.RightToLeft);
+                Regex regex = new Regex($"{Regex.Escape("{")}(.*?){Regex.Escape("}")}", RegexOptions.RightToLeft);
                 msg = regex.Replace(msg, "{" + "}");
             }
 

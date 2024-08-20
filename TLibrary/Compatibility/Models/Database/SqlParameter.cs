@@ -1,10 +1,11 @@
-﻿using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using MySql.Data.MySqlClient;
+using Tavstal.TLibrary.Compatibility.Models.Database.Attributes;
 using Tavstal.TLibrary.Extensions;
 
-namespace Tavstal.TLibrary.Compatibility.Database
+namespace Tavstal.TLibrary.Compatibility.Models.Database
 {
     /// <summary>
     /// Used to handle column value more easily

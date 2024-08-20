@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using Newtonsoft.Json;
+using Tavstal.TLibrary.Compatibility.Interfaces;
 
-namespace Tavstal.TLibrary.Compatibility
+namespace Tavstal.TLibrary.Compatibility.Models.Plugin
 {
     /// <summary>
     /// Abstract class for all configurations.
@@ -21,26 +22,26 @@ namespace Tavstal.TLibrary.Compatibility
 
         /// <param name="filename">Example: myfile.txt</param>
         /// <param name="path">Example: D:\MyDirectory</param>
-        public ConfigurationBase(string filename, string path)
+        private ConfigurationBase(string filename, string path)
         {
             FilePath = path;
             FileName = filename;
             LoadDefaults();
         }
 
-        public ConfigurationBase()
+        private ConfigurationBase()
         {
 
         }
 
-        public virtual void LoadDefaults()
+        public void LoadDefaults()
         {
 
         }
 
         public static T Create<T>() where T : ConfigurationBase
         {
-            return (T)Activator.CreateInstance<T>(); 
+            return Activator.CreateInstance<T>(); 
         }
 
         public static T Create<T>(string fileName, string path) where T : ConfigurationBase

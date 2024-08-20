@@ -85,9 +85,12 @@ namespace Tavstal.TLibrary.Services
             catch (WebException ex)
             {
                 using (var stream = ex.Response.GetResponseStream())
-                using (var reader = new StreamReader(stream))
                 {
-                    LoggerHelper.LogError(reader.ReadToEnd());
+                    if (stream != null)
+                        using (var reader = new StreamReader(stream))
+                        {
+                            LoggerHelper.LogError(reader.ReadToEnd());
+                        }
                 }
                 return null;
             }
@@ -99,8 +102,8 @@ namespace Tavstal.TLibrary.Services
             JObject obj = JObject.Parse(fullResponse);
             JArray jArray = (JArray)obj["attachments"];
             string url;
-            if (jArray.Count > 0)
-                url = jArray[0]["url"].ToString();
+            if (jArray != null && jArray.Count > 0)
+                url = jArray[0]["url"]?.ToString();
             else
                 url = "empty";
             return url;
@@ -214,8 +217,8 @@ namespace Tavstal.TLibrary.Services
 
             JObject obj = JObject.Parse(fullResponse);
             JArray jArray = (JArray)obj["attachments"];
-            if (jArray.Count > 0)
-                url = jArray[0]["url"].ToString();
+            if (jArray != null && jArray.Count > 0)
+                url = jArray[0]["url"]?.ToString();
             return url;
         }
 
@@ -227,7 +230,7 @@ namespace Tavstal.TLibrary.Services
         /// <returns><see cref="HttpWebResponse"></see></returns>
         private HttpWebResponse MultipartFormDataPost(string userAgent, Dictionary<string, object> postParameters)
         {
-            string formDataBoundary = string.Format("----------{0:N}", Guid.NewGuid());
+            string formDataBoundary = $"----------{Guid.NewGuid():N}";
 
             string contentType = "multipart/form-data; boundary=" + formDataBoundary;
 
@@ -299,10 +302,12 @@ namespace Tavstal.TLibrary.Services
         /// </summary>
         /// <param name="postParameters"></param>
         /// <param name="boundary"></param>
-        /// <returns><see cref="byte[]"></see></returns>
+        /// <returns><see>
+        ///     <cref>byte[]</cref>
+        /// </see></returns>
         private byte[] GetMultipartFormData(Dictionary<string, object> postParameters, string boundary)
         {
-            Stream formDataStream = new System.IO.MemoryStream();
+            Stream formDataStream = new MemoryStream();
             bool needsCLRF = false;
 
             foreach (var param in postParameters)
@@ -412,8 +417,8 @@ namespace Tavstal.TLibrary.Services
             JObject obj = JObject.Parse(fullResponse);
             JArray jArray = (JArray)obj["attachments"];
             string url;
-            if (jArray.Count > 0)
-                url = jArray[0]["url"].ToString();
+            if (jArray != null && jArray.Count > 0)
+                url = jArray[0]["url"]?.ToString();
             else
                 url = "empty";
             return url;
@@ -527,8 +532,8 @@ namespace Tavstal.TLibrary.Services
 
             JObject obj = JObject.Parse(fullResponse);
             JArray jArray = (JArray)obj["attachments"];
-            if (jArray.Count > 0)
-                url = jArray[0]["url"].ToString();
+            if (jArray?.Count > 0)
+                url = jArray[0]["url"]?.ToString();
             return url;
         }
 
@@ -540,7 +545,7 @@ namespace Tavstal.TLibrary.Services
         /// <returns><see cref="HttpWebResponse"></see></returns>
         private async Task<HttpWebResponse> MultipartFormDataPostAsync(string userAgent, Dictionary<string, object> postParameters)
         {
-            string formDataBoundary = string.Format("----------{0:N}", Guid.NewGuid());
+            string formDataBoundary = $"----------{Guid.NewGuid():N}";
 
             string contentType = "multipart/form-data; boundary=" + formDataBoundary;
 
@@ -567,7 +572,7 @@ namespace Tavstal.TLibrary.Services
             // Send the form data to the request.
             using (Stream requestStream = request.GetRequestStream())
             {
-                requestStream.Write(formData, 0, formData.Length);
+                await requestStream.WriteAsync(formData, 0, formData.Length);
                 requestStream.Close();
             }
 
@@ -600,7 +605,7 @@ namespace Tavstal.TLibrary.Services
             // Send the form data to the request.
             using (Stream requestStream = request.GetRequestStream())
             {
-                requestStream.Write(formData, 0, formData.Length);
+                await requestStream.WriteAsync(formData, 0, formData.Length);
                 requestStream.Close();
             }
 
@@ -612,52 +617,55 @@ namespace Tavstal.TLibrary.Services
         /// </summary>
         /// <param name="postParameters"></param>
         /// <param name="boundary"></param>
-        /// <returns><see cref="byte[]"></see></returns>
+        /// <returns><see>
+        ///     <cref>byte[]</cref>
+        /// </see></returns>
         private async Task<byte[]> GetMultipartFormDataAsync(Dictionary<string, object> postParameters, string boundary)
         {
-            Stream formDataStream = new System.IO.MemoryStream();
+            Stream formDataStream = new MemoryStream();
             bool needsCLRF = false;
 
             foreach (var param in postParameters)
             {
                 if (needsCLRF)
-                    formDataStream.Write(_encoding.GetBytes("\r\n"), 0, _encoding.GetByteCount("\r\n"));
+                    await formDataStream.WriteAsync(_encoding.GetBytes("\r\n"), 0, _encoding.GetByteCount("\r\n"));
 
                 needsCLRF = true;
 
-                if (param.Value is FileParameter fileToUpload)
+                switch (param.Value)
                 {
-                    string header = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"; filename=\"{2}\"\r\nContent-Type: {3}\r\n\r\n",
-                        boundary,
-                        param.Key,
-                        fileToUpload.FileName ?? param.Key,
-                        fileToUpload.ContentType ?? "application/octet-stream");
+                    case FileParameter fileToUpload:
+                    {
+                        string header =
+                            $"--{boundary}\r\nContent-Disposition: form-data; name=\"{param.Key}\"; filename=\"{fileToUpload.FileName ?? param.Key}\"\r\nContent-Type: {fileToUpload.ContentType ?? "application/octet-stream"}\r\n\r\n";
 
-                    formDataStream.Write(_encoding.GetBytes(header), 0, _encoding.GetByteCount(header));
-                    formDataStream.Write(fileToUpload.File, 0, fileToUpload.File.Length);
-                }
-                else if (param.Value is JsonParameter jsonParam)
-                {
-                    string postData = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"\r\nContent-Type: {3}\r\n\r\n{2}\r\n\r\n",
-                        boundary,
-                        param.Key,
-                        jsonParam.Content,
-                        jsonParam.ContentType ?? "application/json");
-                    formDataStream.Write(_encoding.GetBytes(postData), 0, _encoding.GetByteCount(postData));
-                }
-                else
-                {
-                    string postData = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"\r\n\r\n{2}",
-                        boundary,
-                        param.Key,
-                        param.Value);
-                    formDataStream.Write(_encoding.GetBytes(postData), 0, _encoding.GetByteCount(postData));
+                        await formDataStream.WriteAsync(_encoding.GetBytes(header), 0, _encoding.GetByteCount(header));
+                        await formDataStream.WriteAsync(fileToUpload.File, 0, fileToUpload.File.Length);
+                        break;
+                    }
+                    case JsonParameter jsonParam:
+                    {
+                        string postData = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"\r\nContent-Type: {3}\r\n\r\n{2}\r\n\r\n",
+                            boundary,
+                            param.Key,
+                            jsonParam.Content,
+                            jsonParam.ContentType ?? "application/json");
+                        await formDataStream.WriteAsync(_encoding.GetBytes(postData), 0, _encoding.GetByteCount(postData));
+                        break;
+                    }
+                    default:
+                    {
+                        string postData =
+                            $"--{boundary}\r\nContent-Disposition: form-data; name=\"{param.Key}\"\r\n\r\n{param.Value}";
+                        await formDataStream.WriteAsync(_encoding.GetBytes(postData), 0, _encoding.GetByteCount(postData));
+                        break;
+                    }
                 }
             }
 
             // Add the end of the request.  Start with a newline
             string footer = "\r\n--" + boundary + "--\r\n";
-            formDataStream.Write(_encoding.GetBytes(footer), 0, _encoding.GetByteCount(footer));
+            await formDataStream.WriteAsync(_encoding.GetBytes(footer), 0, _encoding.GetByteCount(footer));
 
             // Dump the Stream into a byte[]
             formDataStream.Position = 0;

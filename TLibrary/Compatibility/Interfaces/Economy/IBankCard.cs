@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Tavstal.TLibrary.Compatibility.Interfaces.Economy
+﻿namespace Tavstal.TLibrary.Compatibility.Interfaces.Economy
 {
     public interface IBankCard : IEconomyCard
     {

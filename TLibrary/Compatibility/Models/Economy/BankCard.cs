@@ -1,8 +1,8 @@
 ﻿using System;
-using Tavstal.TLibrary.Compatibility.Database;
 using Tavstal.TLibrary.Compatibility.Interfaces.Economy;
+using Tavstal.TLibrary.Compatibility.Models.Database.Attributes;
 
-namespace Tavstal.TLibrary.Compatibility.Economy
+namespace Tavstal.TLibrary.Compatibility.Models.Economy
 {
     /// <summary>
     /// BankCard object used to make economy related plugins more compatible

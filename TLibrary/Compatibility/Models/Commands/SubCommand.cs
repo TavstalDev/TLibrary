@@ -1,14 +1,14 @@
-﻿using Rocket.API;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Rocket.API;
 using Tavstal.TLibrary.Compatibility.Interfaces;
 
-namespace Tavstal.TLibrary.Compatibility
+namespace Tavstal.TLibrary.Compatibility.Models.Commands
 {
     /// <summary>
     /// Class used to help in creating subcommands
     /// </summary>
-    public class SubCommand : ICommand
+    public abstract class SubCommand : ICommand
     {
         /// <summary>
         /// Name of the subcommand
@@ -20,7 +20,7 @@ namespace Tavstal.TLibrary.Compatibility
         public string Help { get; private set; }
         /// <summary>
         /// Example usage of the subcommand
-        /// <br/>Example: "give [itemId] <amount>"
+        /// <br/>Example: "give [itemId]&lt;amount>"
         /// </summary>
         public string Syntax { get; private set; }
         /// <summary>
@@ -47,9 +47,9 @@ namespace Tavstal.TLibrary.Compatibility
             ActionToExecute.Invoke(caller, args);
         }
 
-        public SubCommand() { }
+        protected SubCommand() { }
 
-        public SubCommand(string name, string help, string syntax, List<string> aliases, List<string> permissions, Action<IRocketPlayer, string[]> codeToExecute)
+        protected SubCommand(string name, string help, string syntax, List<string> aliases, List<string> permissions, Action<IRocketPlayer, string[]> codeToExecute)
         {
             Name = name;
             Help = help;

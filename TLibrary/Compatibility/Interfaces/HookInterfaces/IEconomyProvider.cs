@@ -1,9 +1,10 @@
-﻿using Steamworks;
-using System.Collections.Generic;
-using Tavstal.TLibrary.Compatibility.Interfaces.Economy;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Steamworks;
+using Tavstal.TLibrary.Compatibility.Enumerators;
+using Tavstal.TLibrary.Compatibility.Interfaces.Economy;
 
-namespace Tavstal.TLibrary.Compatibility.Economy
+namespace Tavstal.TLibrary.Compatibility.Interfaces.HookInterfaces
 {
     /// <summary>
     /// Basic economy plugin provider interface used for hooks
@@ -85,17 +86,15 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// <summary>
         /// Updates the player's bank card
         /// </summary>
-        /// <param name="steamID"></param>
-        /// <param name="id"></param>
-        /// <param name="newData"></param>
+        /// <param name="cardId"></param>
+        /// <param name="limitUsed"></param>
+        /// <param name="isActive"></param>
         void UpdateBankCard(string cardId, decimal limitUsed, bool isActive);
 
         /// <summary>
         /// Deletes the player's bank card
         /// </summary>
-        /// <param name="steamID"></param>
-        /// <param name="index"></param>
-        /// <param name="isReversed"></param>
+        /// <param name="cardId"></param>
         void RemoveBankCard(string cardId);
 
         /// <summary>
@@ -171,17 +170,15 @@ namespace Tavstal.TLibrary.Compatibility.Economy
         /// <summary>
         /// Updates the player's bank card
         /// </summary>
-        /// <param name="steamID"></param>
-        /// <param name="id"></param>
-        /// <param name="newData"></param>
+        /// <param name="cardId"></param>
+        /// <param name="limitUsed"></param>
+        /// <param name="isActive"></param>
         Task UpdateBankCardAsync(string cardId, decimal limitUsed, bool isActive);
 
         /// <summary>
         /// Deletes the player's bank card
         /// </summary>
-        /// <param name="steamID"></param>
-        /// <param name="index"></param>
-        /// <param name="isReversed"></param>
+        /// <param name="cardId"></param>
         Task RemoveBankCardAsync(string cardId);
 
         /// <summary>

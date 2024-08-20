@@ -1,4 +1,4 @@
-﻿namespace Tavstal.TLibrary.Compatibility
+﻿namespace Tavstal.TLibrary.Compatibility.Models.FormatHelper
 {
     /// <summary>
     /// Format for unturned rich chat output.

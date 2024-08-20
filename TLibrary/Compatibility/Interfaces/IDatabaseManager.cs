@@ -1,6 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 
-namespace Tavstal.TLibrary.Compatibility
+namespace Tavstal.TLibrary.Compatibility.Interfaces
 {
     /// <summary>
     /// Base interface for all database managers.

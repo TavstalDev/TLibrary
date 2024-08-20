@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace Tavstal.TLibrary.Compatibility
+namespace Tavstal.TLibrary.Compatibility.Interfaces.HookInterfaces
 {
     /// <summary>
     /// Basic plugin provider interface used for hooks

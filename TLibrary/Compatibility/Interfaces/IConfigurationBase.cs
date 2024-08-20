@@ -1,4 +1,4 @@
-﻿namespace Tavstal.TLibrary.Compatibility
+﻿namespace Tavstal.TLibrary.Compatibility.Interfaces
 {
     /// <summary>
     /// Base interface for all configurations.

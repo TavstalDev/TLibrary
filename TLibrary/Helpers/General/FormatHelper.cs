@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Tavstal.TLibrary.Compatibility;
+using Tavstal.TLibrary.Compatibility.Models.FormatHelper;
 
 namespace Tavstal.TLibrary.Helpers.General
 {
@@ -70,7 +70,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 // Should be formatted
                 if (lastChar == '&' && s != ' ')
                 {
-                    string key = new string(new char[] { lastChar, s });
+                    string key = new string(new[] { lastChar, s });
                     // &r means reset, resets the format if it has active formats already
                     if (key == "&r")
                     {
@@ -93,7 +93,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
                         if (hexString.Length == 6)
                         {
-                            if (!int.TryParse(hexString, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out int result))
+                            if (!int.TryParse(hexString, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out int _))
                             {
                                 isHex = false;
                                 hexString = string.Empty;
@@ -103,11 +103,10 @@ namespace Tavstal.TLibrary.Helpers.General
                     }
                     else
                     {
-                        TextFormat newFormat = null;
-                        if (isHex)
-                            newFormat = new TextFormat(null, string.Format("<color=#{0}>", hexString), "</color>", false);
-                        else
-                            newFormat = DefaultFormats.Find(x => x.Key == key);
+                        TextFormat newFormat = isHex ? 
+                            new TextFormat(null, $"<color=#{hexString}>", "</color>", false) 
+                            : 
+                            DefaultFormats.Find(x => x.Key == key);
 
                         if (newFormat != null)
                         {
@@ -165,7 +164,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 // If it gets to the end of the string, it will close the formatting
                 if (i == text.Length - 1 && activeFormats.Count > 0)
                 {
-                    int endIndex = formated.Length - 1;
+                    //int endIndex = formated.Length - 1;
                     //formated += s;
                     foreach (TextFormat f in activeFormats)
                         formated += f.EndTag;
@@ -181,7 +180,6 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="text"></param>
         public static void SendFormatedConsole(string text)
         {
-            string formated = string.Empty;
             ConsoleColor oldColor = Console.ForegroundColor;
             char lastChar = ' ';
             bool isHex = false;
@@ -192,7 +190,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 // Should be formatted
                 if (lastChar == '&' && s != ' ')
                 {
-                    string key = new string(new char[] { lastChar, s });
+                    string key = new string(new[] { lastChar, s });
                     // &r means reset, resets the format if it has active formats already
                     if (key == "&r")
                         Console.ForegroundColor = ConsoleColor.White;
@@ -207,7 +205,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
                         if (hexString.Length == 6)
                         {
-                            if (!int.TryParse(hexString, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out int result))
+                            if (!int.TryParse(hexString, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out int _))
                             {
                                 isHex = false;
                                 hexString = string.Empty;

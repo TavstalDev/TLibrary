@@ -1,6 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using Tavstal.TLibrary.Compatibility;
 using Tavstal.TLibrary.Compatibility.Interfaces;
 using Tavstal.TLibrary.Extensions;
 
@@ -14,11 +13,11 @@ namespace Tavstal.TLibrary.Managers
         public IPlugin _plugin { get; }
         public IConfigurationBase _configuration { get; }
 
-        public DatabaseManagerBase(IPlugin plugin, IConfigurationBase configuration)
+        protected DatabaseManagerBase(IPlugin plugin, IConfigurationBase configuration)
         {
             _plugin = plugin;
             _configuration = configuration;
-            new I18N.West.CP1250();
+            var _ = new I18N.West.CP1250();
             CheckSchema();
         }
 

@@ -1,18 +1,18 @@
-﻿using Rocket.Core.Plugins;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using Rocket.Core.Plugins;
 using Tavstal.TLibrary.Compatibility.Interfaces;
 using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Managers;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Tavstal.TLibrary.Compatibility
+namespace Tavstal.TLibrary.Compatibility.Models.Plugin
 {
     /// <summary>
     /// Abstract Plugin Base Class
@@ -24,7 +24,8 @@ namespace Tavstal.TLibrary.Compatibility
         /// <summary>
         /// Plugin Configuration
         /// </summary>
-        public PluginConfig Config { get { return _config; } }
+        public PluginConfig Config => _config;
+
         /// <summary>
         /// Instance of the Plugin
         /// </summary>
@@ -41,18 +42,17 @@ namespace Tavstal.TLibrary.Compatibility
         /// <summary>
         /// Rich logger used to replace Rocket's logger
         /// </summary>
-        private static TLogger _logger;
+        private static TLogger _logger { get; set; }
         /// <summary>
         /// Rich logger used to replace Rocket's logger
         /// </summary>
-        public static TLogger Logger { get { return _logger; } }
+        public static TLogger Logger => _logger;
 
-        private static readonly System.Version _version = Assembly.GetExecutingAssembly().GetName().Version;
+        private static readonly Version _version = Assembly.GetExecutingAssembly().GetName().Version;
         private static readonly DateTime _buildDate = new DateTime(2000, 1, 1).AddDays(_version.Build).AddSeconds(_version.Revision * 2);
-        private static FileVersionInfo _versionInfo;
-        public static System.Version Version { get { return _version; } }
-        public static DateTime BuildDate { get { return _buildDate; } }
-        public static FileVersionInfo VersionInfo { get { return _versionInfo; } }
+        public static Version Version => _version;
+        public static DateTime BuildDate => _buildDate;
+        public static FileVersionInfo VersionInfo { get; private set; }
 
         /// <summary>
         /// Used when the plugin loads
@@ -60,7 +60,7 @@ namespace Tavstal.TLibrary.Compatibility
         protected override void Load()
         {
             _logger = TLogger.CreateInstance(this, false);
-            _versionInfo = FileVersionInfo.GetVersionInfo(this.Assembly.Location);
+            VersionInfo = FileVersionInfo.GetVersionInfo(this.Assembly.Location);
             base.Load();
             Instance = this;
             CheckPluginFiles();
@@ -137,7 +137,7 @@ namespace Tavstal.TLibrary.Compatibility
             _config = ConfigurationBase.Create<PluginConfig>("Configuration.json", this.Directory);
 
             if (_config.CheckConfigFile())
-                _config = PluginExtensions.ReadConfig<PluginConfig>(_config);
+                _config = _config.ReadConfig<PluginConfig>();
             else
             {
                 CultureInfo ci = CultureInfo.InstalledUICulture;
@@ -155,15 +155,14 @@ namespace Tavstal.TLibrary.Compatibility
             _logger.SetDebugMode(_config.DebugMode);
 
             Dictionary<string, string> localLocalization = CommonLocalization ?? new Dictionary<string, string>();
-            if (DefaultLocalization != null)
-                foreach (var l in DefaultLocalization)
-                {
-                    if (localLocalization.ContainsKey(l.Key))
-                        localLocalization[l.Key] = l.Value;   
-                    else
-                        localLocalization.Add(l.Key, l.Value);
-                }
-
+            if (DefaultLocalization == null)
+                DefaultLocalization = new Dictionary<string, string>();
+            
+            foreach (var l in DefaultLocalization)
+            {
+                localLocalization[l.Key] = l.Value;
+            }
+            
             string defaultTranslationFile = Path.Combine(translationsDirectory, "locale.en.json");
             if (!File.Exists(defaultTranslationFile))
             {
@@ -195,7 +194,6 @@ namespace Tavstal.TLibrary.Compatibility
                     }
 
             
-
             string locale = _config.Locale;
             if (File.Exists(Path.Combine(translationsDirectory, $"locale.{locale}.json")))
             {
@@ -208,10 +206,7 @@ namespace Tavstal.TLibrary.Compatibility
                         {
                             foreach (var l in localLocale)
                             {
-                                if (localLocalization.ContainsKey(l.Key))
-                                    localLocalization[l.Key] = l.Value;
-                                else
-                                    localLocalization.Add(l.Key, l.Value);
+                                localLocalization[l.Key] = l.Value;
                             }
                             PluginExtensions.SaveTranslation(localLocalization, translationsDirectory, $"locale.{locale}.json");
                         }
@@ -235,7 +230,7 @@ namespace Tavstal.TLibrary.Compatibility
         /// </summary>
         /// <param name="delay"></param>
         /// <param name="action"></param>
-        public void InvokeAction(float delay, System.Action action)
+        public void InvokeAction(float delay, Action action)
         {
             StartCoroutine(InvokeRoutine(action, delay));
         }
@@ -246,7 +241,7 @@ namespace Tavstal.TLibrary.Compatibility
         /// <param name="f"></param>
         /// <param name="delay"></param>
         /// <returns></returns>
-        private static IEnumerator InvokeRoutine(System.Action f, float delay)
+        private static IEnumerator InvokeRoutine(Action f, float delay)
         {
             yield return new WaitForSeconds(delay);
             f();

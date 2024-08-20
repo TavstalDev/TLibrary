@@ -15,7 +15,8 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         public static List<Interactable2SalvageBarricade> GetBarricadesInRadius(Vector3 center, float sqrRadius)
         {
             List<Interactable2SalvageBarricade> result = new List<Interactable2SalvageBarricade>();
-            var rayResult = Physics.SphereCastAll(center, sqrRadius, Vector3.forward, RayMasks.BARRICADE);
+            RaycastHit[] rayResult = new RaycastHit[] { };
+            Physics.SphereCastNonAlloc(center, sqrRadius, Vector3.forward, rayResult, RayMasks.BARRICADE);
             foreach (RaycastHit ray in rayResult)
             {
                 var barricadeDrop = BarricadeManager.FindBarricadeByRootTransform(ray.transform);

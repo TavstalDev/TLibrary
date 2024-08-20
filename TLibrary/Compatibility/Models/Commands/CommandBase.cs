@@ -1,12 +1,12 @@
-﻿using Rocket.API;
-using Rocket.Unturned.Player;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Rocket.API;
+using Rocket.Unturned.Player;
 using Tavstal.TLibrary.Compatibility.Interfaces;
 using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Helpers.Unturned;
 
-namespace Tavstal.TLibrary.Compatibility
+namespace Tavstal.TLibrary.Compatibility.Models.Commands
 {
     /// <summary>
     /// Abstract class for creating commands
@@ -17,7 +17,7 @@ namespace Tavstal.TLibrary.Compatibility
         /// The plugin that owns the command
         /// Example usage: MyPlugin.Instance
         /// </summary>
-        public abstract IPlugin Plugin { get; }
+        protected abstract IPlugin Plugin { get; }
 
         /// <summary>
         /// The allowed caller of the command
@@ -50,7 +50,7 @@ namespace Tavstal.TLibrary.Compatibility
         /// Subcommands like /example help
         /// <br/>help can be modified with on ExecuteHelp
         /// </summary>
-        public abstract List<SubCommand> SubCommands { get; }
+        protected abstract List<SubCommand> SubCommands { get; }
 
         /// <summary>
         /// Called when the command is executed
@@ -59,19 +59,21 @@ namespace Tavstal.TLibrary.Compatibility
         /// <param name="caller"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        public abstract bool ExecutionRequested(IRocketPlayer caller, string[] args);
+        protected abstract bool ExecutionRequested(IRocketPlayer caller, string[] args);
 
         /// <summary>
         /// Called when the command is executed with help subcommand
         /// </summary>
         /// <param name="caller"></param>
+        /// <param name="isError"></param>
+        /// <param name="subcommand"></param>
         /// <param name="args"></param>
-        public virtual void ExecuteHelp(IRocketPlayer caller, bool isError, string subcommand, string[] args)
+        protected virtual void ExecuteHelp(IRocketPlayer caller, bool isError, string subcommand, string[] args)
         {
             string translation = isError ? "error_command_syntax" : "success_command_help";
             if (args == null || args.Length == 0)
             {
-                UChatHelper.SendCommandReply(Plugin, caller, translation, Name, Syntax);
+                Plugin.SendCommandReply(caller, translation, Name, Syntax);
                 return;
             }
 
@@ -80,12 +82,12 @@ namespace Tavstal.TLibrary.Compatibility
                 SubCommand subCommand = GetSubCommandByName(subcommand);
                 if (subCommand != null)
                 {
-                    UChatHelper.SendCommandReply(Plugin, caller, translation, Name, subCommand.Syntax);
+                    Plugin.SendCommandReply(caller, translation, Name, subCommand.Syntax);
                     return;
                 }
             }
 
-            UChatHelper.SendCommandReply(Plugin, caller, translation, Name, Syntax);
+            Plugin.SendCommandReply(caller, translation, Name, Syntax);
         }
 
         /// <summary>
@@ -104,7 +106,7 @@ namespace Tavstal.TLibrary.Compatibility
                     {
                         if (caller is UnturnedPlayer)
                         {
-                            UChatHelper.SendCommandReply(Plugin, caller, "error_command_caller_not_console");
+                            Plugin.SendCommandReply(caller, "error_command_caller_not_console");
                             return;
                         }
                         break;
@@ -113,17 +115,20 @@ namespace Tavstal.TLibrary.Compatibility
                     {
                         if (caller is ConsolePlayer)
                         {
-                            UChatHelper.SendCommandReply(Plugin, caller, "error_command_caller_not_player");
+                            Plugin.SendCommandReply(caller, "error_command_caller_not_player");
                             return;
                         }
                         break;
                     }
+                case AllowedCaller.Both:
+                default:
+                    break;
             }
 
             // Check Permission
-            if (isPlayer && !Permissions.Any(x => caller.HasPermission(x)))
+            if (isPlayer && !Permissions.Any(caller.HasPermission))
             {
-                UChatHelper.SendCommandReply(Plugin, caller, "error_command_no_permission");
+                Plugin.SendCommandReply(caller, "error_command_no_permission");
                 return;
             }
 
@@ -132,9 +137,9 @@ namespace Tavstal.TLibrary.Compatibility
                 SubCommand subCommand = GetSubCommandByName(args[0]);
                 if (subCommand != null)
                 {
-                    if (isPlayer && !subCommand.Permissions.Any(x => caller.HasPermission(x)))
+                    if (isPlayer && !subCommand.Permissions.Any(caller.HasPermission))
                     {
-                        UChatHelper.SendCommandReply(Plugin, caller, "error_command_no_permission");
+                        Plugin.SendCommandReply(caller, "error_command_no_permission");
                         return;
                     }
 

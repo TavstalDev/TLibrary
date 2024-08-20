@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
+using Tavstal.TLibrary.Compatibility.Interfaces;
 
-namespace Tavstal.TLibrary.Compatibility
+namespace Tavstal.TLibrary.Compatibility.Models
 {
     public abstract class DatabaseSettingsBase : IDatabaseSettings
     {

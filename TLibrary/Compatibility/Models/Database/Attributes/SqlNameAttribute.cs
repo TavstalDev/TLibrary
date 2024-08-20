@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace Tavstal.TLibrary.Compatibility.Database
+namespace Tavstal.TLibrary.Compatibility.Models.Database.Attributes
 {
     /// <summary>
     /// SQL Attribute used to declare the name of a table 
     /// </summary>
-    [System.AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
-    public class SqlNameAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
+    public abstract class SqlNameAttribute : Attribute
     {
         public string Name { get; set; }
 

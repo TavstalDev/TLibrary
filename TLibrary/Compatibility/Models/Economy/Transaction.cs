@@ -1,11 +1,12 @@
-﻿using Rocket.Unturned.Player;
+﻿using System;
+using Rocket.Unturned.Player;
 using Steamworks;
-using System;
-using Tavstal.TLibrary.Compatibility.Database;
+using Tavstal.TLibrary.Compatibility.Enumerators;
 using Tavstal.TLibrary.Compatibility.Interfaces;
 using Tavstal.TLibrary.Compatibility.Interfaces.Economy;
+using Tavstal.TLibrary.Compatibility.Models.Database.Attributes;
 
-namespace Tavstal.TLibrary.Compatibility.Economy
+namespace Tavstal.TLibrary.Compatibility.Models.Economy
 {
     /// <summary>
     /// Transaction

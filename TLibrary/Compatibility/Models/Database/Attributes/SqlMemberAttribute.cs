@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Tavstal.TLibrary.Compatibility.Database
+namespace Tavstal.TLibrary.Compatibility.Models.Database.Attributes
 {
     /// <summary>
     /// SQL Attribute used to declare variables as sql members, so the database manager will easily recognise it
     /// </summary>
-    [System.AttributeUsage(System.AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true, Inherited = false)]
     public class SqlMemberAttribute : Attribute
     {
         public string ColumnName { get; internal set; }

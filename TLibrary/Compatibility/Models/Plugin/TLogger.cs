@@ -2,9 +2,8 @@
 using System.IO;
 using System.Text.RegularExpressions;
 using Tavstal.TLibrary.Compatibility.Interfaces;
-using Tavstal.TLibrary.Helpers.General;
 
-namespace Tavstal.TLibrary.Compatibility
+namespace Tavstal.TLibrary.Compatibility.Models.Plugin
 {
     /// <summary>
     /// Logger helper used to log messages to console and log file.
@@ -22,7 +21,7 @@ namespace Tavstal.TLibrary.Compatibility
         /// <summary>
         /// Should show debug messages?
         /// </summary>
-        public bool IsDebugEnabled { get { return _isDebugEnabled; } }
+        public bool IsDebugEnabled => _isDebugEnabled;
 
         public TLogger(string pluginName, bool isDebugEnabled)
         {
@@ -74,16 +73,16 @@ namespace Tavstal.TLibrary.Compatibility
         /// <param name="prefix"></param>
         public void LogRich(object message, string prefix = "&a[INFO] >&f")
         {
-            string text = string.Format("&b[{0}] {1} {2}", _pluginName, prefix, message.ToString());
+            string text = $"&b[{_pluginName}] {prefix} {message}";
             try
             {
                 ConsoleColor oldColor = Console.ForegroundColor;
                 using (StreamWriter streamWriter = File.AppendText(Path.Combine(Rocket.Core.Environment.LogsDirectory, Rocket.Core.Environment.LogFile)))
                 {
-                    streamWriter.WriteLine(string.Concat("[", DateTime.Now, "] ", FormatHelper.ClearFormaters(text)));
+                    streamWriter.WriteLine(string.Concat("[", DateTime.Now, "] ", Helpers.General.FormatHelper.ClearFormaters(text)));
                     streamWriter.Close();
                 }
-                FormatHelper.SendFormatedConsole(text);
+                Helpers.General.FormatHelper.SendFormatedConsole(text);
                 Console.ForegroundColor = oldColor;
             }
             catch
@@ -152,7 +151,7 @@ namespace Tavstal.TLibrary.Compatibility
         public void Log(object message, ConsoleColor color = ConsoleColor.Green, string prefix = "[INFO] >")
         {
 
-            string text = string.Format("[{0}] {1} {2}", _pluginName, prefix, message.ToString());
+            string text = $"[{_pluginName}] {prefix} {message}";
             try
             {
                 ConsoleColor oldColor = Console.ForegroundColor;
@@ -230,7 +229,7 @@ namespace Tavstal.TLibrary.Compatibility
             {
                 using (StreamWriter streamWriter = File.AppendText(Path.Combine(Rocket.Core.Environment.LogsDirectory, Rocket.Core.Environment.LogFile)))
                 {
-                    streamWriter.WriteLine(string.Concat("[", DateTime.Now, "] ", string.Format("[{0}] {1}", _pluginName, text)));
+                    streamWriter.WriteLine(string.Concat("[", DateTime.Now, "] ", $"[{_pluginName}] {text}"));
                     streamWriter.Close();
                 }
                 Console.WriteLine(text);
@@ -255,7 +254,7 @@ namespace Tavstal.TLibrary.Compatibility
             int amount = msg.Split('{').Length;
             for (int i = 0; i < amount; i++)
             {
-                Regex regex = new Regex(string.Format("{0}(.*?){1}", Regex.Escape("{"), Regex.Escape("}")), RegexOptions.RightToLeft);
+                Regex regex = new Regex($"{Regex.Escape("{")}(.*?){Regex.Escape("}")}", RegexOptions.RightToLeft);
                 msg = regex.Replace(msg, "{" + "}");
             }
 

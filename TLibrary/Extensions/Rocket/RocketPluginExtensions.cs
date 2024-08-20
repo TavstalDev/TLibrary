@@ -1,9 +1,9 @@
-﻿using Rocket.API;
-using System;
+﻿using System;
 using System.Reflection;
+using Rocket.API;
 using Tavstal.TLibrary.Helpers.General;
 
-namespace Tavstal.TLibrary.Extensions
+namespace Tavstal.TLibrary.Extensions.Rocket
 {
     /// <summary>
     /// Extensions used for RocketPlugins.
