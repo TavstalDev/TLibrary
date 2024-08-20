@@ -1,7 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using Tavstal.TLibrary.Compatibility.Interfaces;
 using Tavstal.TLibrary.Extensions;
+using Tavstal.TLibrary.Models.Database;
+using Tavstal.TLibrary.Models.Plugin;
 
 namespace Tavstal.TLibrary.Managers
 {

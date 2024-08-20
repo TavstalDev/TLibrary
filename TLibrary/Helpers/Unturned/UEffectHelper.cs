@@ -1,8 +1,8 @@
 ﻿using Rocket.Unturned.Player;
 using SDG.NetTransport;
 using SDG.Unturned;
-using Tavstal.TLibrary.Compatibility.Interfaces;
 using Tavstal.TLibrary.Helpers.General;
+using Tavstal.TLibrary.Models.Plugin;
 
 namespace Tavstal.TLibrary.Helpers.Unturned
 {

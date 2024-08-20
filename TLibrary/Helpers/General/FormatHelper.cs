@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Tavstal.TLibrary.Compatibility.Models.FormatHelper;
+using Tavstal.TLibrary.Models.FormatHelper;
 
 namespace Tavstal.TLibrary.Helpers.General
 {

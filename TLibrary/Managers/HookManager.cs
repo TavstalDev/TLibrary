@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Tavstal.TLibrary.Compatibility.Hooks;
-using Tavstal.TLibrary.Compatibility.Interfaces;
-using Tavstal.TLibrary.Compatibility.Models.Plugin;
+using Tavstal.TLibrary.Models.Hooks;
+using Tavstal.TLibrary.Models.Plugin;
 
 namespace Tavstal.TLibrary.Managers
 {

@@ -1,7 +1,7 @@
 ﻿using Rocket.Unturned.Player;
 using SDG.Unturned;
-using Tavstal.TLibrary.Compatibility.Interfaces;
 using Tavstal.TLibrary.Helpers.General;
+using Tavstal.TLibrary.Models.Plugin;
 using UnityEngine;
 
 namespace Tavstal.TLibrary.Helpers.Unturned

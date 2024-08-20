@@ -3,9 +3,8 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Tavstal.TLibrary.Compatibility.Interfaces;
-using Tavstal.TLibrary.Compatibility.Models.Plugin;
 using Tavstal.TLibrary.Helpers.General;
+using Tavstal.TLibrary.Models.Plugin;
 
 namespace Tavstal.TLibrary.Extensions
 {

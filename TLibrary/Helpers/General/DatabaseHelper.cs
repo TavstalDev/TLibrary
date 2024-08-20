@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using System.Reflection;
 using Tavstal.TLibrary.Extensions;
 using System.Data.Common;
-using Tavstal.TLibrary.Compatibility.Models.Database;
-using Tavstal.TLibrary.Compatibility.Models.Database.Attributes;
+using Tavstal.TLibrary.Models.Database;
+using Tavstal.TLibrary.Models.Database.Attributes;
 
 namespace Tavstal.TLibrary.Helpers.General
 {

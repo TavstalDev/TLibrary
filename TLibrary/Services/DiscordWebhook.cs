@@ -6,9 +6,9 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Tavstal.TLibrary.Compatibility.Models.Discord;
 using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Helpers.General;
+using Tavstal.TLibrary.Models.Discord;
 
 namespace Tavstal.TLibrary.Services
 {
