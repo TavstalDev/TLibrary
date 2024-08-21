@@ -21,14 +21,14 @@ namespace Tavstal.TLibrary.Models.Plugin
 
         /// <param name="filename">Example: myfile.txt</param>
         /// <param name="path">Example: D:\MyDirectory</param>
-        protected ConfigurationBase(string filename, string path)
+        public ConfigurationBase(string filename, string path)
         {
             FilePath = path;
             FileName = filename;
             LoadDefaults();
         }
 
-        protected ConfigurationBase()
+        public ConfigurationBase()
         {
 
         }
