@@ -194,6 +194,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <summary>
         /// Gets a formatted time span string based on the specified format and TimeSpan object.
         /// </summary>
+        /// <param name="isAnalogue"></param>
         /// <param name="format">The custom format string for time span formatting.</param>
         /// <param name="time">The TimeSpan object representing the duration of time.</param>
         /// <returns>The formatted time span string based on the provided format.</returns>

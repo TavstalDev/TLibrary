@@ -99,7 +99,7 @@ namespace Tavstal.TLibrary.Models.Commands
         /// <param name="args"></param>
         public void Execute(IRocketPlayer caller, string[] args)
         {
-            var task = Task.Run(async () =>
+            Task.Run(async () =>
             {
                 bool isPlayer = caller is UnturnedPlayer;
 
@@ -107,23 +107,23 @@ namespace Tavstal.TLibrary.Models.Commands
                 switch (AllowedCaller)
                 {
                     case AllowedCaller.Console:
+                    {
+                        if (caller is UnturnedPlayer)
                         {
-                            if (caller is UnturnedPlayer)
-                            {
-                                Plugin.SendCommandReply(caller, "error_command_caller_not_console");
-                                return;
-                            }
-                            break;
+                            Plugin.SendCommandReply(caller, "error_command_caller_not_console");
+                            return;
                         }
+                        break;
+                    }
                     case AllowedCaller.Player:
+                    {
+                        if (caller is ConsolePlayer)
                         {
-                            if (caller is ConsolePlayer)
-                            {
-                                Plugin.SendCommandReply(caller, "error_command_caller_not_player");
-                                return;
-                            }
-                            break;
+                            Plugin.SendCommandReply(caller, "error_command_caller_not_player");
+                            return;
                         }
+                        break;
+                    }
                     case AllowedCaller.Both:
                     default:
                         break;
@@ -165,7 +165,7 @@ namespace Tavstal.TLibrary.Models.Commands
                     if (!(ExecutionRequested(caller, args).Result))
                         await ExecuteHelp(caller, true, null, null);
                 }
-            });
+            }).GetAwaiter().GetResult();
         }
 
         private SubCommand GetSubCommandByName(string arg)

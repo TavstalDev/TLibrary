@@ -19,6 +19,7 @@ namespace Tavstal.TLibrary.Managers
             _plugin = plugin;
             _configuration = configuration;
             var _ = new I18N.West.CP1250();
+            // ReSharper disable once VirtualMemberCallInConstructor
             CheckSchema();
         }
 
