@@ -1,4 +1,5 @@
-﻿using Rocket.Unturned.Player;
+﻿using System;
+using Rocket.Unturned.Player;
 using SDG.Unturned;
 using Tavstal.TLibrary.Helpers.General;
 using Tavstal.TLibrary.Models.Plugin;
@@ -11,10 +12,22 @@ namespace Tavstal.TLibrary.Helpers.Unturned
     /// </summary>
     public static class UChatHelper
     {
-        //private static string Translate(bool addPrefix, string key, params object[] args) => TAdvancedHealthMain.Instance.Translate(addPrefix, key, args);
-
-        public static void ServerSendChatMessage(string text, string icon = null, SteamPlayer fromPlayer = null, SteamPlayer toPlayer = null, EChatMode mode = EChatMode.GLOBAL)
-        => ChatManager.serverSendMessage(text, Color.white, fromPlayer, toPlayer, mode, icon, true);
+        public static void ServerSendChatMessage(string text, string icon = null, SteamPlayer fromPlayer = null,  SteamPlayer toPlayer = null, EChatMode mode = EChatMode.GLOBAL)
+        {
+            // Main thread execution error fix
+            MainThreadDispatcher.RunOnMainThread(() =>
+            {
+                try
+                {
+                    ChatManager.serverSendMessage(text, Color.white, fromPlayer, toPlayer, mode, icon, true);
+                }
+                catch (Exception ex)
+                {
+                    LoggerHelper.LogException("The serverSendMessage function must be called from unity's game main thread.");
+                    LoggerHelper.LogError(ex);
+                }
+            });
+        }
 
         /// <summary>
         /// Send plain text chat message to a specific player
@@ -36,11 +49,18 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="args"></param>
         public static void SendCommandReply(this IPlugin plugin, object toPlayer, string translation, params object[] args)
         {
+            LoggerHelper.LogWarning("I was called, so what");
             string icon = "";
             if (toPlayer is SteamPlayer steamPlayer)
-                ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, steamPlayer);
+            {
+                ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null,
+                    steamPlayer);
+            }
             else if (toPlayer is UnturnedPlayer player)
-                ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, player.SteamPlayer());
+            {
+                ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null,
+                    player.SteamPlayer());
+            }
             else
                 plugin.GetLogger().LogRichCommand(plugin.Localize(false, translation, args));
         }
@@ -73,7 +93,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         public static void SendChatMessage(this IPlugin plugin, SteamPlayer toPlayer, string translation, params object[] args)
         {
             string icon = "";
-            ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, toPlayer);
+           ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, toPlayer);
         }
 
 
