@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Rocket.API;
 
 namespace Tavstal.TLibrary.Models.Commands
@@ -7,6 +8,7 @@ namespace Tavstal.TLibrary.Models.Commands
     /// <summary>
     /// Class used to help in creating subcommands
     /// </summary>
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class SubCommand : ICommand
     {
         /// <summary>
@@ -34,21 +36,21 @@ namespace Tavstal.TLibrary.Models.Commands
         /// <summary>
         /// The action that stores what the subcommand should do
         /// </summary>
-        public Action<IRocketPlayer, string[]> ActionToExecute { get; private set; }
+        public Func<IRocketPlayer, string[], Task> ActionToExecute { get; private set; }
 
         /// <summary>
         /// Executes the <see cref="ActionToExecute"/> action
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="args"></param>
-        public void Execute(IRocketPlayer caller, string[] args)
+        public async Task Execute(IRocketPlayer caller, string[] args)
         {
-            ActionToExecute.Invoke(caller, args);
+            await ActionToExecute(caller, args);
         }
 
         public SubCommand() { }
 
-        public SubCommand(string name, string help, string syntax, List<string> aliases, List<string> permissions, Action<IRocketPlayer, string[]> codeToExecute)
+        public SubCommand(string name, string help, string syntax, List<string> aliases, List<string> permissions, Func<IRocketPlayer, string[], Task> codeToExecute)
         {
             Name = name;
             Help = help;

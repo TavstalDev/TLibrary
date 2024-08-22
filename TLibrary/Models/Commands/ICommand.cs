@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Rocket.API;
 
 namespace Tavstal.TLibrary.Models.Commands
@@ -38,6 +39,6 @@ namespace Tavstal.TLibrary.Models.Commands
         /// </summary>
         /// <param name="caller"></param>
         /// <param name="args"></param>
-        void Execute(IRocketPlayer caller, string[] args);
+        Task Execute(IRocketPlayer caller, string[] args);
     }
 }

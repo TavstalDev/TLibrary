@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Rocket.API;
 using Rocket.Unturned.Player;
 using Tavstal.TLibrary.Extensions;
@@ -59,7 +60,7 @@ namespace Tavstal.TLibrary.Models.Commands
         /// <param name="caller"></param>
         /// <param name="args"></param>
         /// <returns></returns>
-        protected abstract bool ExecutionRequested(IRocketPlayer caller, string[] args);
+        protected abstract Task<bool> ExecutionRequested(IRocketPlayer caller, string[] args);
 
         /// <summary>
         /// Called when the command is executed with help subcommand
@@ -68,13 +69,13 @@ namespace Tavstal.TLibrary.Models.Commands
         /// <param name="isError"></param>
         /// <param name="subcommand"></param>
         /// <param name="args"></param>
-        protected virtual void ExecuteHelp(IRocketPlayer caller, bool isError, string subcommand, string[] args)
+        protected virtual Task ExecuteHelp(IRocketPlayer caller, bool isError, string subcommand, string[] args)
         {
             string translation = isError ? "error_command_syntax" : "success_command_help";
             if (args == null || args.Length == 0)
             {
                 Plugin.SendCommandReply(caller, translation, Name, Syntax);
-                return;
+                return Task.CompletedTask;
             }
 
             if (subcommand != null)
@@ -83,11 +84,12 @@ namespace Tavstal.TLibrary.Models.Commands
                 if (subCommand != null)
                 {
                     Plugin.SendCommandReply(caller, translation, Name, subCommand.Syntax);
-                    return;
+                    return Task.CompletedTask;
                 }
             }
 
             Plugin.SendCommandReply(caller, translation, Name, Syntax);
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -97,70 +99,73 @@ namespace Tavstal.TLibrary.Models.Commands
         /// <param name="args"></param>
         public void Execute(IRocketPlayer caller, string[] args)
         {
-            bool isPlayer = caller is UnturnedPlayer;
-
-            // Check AllowedCaller
-            switch (AllowedCaller)
+            var task = Task.Run(async () =>
             {
-                case AllowedCaller.Console:
-                    {
-                        if (caller is UnturnedPlayer)
-                        {
-                            Plugin.SendCommandReply(caller, "error_command_caller_not_console");
-                            return;
-                        }
-                        break;
-                    }
-                case AllowedCaller.Player:
-                    {
-                        if (caller is ConsolePlayer)
-                        {
-                            Plugin.SendCommandReply(caller, "error_command_caller_not_player");
-                            return;
-                        }
-                        break;
-                    }
-                case AllowedCaller.Both:
-                default:
-                    break;
-            }
+                bool isPlayer = caller is UnturnedPlayer;
 
-            // Check Permission
-            if (isPlayer && !Permissions.Any(caller.HasPermission))
-            {
-                Plugin.SendCommandReply(caller, "error_command_no_permission");
-                return;
-            }
-
-            if (args.Length > 0 && SubCommands.IsValidIndex(0))
-            {
-                SubCommand subCommand = GetSubCommandByName(args[0]);
-                if (subCommand != null)
+                // Check AllowedCaller
+                switch (AllowedCaller)
                 {
-                    if (isPlayer && !subCommand.Permissions.Any(caller.HasPermission))
-                    {
-                        Plugin.SendCommandReply(caller, "error_command_no_permission");
-                        return;
-                    }
+                    case AllowedCaller.Console:
+                        {
+                            if (caller is UnturnedPlayer)
+                            {
+                                Plugin.SendCommandReply(caller, "error_command_caller_not_console");
+                                return;
+                            }
+                            break;
+                        }
+                    case AllowedCaller.Player:
+                        {
+                            if (caller is ConsolePlayer)
+                            {
+                                Plugin.SendCommandReply(caller, "error_command_caller_not_player");
+                                return;
+                            }
+                            break;
+                        }
+                    case AllowedCaller.Both:
+                    default:
+                        break;
+                }
 
-                    List<string> argList = args.ToList();
-                    argList.RemoveAt(0);
-                    subCommand.Execute(caller, argList.ToArray());
+                // Check Permission
+                if (isPlayer && !Permissions.Any(caller.HasPermission))
+                {
+                    Plugin.SendCommandReply(caller, "error_command_no_permission");
                     return;
                 }
-            }
-            
-            if (args.Length > 0 && (args[0].ToLower() == "help" || args[0].ToLower() == "?"))
-            {
-                List<string> argList = args.ToList();
-                argList.RemoveAt(0);
-                ExecuteHelp(caller, false, null, argList.ToArray());
-            }
-            else
-            {
-                if (!ExecutionRequested(caller, args))
-                    ExecuteHelp(caller, true, null, null);
-            }
+
+                if (args.Length > 0 && SubCommands.IsValidIndex(0))
+                {
+                    SubCommand subCommand = GetSubCommandByName(args[0]);
+                    if (subCommand != null)
+                    {
+                        if (isPlayer && !subCommand.Permissions.Any(caller.HasPermission))
+                        {
+                            Plugin.SendCommandReply(caller, "error_command_no_permission");
+                            return;
+                        }
+
+                        List<string> argList = args.ToList();
+                        argList.RemoveAt(0);
+                        await subCommand.Execute(caller, argList.ToArray());
+                        return;
+                    }
+                }
+                
+                if (args.Length > 0 && (args[0].ToLower() == "help" || args[0].ToLower() == "?"))
+                {
+                    List<string> argList = args.ToList();
+                    argList.RemoveAt(0);
+                    await ExecuteHelp(caller, false, null, argList.ToArray());
+                }
+                else
+                {
+                    if (!(ExecutionRequested(caller, args).Result))
+                        await ExecuteHelp(caller, true, null, null);
+                }
+            });
         }
 
         private SubCommand GetSubCommandByName(string arg)
