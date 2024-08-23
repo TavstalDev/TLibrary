@@ -25,6 +25,7 @@ namespace Tavstal.TLibrary.Models.Plugin
         {
             FilePath = path;
             FileName = filename;
+            // ReSharper disable once VirtualMemberCallInConstructor
             LoadDefaults();
         }
 
@@ -33,7 +34,7 @@ namespace Tavstal.TLibrary.Models.Plugin
 
         }
 
-        public void LoadDefaults()
+        public virtual void LoadDefaults()
         {
 
         }
