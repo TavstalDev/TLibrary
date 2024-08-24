@@ -49,7 +49,6 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="args"></param>
         public static void SendCommandReply(this IPlugin plugin, object toPlayer, string translation, params object[] args)
         {
-            LoggerHelper.LogWarning("I was called, so what");
             string icon = "";
             if (toPlayer is SteamPlayer steamPlayer)
             {
