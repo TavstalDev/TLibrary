@@ -296,6 +296,7 @@ namespace Tavstal.TLibrary.Helpers.General
             if (connection == null)
                 return false;
 
+            string commandText = "not_created";
             try
             {
                 //var schemaType = typeof(T);
@@ -304,6 +305,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 {
                     command.Parameters.AddWithValue("@TableName", tableName);
                     command.CommandText = $"SHOW TABLES LIKE @TableName;";
+                    commandText = command.CommandText;
 
                     object result = await command.ExecuteScalarAsync();
                     if (result != null)
@@ -318,6 +320,7 @@ namespace Tavstal.TLibrary.Helpers.General
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogException($"SQL Command: {commandText}");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
                     await connection.CloseAsync();
@@ -335,7 +338,7 @@ namespace Tavstal.TLibrary.Helpers.General
         {
             if (connection == null)
                 return false;
-
+            
             try
             {
                 var schemaType = typeof(T);
@@ -364,6 +367,7 @@ namespace Tavstal.TLibrary.Helpers.General
             if (connection == null)
                 return false;
 
+            string commandText = "not_created";
             try
             {
                 var schemaType = typeof(T);
@@ -373,6 +377,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 {
                     command.Parameters.AddWithValue("@TableName", tableName);
                     command.CommandText = $"SHOW TABLES LIKE @TableName;";
+                    commandText = command.CommandText;
                     object result = await command.ExecuteScalarAsync();
                     if (result != null)
                         return false;
@@ -425,6 +430,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 {
                     command.CommandText = $"CREATE TABLE {tableName} ({schemaParams}{keyParams})";
                     command.CommandText = command.CommandText.Remove(command.CommandText.LastIndexOf(','), 1);
+                    commandText = command.CommandText;
                     await command.ExecuteNonQueryAsync();
                 }
                 await connection.CloseAsync();
@@ -433,6 +439,7 @@ namespace Tavstal.TLibrary.Helpers.General
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogException($"SQL Command: {commandText}");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
                     await connection.CloseAsync();
@@ -481,6 +488,7 @@ namespace Tavstal.TLibrary.Helpers.General
             if (connection == null)
                 return false;
 
+            string commandText = "not_created";
             try
             {
                 var schemaType = typeof(T);
@@ -520,12 +528,14 @@ namespace Tavstal.TLibrary.Helpers.General
                 {
                     command.Parameters.AddWithValue("@TableName", tableName);
                     command.CommandText = $"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE @TableName;";
+                    commandText = command.CommandText;
 
                     object result = await command.ExecuteScalarAsync();
                     if (result == null)
                         return false;
 
-                    command.CommandText = $"SHOW COLUMNS FROM `{tableName}`;";
+                    command.CommandText = $"SHOW COLUMNS FROM '{tableName}';";
+                    commandText = command.CommandText;
                     using (var reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
@@ -547,7 +557,7 @@ namespace Tavstal.TLibrary.Helpers.General
                                 foreignColumn: null);
                             liveColumns.Add(localColumn);
 
-                            if (!classColumns.Any(x => x.ColumnName == localColumn.ColumnName))
+                            if (classColumns.All(x => x.ColumnName != localColumn.ColumnName))
                                 columnsToRemove.Add(localColumn);
                         }
                     }
@@ -581,7 +591,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
                 if (columnsToAdd.Count == 0 && columnsToRemove.Count == 0 && columnsToUpdate.Count == 0)
                 {
-                    connection.Close();
+                    await connection.CloseAsync();
                     return true;
                 }
 
@@ -626,6 +636,7 @@ namespace Tavstal.TLibrary.Helpers.General
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogException($"SQL Command: {commandText}");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
                     await connection.CloseAsync();
@@ -678,6 +689,7 @@ namespace Tavstal.TLibrary.Helpers.General
             if (connection == null)
                 return null;
 
+            string commandText = "not_created";
             try
             {
                 List<T> localList = new List<T>();
@@ -697,6 +709,7 @@ namespace Tavstal.TLibrary.Helpers.General
                     
                     whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"SELECT * FROM {tableName} {whereClause}{limitClause}";
+                    commandText = command.CommandText;
 
                     var reader = await command.ExecuteReaderAsync();
                     while (await reader.ReadAsync())
@@ -710,6 +723,7 @@ namespace Tavstal.TLibrary.Helpers.General
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogException($"SQL Command: {commandText}");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
                     await connection.CloseAsync();
@@ -827,6 +841,7 @@ namespace Tavstal.TLibrary.Helpers.General
             if (connection == null)
                 return false;
 
+            string commandText = "not_created";
             try
             {
                 var schemaType = typeof(T);
@@ -879,6 +894,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = $"INSERT INTO {tableName} ({keyString}) VALUES({paramString});";
+                    commandText = command.CommandText;
                     await command.ExecuteNonQueryAsync();
                 }
                 await connection.CloseAsync();
@@ -887,6 +903,7 @@ namespace Tavstal.TLibrary.Helpers.General
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogException($"SQL Command: {commandText}");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
                     await connection.CloseAsync();
@@ -913,8 +930,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-                else
-                    return await AddTableRowAsync(connection, tableAttribute.Name, value);
+                return await AddTableRowAsync(connection, tableAttribute.Name, value);
             }
             catch (Exception ex)
             {
@@ -946,6 +962,7 @@ namespace Tavstal.TLibrary.Helpers.General
             if (values.Count == 0)
                 return false;
 
+            string commandText = "not_created";
             try
             {
                 var schemaType = typeof(T);
@@ -1009,6 +1026,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = $"INSERT INTO {tableName} ({keyString}) VALUES{paramString};";
+                    commandText = command.CommandText;
                     await command.ExecuteNonQueryAsync();
                 }
                 await connection.CloseAsync();
@@ -1017,6 +1035,7 @@ namespace Tavstal.TLibrary.Helpers.General
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogException($"SQL Command: {commandText}");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
                     await connection.CloseAsync();
@@ -1047,6 +1066,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 return false;
             }
 
+            string commandText = "not_created";
             try
             {
                 var schemaType = typeof(T);
@@ -1107,6 +1127,7 @@ namespace Tavstal.TLibrary.Helpers.General
                     }
                     whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"UPDATE {tableName} SET {setClause} WHERE {whereClause}";
+                    commandText = command.CommandText;
                     await command.ExecuteNonQueryAsync();
                 }
                 await connection.CloseAsync();
@@ -1115,6 +1136,7 @@ namespace Tavstal.TLibrary.Helpers.General
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogException($"SQL Command: {commandText}");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
                     await connection.CloseAsync();
@@ -1143,8 +1165,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-                else
-                    return await UpdateTableRowAsync(connection, tableAttribute.Name, newValue, whereClause, parameters);
+                return await UpdateTableRowAsync(connection, tableAttribute.Name, newValue, whereClause, parameters);
             }
             catch (Exception ex)
             {
@@ -1177,6 +1198,7 @@ namespace Tavstal.TLibrary.Helpers.General
             if (whereClause.IsNullOrEmpty())
                 return false;
 
+            string commandText = "not_created";
             try
             {
                 //var schemaType = typeof(T);
@@ -1195,6 +1217,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
                     whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"UPDATE {tableName} SET {setClause} WHERE {whereClause}";
+                    commandText = command.CommandText;
                     await command.ExecuteNonQueryAsync();
                 }
                 await connection.CloseAsync();
@@ -1203,6 +1226,7 @@ namespace Tavstal.TLibrary.Helpers.General
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogException($"SQL Command: {commandText}");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
                     await connection.CloseAsync();
@@ -1236,8 +1260,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-                else
-                    return await UpdateTableRowAsync<T>(connection, tableName: tableAttribute.Name, whereClause: whereClause, newValue: newValue);
+                return await UpdateTableRowAsync<T>(connection, tableName: tableAttribute.Name, whereClause: whereClause, newValue: newValue);
             }
             catch (Exception ex)
             {
@@ -1273,6 +1296,7 @@ namespace Tavstal.TLibrary.Helpers.General
             if (whereClause.IsNullOrEmpty())
                 return false;
 
+            string commandText = "not_created";
             try
             {
                 //var schemaType = typeof(T);
@@ -1296,6 +1320,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
                     whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"UPDATE {tableName} SET {setClause} WHERE {whereClause}";
+                    commandText = command.CommandText;
                     await command.ExecuteNonQueryAsync();
                 }
                 await connection.CloseAsync();
@@ -1304,6 +1329,7 @@ namespace Tavstal.TLibrary.Helpers.General
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogException($"SQL Command: {commandText}");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
                     await connection.CloseAsync();
@@ -1331,8 +1357,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-                else
-                    return await UpdateTableRowAsync<T>(connection, tableAttribute.Name, whereClause, newValues);
+                return await UpdateTableRowAsync<T>(connection, tableAttribute.Name, whereClause, newValues);
             }
             catch (Exception ex)
             {
@@ -1359,6 +1384,7 @@ namespace Tavstal.TLibrary.Helpers.General
             if (connection == null)
                 return false;
 
+            string commandText = "not_created";
             try
             {
                 //var schemaType = typeof(T);
@@ -1379,6 +1405,7 @@ namespace Tavstal.TLibrary.Helpers.General
                     }
                     whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"DELETE FROM {tableName} WHERE {whereClause}";
+                    commandText = command.CommandText;
                     await command.ExecuteNonQueryAsync();
                 }
                 await connection.CloseAsync();
@@ -1387,6 +1414,7 @@ namespace Tavstal.TLibrary.Helpers.General
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogException($"SQL Command: {commandText}");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
                     await connection.CloseAsync();
@@ -1414,8 +1442,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-                else
-                    return await RemoveTableRowAsync<T>(connection, tableAttribute.Name, whereClause, parameters);
+                return await RemoveTableRowAsync<T>(connection, tableAttribute.Name, whereClause, parameters);
             }
             catch (Exception ex)
             {
@@ -1441,6 +1468,7 @@ namespace Tavstal.TLibrary.Helpers.General
             if (connection == null)
                 return false;
 
+            string commandText = "not_created";
             try
             {
                 //var schemaType = typeof(T);
@@ -1461,6 +1489,7 @@ namespace Tavstal.TLibrary.Helpers.General
                     }
                     whereClause = FixWhereClause(whereClause);
                     command.CommandText = $"DELETE * FROM {tableName} WHERE {whereClause}";
+                    commandText = command.CommandText;
                     await command.ExecuteNonQueryAsync();
                 }
                 await connection.CloseAsync();
@@ -1469,6 +1498,7 @@ namespace Tavstal.TLibrary.Helpers.General
             catch (Exception ex)
             {
                 LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogException($"SQL Command: {commandText}");
                 LoggerHelper.LogError(ex);
                 if (connection.State != ConnectionState.Closed)
                     await connection.CloseAsync();
@@ -1496,8 +1526,8 @@ namespace Tavstal.TLibrary.Helpers.General
                 var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
                 if (tableAttribute == null)
                     throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
-                else
-                    return await RemoveTableRowsAsync<T>(connection, tableAttribute.Name, whereClause, parameters);
+                
+                return await RemoveTableRowsAsync<T>(connection, tableAttribute.Name, whereClause, parameters);
             }
             catch (Exception ex)
             {
