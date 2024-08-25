@@ -534,7 +534,7 @@ namespace Tavstal.TLibrary.Helpers.General
                     if (result == null)
                         return false;
 
-                    command.CommandText = $"SHOW COLUMNS FROM '{tableName}';";
+                    command.CommandText = $"SHOW COLUMNS FROM @TableName;";
                     commandText = command.CommandText;
                     using (var reader = await command.ExecuteReaderAsync())
                     {
