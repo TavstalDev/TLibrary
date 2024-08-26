@@ -279,13 +279,10 @@ namespace Tavstal.TLibrary.Models.Plugin
             {
                 if (Localization.TryGetValue("prefix", out string prefixLocalization))
                     return prefixLocalization + string.Format(localization, args);
-                else
-                    return string.Format(localization, args);
-            }
-            else
-            {
                 return string.Format(localization, args);
             }
+
+            return string.Format(localization, args);
         }
 
         /// <summary>
