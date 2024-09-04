@@ -10,11 +10,21 @@ namespace Tavstal.TLibrary.Helpers.General
         private static readonly string _chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         private static readonly string _charsNoNums = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+        /// <summary>
+        /// Retrieves a random character from a predefined set of characters.
+        /// </summary>
+        /// <returns>A <see cref="char"/> representing the randomly selected character.</returns>
         public static char GetRandomChar()
         {
             return _chars.ElementAt(MathHelper.Next(_chars.Length - 1));
         }
 
+        /// <summary>
+        /// Generates a string consisting of random characters with the specified length, optionally including numeric characters.
+        /// </summary>
+        /// <param name="length">The length of the generated string. Defaults to 32 if not specified.</param>
+        /// <param name="includeNums">Indicates whether to include numeric characters in the generated string. Defaults to true if not specified.</param>
+        /// <returns>A <see cref="string"/> containing the generated characters based on the specified parameters.</returns>
         public static string Generate(int length = 32, bool includeNums = true)
         {
             string key = "";
@@ -36,6 +46,11 @@ namespace Tavstal.TLibrary.Helpers.General
             return key;
         }
 
+        /// <summary>
+        /// Generates a string consisting of random lowercase alphabetic characters with the specified length.
+        /// </summary>
+        /// <param name="length">The length of the lowercase string to be generated. Defaults to 32 if not specified.</param>
+        /// <returns>A <see cref="string"/> containing the generated lowercase alphabetic characters.</returns>
         public static string GenerateLowercase(int length = 32)
         {
             string key = "";
@@ -52,6 +67,11 @@ namespace Tavstal.TLibrary.Helpers.General
             return key;
         }
 
+        /// <summary>
+        /// Generates a string consisting of random uppercase alphabetic characters with the specified length.
+        /// </summary>
+        /// <param name="length">The length of the uppercase string to be generated. Defaults to 32 if not specified.</param>
+        /// <returns>A <see cref="string"/> containing the generated uppercase alphabetic characters.</returns>
         public static string GenerateUppercase(int length = 32)
         {
             string key = "";
@@ -68,6 +88,11 @@ namespace Tavstal.TLibrary.Helpers.General
             return key;
         }
 
+        /// <summary>
+        /// Generates a string consisting of random numeric characters with the specified length.
+        /// </summary>
+        /// <param name="length">The length of the numeric string to be generated. Defaults to 32 if not specified.</param>
+        /// <returns>A <see cref="string"/> containing the generated numeric characters.</returns>
         public static string GenerateNumbers(int length = 32)
         {
             string charSet = "0123456789";

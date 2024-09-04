@@ -73,7 +73,7 @@ namespace Tavstal.TLibrary.Extensions
             try
             {
                 MailAddress mail = new MailAddress(str);
-                return mail != null;
+                return true;
             }
             catch
             {
