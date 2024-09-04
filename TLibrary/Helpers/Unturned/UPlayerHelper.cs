@@ -149,8 +149,12 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="radious">The maximum distance from the destination location where the player can teleport. (Default is 3.0f)</param>
         public static void ForceTeleport(Player player, Vector3 location, float radious = 3f)
         {
-            if (!player.teleportToLocation(location + UnityEngine.Random.insideUnitSphere * radious, player.transform.rotation.y))
-                ForceTeleport(player, location, radious);
+            while (true)
+            {
+                if (!player.teleportToLocation(location + UnityEngine.Random.insideUnitSphere * radious, player.transform.rotation.y)) 
+                    continue;
+                break;
+            }
         }
 
         /// <summary>
@@ -177,10 +181,125 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         }
 
         /// <summary>
+        /// Retrieves the inventory of a specified player, optionally including equipped items.
+        /// </summary>
+        /// <param name="target">The player whose inventory is to be retrieved.</param>
+        /// <param name="includeEquipment">If true, the method will include the player's equipped items in the inventory list; otherwise, it will exclude them.</param>
+        /// <returns>A list of <see cref="Item"/> objects representing the player's inventory.</returns>
+        public static List<Item> GetInventory(UnturnedPlayer target, bool includeEquipment)
+        {
+            PlayerClothing clothing = target.Player.clothing;
+
+            List<Item> items = new List<Item>();
+
+            items.AddRange(SaveItemsFromPage(target, 0)); // Primary slot
+            items.AddRange(SaveItemsFromPage(target, 1)); // Secondary slot
+            items.AddRange(SaveItemsFromPage(target, 2)); // Hands
+
+            if (clothing.backpack != 0)
+            {
+                if (includeEquipment)
+                    items.Add(new Item(clothing.backpack, 1, clothing.backpackQuality, clothing.backpackState));
+                items.AddRange(SaveItemsFromPage(target, 3));
+            }
+            if (clothing.shirt != 0)
+            {
+                if (includeEquipment)
+                    items.Add(new Item(clothing.shirt, 1, clothing.shirtQuality, clothing.shirtState));
+                items.AddRange(SaveItemsFromPage(target, 5));
+            }
+            if (clothing.vest != 0)
+            {
+                if (includeEquipment)
+                    items.Add(new Item(clothing.vest, 1, clothing.vestQuality, clothing.vestState));
+                items.AddRange(SaveItemsFromPage(target, 4));
+            }
+            if (clothing.pants != 0)
+            {
+                if (includeEquipment)
+                    items.Add(new Item(clothing.pants, 1, clothing.pantsQuality, clothing.pantsState));
+                items.AddRange(SaveItemsFromPage(target, 6));
+            }
+            if (clothing.mask != 0 && includeEquipment)
+                items.Add(new Item(clothing.mask, 1, clothing.maskQuality, clothing.maskState));
+            if (clothing.hat != 0 && includeEquipment)
+                items.Add(new Item(clothing.hat, 1, clothing.hatQuality, clothing.hatState));
+            if (clothing.glasses != 0 && includeEquipment)
+                items.Add(new Item(clothing.glasses, 1, clothing.glassesQuality, clothing.glassesState));
+
+            return items;
+        }
+
+        /// <summary>
+        /// Saves the items from a specific inventory page of the given player.
+        /// </summary>
+        /// <param name="player">The player from whom the items are to be saved.</param>
+        /// <param name="page">The inventory page number from which the items should be saved.</param>
+        /// <returns>A list of <see cref="Item"/> objects representing the items saved from the specified page.</returns>
+        private static List<Item> SaveItemsFromPage(UnturnedPlayer player, byte page)
+        {
+            PlayerInventory inventory = player.Player.inventory;
+            var count = inventory.getItemCount(page);
+            List<Item> items = new List<Item>();
+
+            for (byte index = 0; index < count; index++)
+            {
+                var item = inventory.getItem(page, index).item;
+
+                if (item == null)
+                    continue;
+
+                ItemAsset asset = Assets.find(EAssetType.ITEM, item.id) as ItemAsset;
+
+                items.Add(asset?.type == EItemType.MAGAZINE
+                    ? new Item(item.id, item.amount, item.quality, item.state)
+                    : new Item(item.id, 1, item.quality, item.state));
+            }
+            return items;
+        }
+
+        /// <summary>
+        /// Removes a specified amount of an item from the target player's inventory.
+        /// </summary>
+        /// <param name="targetPlayer">The player from whose inventory the item is to be removed.</param>
+        /// <param name="itemID">The ID of the item to be removed.</param>
+        /// <param name="amount">The quantity of the item to remove. Defaults to 1 if not specified.</param>
+        public static void RemoveItemFromInventory(UnturnedPlayer targetPlayer, ushort itemID, int amount = 1)
+        {
+            PlayerInventory inventory = targetPlayer.Player.inventory;
+
+            for (byte page = 0; page < 7; page++)
+            {
+                var count = inventory.getItemCount(page);
+
+                for (byte index = 0; index < count; index++)
+                {
+                    var item = inventory.getItem(page, index).item;
+
+                    if (item == null)
+                        continue;
+
+                    ItemAsset asset = Assets.find(EAssetType.ITEM, item.id) as ItemAsset;
+
+                    if (item.id != itemID)
+                        continue;
+
+                    inventory.removeItem(page, index);
+
+                    amount--;
+                    if (amount == 0)
+                        break;
+                }
+                if (amount == 0)
+                    break;
+            }
+        }
+
+        /// <summary>
         /// Clears the entire inventory of the specified player.
         /// </summary>
         /// <param name="player">The player whose inventory will be cleared.</param>
-        public static void ClearInvventory(UnturnedPlayer player)
+        public static void ClearInventory(UnturnedPlayer player)
         {
             PlayerInventory playerInv = player.Inventory;
 
@@ -251,6 +370,12 @@ namespace Tavstal.TLibrary.Helpers.Unturned
             return players;
         }
 
+        /// <summary>
+        /// Retrieves a list of mutual permission groups that both specified players belong to.
+        /// </summary>
+        /// <param name="player1">The first player for whom mutual groups are being checked.</param>
+        /// <param name="player2">The second player for whom mutual groups are being checked.</param>
+        /// <returns>A list of <see cref="RocketPermissionsGroup"/> objects representing the permission groups that both players have in common.</returns>
         public static List<RocketPermissionsGroup> GetMutualGroups(UnturnedPlayer player1, UnturnedPlayer player2)
         {
             List<RocketPermissionsGroup> p1Groups = Rocket.Core.R.Permissions.GetGroups(player1, true);
@@ -259,7 +384,11 @@ namespace Tavstal.TLibrary.Helpers.Unturned
             return p1Groups.Intersect(p2Groups).ToList();
         }
 
-        internal static uint GenerateFrequency()
+        /// <summary>
+        /// Generates a unique frequency value.
+        /// </summary>
+        /// <returns>A <see cref="uint"/> representing the generated frequency.</returns>
+        public static uint GenerateFrequency()
         {
             return Convert.ToUInt32(MathHelper.Next(300000, 900000));
         }
