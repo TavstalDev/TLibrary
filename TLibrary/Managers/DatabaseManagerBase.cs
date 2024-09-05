@@ -1,5 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
+using System.Threading.Tasks;
 using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Models.Database;
 using Tavstal.TLibrary.Models.Plugin;
@@ -21,6 +22,7 @@ namespace Tavstal.TLibrary.Managers
             var _ = new I18N.West.CP1250();
             // ReSharper disable once VirtualMemberCallInConstructor
             CheckSchema();
+            Task.Run(async () => await CheckSchemaAsync());
         }
 
         /// <summary>
@@ -50,7 +52,15 @@ namespace Tavstal.TLibrary.Managers
         /// <summary>
         /// Checks the database schema and performs necessary updates if required.
         /// </summary>
-        protected virtual void CheckSchema()
+        public virtual void CheckSchema()
+        {
+            
+        }
+
+        /// <summary>
+        /// Checks the database schema and performs necessary updates if required.
+        /// </summary>
+        public virtual async Task CheckSchemaAsync()
         {
             
         }

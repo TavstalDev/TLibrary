@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 using Tavstal.TLibrary.Models.Plugin;
 
 namespace Tavstal.TLibrary.Models.Database
@@ -18,5 +19,9 @@ namespace Tavstal.TLibrary.Models.Database
         /// </summary>
         /// <returns></returns>
         MySqlConnection CreateConnection();
+
+        void CheckSchema();
+        
+        Task CheckSchemaAsync();
     }
 }
