@@ -60,7 +60,9 @@ namespace Tavstal.TLibrary.Managers
         /// <summary>
         /// Checks the database schema and performs necessary updates if required.
         /// </summary>
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public virtual async Task CheckSchemaAsync()
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             
         }
