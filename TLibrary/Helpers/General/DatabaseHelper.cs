@@ -303,8 +303,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 await connection.OpenSafeAsync();
                 using (var command = connection.CreateCommand())
                 {
-                    command.Parameters.AddWithValue("@TableName", tableName);
-                    command.CommandText = $"SHOW TABLES LIKE @TableName;";
+                    command.CommandText = $"SHOW TABLES LIKE '{tableName}';";
                     commandText = command.CommandText;
 
                     object result = await command.ExecuteScalarAsync();
@@ -375,8 +374,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 await connection.OpenSafeAsync();
                 using (var command = connection.CreateCommand())
                 {
-                    command.Parameters.AddWithValue("@TableName", tableName);
-                    command.CommandText = $"SHOW TABLES LIKE @TableName;";
+                    command.CommandText = $"SHOW TABLES LIKE '{tableName}';";
                     commandText = command.CommandText;
                     object result = await command.ExecuteScalarAsync();
                     if (result != null)
@@ -526,15 +524,14 @@ namespace Tavstal.TLibrary.Helpers.General
                 List<SqlColumn> columnsToRemove = new List<SqlColumn>();
                 using (var command = connection.CreateCommand())
                 {
-                    command.Parameters.AddWithValue("@TableName", tableName);
-                    command.CommandText = $"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE @TableName;";
+                    command.CommandText = $"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE '{tableName}';";
                     commandText = command.CommandText;
 
                     object result = await command.ExecuteScalarAsync();
                     if (result == null)
                         return false;
 
-                    command.CommandText = $"SHOW COLUMNS FROM @TableName;";
+                    command.CommandText = $"SHOW COLUMNS FROM {tableName};";
                     commandText = command.CommandText;
                     using (var reader = await command.ExecuteReaderAsync())
                     {
