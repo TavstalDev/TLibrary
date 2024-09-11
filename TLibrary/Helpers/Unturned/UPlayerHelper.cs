@@ -171,9 +171,11 @@ namespace Tavstal.TLibrary.Helpers.Unturned
 
             foreach (var region in BarricadeManager.regions)
             {
-                var drops = region.drops.FindAll(x => (CSteamID)x.GetServersideData().owner == player.CSteamID);
-                foreach (var drop in drops)
+                foreach (var drop in region.drops)
                 {
+                    if (drop.GetServersideData().owner == player.CSteamID.m_SteamID)
+                        continue;
+                    
                     BarricadeManager.tryGetRegion(drop.model, out var x, out var y, out var plant, out var _);
                     BarricadeManager.destroyBarricade(drop, x, y, plant);
                 }
