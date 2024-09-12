@@ -55,5 +55,10 @@ namespace Tavstal.TLibrary.Models
             // ReSharper disable once BaseObjectGetHashCodeCallInGetHashCode
             return base.GetHashCode();
         }
+        
+        public static string Serialize(Vector3 v)
+        {
+            return $"{v.x};{v.y};{v.z}";
+        }
     }
 }
