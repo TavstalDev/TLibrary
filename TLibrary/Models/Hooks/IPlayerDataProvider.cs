@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Rocket.Unturned.Player;
 
 namespace Tavstal.TLibrary.Models.Hooks
 {
@@ -45,6 +47,11 @@ namespace Tavstal.TLibrary.Models.Hooks
         /// <param name="steamId">The unique identifier associated with the Steam account.</param>
         /// <returns>The date and time of the last login for the specified Steam ID.</returns>
         DateTime GetLastLogin(ulong steamId);
+        /// <summary>
+        /// Retrieves a list of currently active <see cref="UnturnedPlayer"/> instances.
+        /// </summary>
+        /// <returns>A <see cref="List{T}"/> of <see cref="UnturnedPlayer"/> objects representing all active players.</returns>
+        List<UnturnedPlayer> GetPlayers();
         #endregion
         #region  Async
         /// <summary>
