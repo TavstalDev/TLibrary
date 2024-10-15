@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using Tavstal.TLibrary.Models.Hooks;
@@ -53,7 +54,8 @@ namespace Tavstal.TLibrary.Managers
         /// Loads all hooks from the specified plugin assembly.
         /// </summary>
         /// <param name="pluginAssembly">The assembly containing the plugin hooks to load.</param>
-        public void LoadAll(Assembly pluginAssembly)
+        /// <param name="ignoreDuplicate"></param>
+        public void LoadAll(Assembly pluginAssembly, bool ignoreDuplicate = false)
         {
             foreach (Type t in pluginAssembly.GetTypes().ToList().FindAll(x => !x.IsAbstract && typeof(Hook).IsAssignableFrom(x)))
             {
@@ -66,6 +68,13 @@ namespace Tavstal.TLibrary.Managers
                         continue;
                     }
 
+                    if (_hooks.ContainsKey(hook.Name))
+                    {
+                        if (!ignoreDuplicate)
+                            throw new Exception($"Hook with '{hook.Name}' name already exists.");
+                        continue;
+                    }
+                    
                     _hooks.Add(hook.Name, hook);
                     hook.Load();
                 }
@@ -91,7 +100,6 @@ namespace Tavstal.TLibrary.Managers
 
             if (!_hooks.Any(x => x.Value.GetType() == type))
             {
-
                 _logger.LogException($"'{type.Name}' is not loaded.");
                 return;
             }
