@@ -120,7 +120,7 @@ namespace Tavstal.TLibrary.Extensions
             }
             catch (Exception ex)
             {
-                LoggerHelper.LogException("Error in GetValue, PluginExtensions:");
+                LoggerHelper.LogException($"Error in GetValue({name}), PluginExtensions:");
                 LoggerHelper.LogError(ex);
                 return default;
             }
