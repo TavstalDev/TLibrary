@@ -6,7 +6,8 @@ namespace Tavstal.TLibrary.Models.Database.Attributes
     /// SQL Attribute used to declare the name of a table 
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
-    public abstract class SqlNameAttribute : Attribute
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public class SqlNameAttribute : Attribute
     {
         public string Name { get; set; }
 
