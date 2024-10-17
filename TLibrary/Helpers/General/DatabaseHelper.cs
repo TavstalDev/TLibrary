@@ -1485,7 +1485,7 @@ namespace Tavstal.TLibrary.Helpers.General
                             whereClause = whereClause.Replace(" WHERE", "");
                     }
                     whereClause = FixWhereClause(whereClause);
-                    command.CommandText = $"DELETE * FROM {tableName} WHERE {whereClause}";
+                    command.CommandText = $"DELETE FROM {tableName} WHERE {whereClause}";
                     commandText = command.CommandText;
                     await command.ExecuteNonQueryAsync();
                 }
