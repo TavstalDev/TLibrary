@@ -8,12 +8,12 @@ using System.Reflection;
 using Rocket.Core.Plugins;
 using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Managers;
-using Tavstal.TLibrary.Models.Database;
 using UnityEngine;
 using UnityEngine.Networking;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable StaticMemberInGenericType
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable InconsistentNaming
 
 namespace Tavstal.TLibrary.Models.Plugin
 {
@@ -23,20 +23,11 @@ namespace Tavstal.TLibrary.Models.Plugin
     /// <typeparam name="PluginConfig"></typeparam>
     public abstract class PluginBase<PluginConfig> : RocketPlugin, IPlugin where PluginConfig : ConfigurationBase
     {
-        private PluginConfig _config;
         /// <summary>
         /// Plugin Configuration
         /// </summary>
-        public PluginConfig Config => _config;
+        public PluginConfig Config { get; private set; }
 
-        /// <summary>
-        /// Instance of the Plugin
-        /// </summary>
-        public virtual PluginBase<PluginConfig> Instance { get; set; }
-        /// <summary>
-        /// Optional Database Manager
-        /// </summary>
-        public virtual IDatabaseManager DatabaseManager { get; set; }
         /// <summary>
         /// Hook Manager used to work with plugin hooks
         /// </summary>
@@ -51,10 +42,10 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// </summary>
         public static TLogger Logger => _logger;
 
-        private static readonly Version _version = Assembly.GetExecutingAssembly().GetName().Version;
-        private static readonly DateTime _buildDate = new DateTime(2000, 1, 1).AddDays(_version.Build).AddSeconds(_version.Revision * 2);
-        public static Version Version => _version;
-        public static DateTime BuildDate => _buildDate;
+        public static Version Version { get; } = Assembly.GetExecutingAssembly().GetName().Version;
+
+        public static DateTime BuildDate { get; } = new DateTime(2000, 1, 1).AddDays(Version.Build).AddSeconds(Version.Revision * 2);
+
         public static FileVersionInfo VersionInfo { get; private set; }
 
         /// <summary>
@@ -65,7 +56,6 @@ namespace Tavstal.TLibrary.Models.Plugin
             _logger = TLogger.CreateInstance(this, false);
             VersionInfo = FileVersionInfo.GetVersionInfo(this.Assembly.Location);
             base.Load();
-            Instance = this;
             CheckPluginFiles();
             OnLoad();
         }
@@ -137,10 +127,10 @@ namespace Tavstal.TLibrary.Models.Plugin
                 System.IO.Directory.CreateDirectory(translationsDirectory);
 
             // Handle Configuration
-            _config = ConfigurationBase.Create<PluginConfig>("Configuration.json", this.Directory);
+            Config = ConfigurationBase.Create<PluginConfig>("Configuration.json", this.Directory);
 
-            if (_config.CheckConfigFile())
-                _config = _config.ReadConfig<PluginConfig>();
+            if (Config.CheckConfigFile())
+                Config = Config.ReadConfig<PluginConfig>();
             else
             {
                 CultureInfo ci = CultureInfo.InstalledUICulture;
@@ -149,13 +139,13 @@ namespace Tavstal.TLibrary.Models.Plugin
                 {
                     if (LanguagePacks.ContainsKey(ci.TwoLetterISOLanguageName))
                     {
-                        _config.Locale = langISO;
-                        _config.SaveConfig();
+                        Config.Locale = langISO;
+                        Config.SaveConfig();
                     }
                 }
             }
 
-            _logger.SetDebugMode(_config.DebugMode);
+            _logger.SetDebugMode(Config.DebugMode);
 
             Dictionary<string, string> localLocalization = CommonLocalization ?? new Dictionary<string, string>();
             if (DefaultLocalization == null)
@@ -173,7 +163,7 @@ namespace Tavstal.TLibrary.Models.Plugin
             }
 
             if (LanguagePacks != null)
-                if (_config.DownloadLocalePacks && LanguagePacks.Count > 0)
+                if (Config.DownloadLocalePacks && LanguagePacks.Count > 0)
                     foreach (var pack in LanguagePacks)
                     {
                         string path = Path.Combine(translationsDirectory, $"locale.{pack.Key}.json");
@@ -197,7 +187,7 @@ namespace Tavstal.TLibrary.Models.Plugin
                     }
 
             
-            string locale = _config.Locale;
+            string locale = Config.Locale;
             if (File.Exists(Path.Combine(translationsDirectory, $"locale.{locale}.json")))
             {
                 var localLocale = PluginExtensions.ReadTranslation(translationsDirectory, $"locale.{locale}.json");
