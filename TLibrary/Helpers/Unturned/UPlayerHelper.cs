@@ -173,7 +173,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
             {
                 foreach (var drop in region.drops)
                 {
-                    if (drop.GetServersideData().owner == player.CSteamID.m_SteamID)
+                    if (drop.GetServersideData().owner != player.CSteamID.m_SteamID)
                         continue;
                     
                     BarricadeManager.tryGetRegion(drop.model, out var x, out var y, out var plant, out var _);
