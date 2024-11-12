@@ -46,18 +46,25 @@ namespace Tavstal.TLibrary.Models.Plugin
 
         public static DateTime BuildDate { get; } = new DateTime(2000, 1, 1).AddDays(Version.Build).AddSeconds(Version.Revision * 2);
 
-        public static FileVersionInfo VersionInfo { get; private set; }
-
         /// <summary>
         /// Used when the plugin loads
         /// </summary>
         protected override void Load()
         {
             _logger = TLogger.CreateInstance(this, false);
-            VersionInfo = FileVersionInfo.GetVersionInfo(this.Assembly.Location);
-            base.Load();
-            CheckPluginFiles();
-            OnLoad();
+
+            try
+            {
+                base.Load();
+                CheckPluginFiles();
+                OnLoad();
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogException($"Failed to load {Name}");
+                _logger.LogError(ex);
+            }
         }
 
         /// <summary>
