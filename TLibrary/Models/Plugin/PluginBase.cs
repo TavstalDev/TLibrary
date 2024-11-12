@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -23,6 +22,42 @@ namespace Tavstal.TLibrary.Models.Plugin
     /// <typeparam name="PluginConfig"></typeparam>
     public abstract class PluginBase<PluginConfig> : RocketPlugin, IPlugin where PluginConfig : ConfigurationBase
     {
+        /// <summary>
+        /// The root directory path for the plugin.
+        /// </summary>
+        private string _rootDirectory;
+        /// <summary>
+        /// Gets the root directory path for the plugin.
+        /// </summary>
+        public string RootDirectory => _rootDirectory;
+
+        /// <summary>
+        /// The directory path specific to the plugin.
+        /// </summary>
+        private string _pluginDirectory;
+        /// <summary>
+        /// Gets the directory path specific to the plugin.
+        /// </summary>
+        public string PluginDirectory => _pluginDirectory;
+
+        /// <summary>
+        /// The name of the plugin.
+        /// </summary>
+        private string _pluginName;
+        /// <summary>
+        /// Gets or sets the name of the plugin. The name can only be set if it is currently null or empty.
+        /// </summary>
+        public string PluginName 
+        { 
+            get => _pluginName; 
+            set 
+            { 
+                if (_pluginName.IsNullOrEmpty()) 
+                    _pluginName = value; 
+            } 
+        }
+
+        
         /// <summary>
         /// Plugin Configuration
         /// </summary>
@@ -51,8 +86,12 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// </summary>
         protected override void Load()
         {
+            if (!this.Name.IsNullOrEmpty())
+                _pluginName = this.Name;
+            _rootDirectory = System.IO.Directory.GetCurrentDirectory();
+            _pluginDirectory = Path.Combine(_rootDirectory, "Plugins", GetPluginName());
             _logger = TLogger.CreateInstance(this, false);
-
+                
             try
             {
                 base.Load();
@@ -78,21 +117,21 @@ namespace Tavstal.TLibrary.Models.Plugin
         }
 
         /// <summary>
-        /// Returns the name of the plugin
-        /// </summary>
-        /// <returns>A <see cref="string"></see> containing the name of the plugin.</returns>
-        public string GetPluginName()
-        {
-            return this.Name;
-        }
-
-        /// <summary>
         /// Returns the logger
         /// </summary>
         /// <returns>Object of a <see cref="TLogger"/></returns>
         public TLogger GetLogger()
         {
             return _logger;
+        }
+        
+        /// <summary>
+        /// Returns the name of the plugin
+        /// </summary>
+        /// <returns>A <see cref="string"></see> containing the name of the plugin.</returns>
+        public string GetPluginName()
+        {
+            return _pluginName;
         }
 
         /// <summary>
@@ -119,23 +158,24 @@ namespace Tavstal.TLibrary.Models.Plugin
         public virtual void CheckPluginFiles()
         {
             // Delete Rocket Config
-            string rocketConfigFile = Path.Combine(this.Directory, $"{GetPluginName()}.configuration.xml");
+            string rocketConfigFile = Path.Combine(_pluginDirectory, $"{PluginName}.configuration.xml");
             if (File.Exists(rocketConfigFile))
                 File.Delete(rocketConfigFile);
 
             // Delete Rocket Translation
-            string rocketTranslationFile = Path.Combine(this.Directory, $"{GetPluginName()}.en.translation.xml");
+            string rocketTranslationFile = Path.Combine(_pluginDirectory, $"{PluginName}.en.translation.xml");
+
             if (File.Exists(rocketTranslationFile))
                 File.Delete(rocketTranslationFile);
 
             // Create Translations Directory
-            string translationsDirectory = Path.Combine(this.Directory, "Translations");
+            string translationsDirectory = Path.Combine(_pluginDirectory, "Translations");
             if (!System.IO.Directory.Exists(translationsDirectory))
                 System.IO.Directory.CreateDirectory(translationsDirectory);
 
             // Handle Configuration
-            Config = ConfigurationBase.Create<PluginConfig>("Configuration.json", this.Directory);
-
+            Config = ConfigurationBase.Create<PluginConfig>("Configuration.json", _pluginDirectory);
+            
             if (Config.CheckConfigFile())
                 Config = Config.ReadConfig<PluginConfig>();
             else
@@ -151,18 +191,16 @@ namespace Tavstal.TLibrary.Models.Plugin
                     }
                 }
             }
-
+            
             _logger.SetDebugMode(Config.DebugMode);
 
             Dictionary<string, string> localLocalization = CommonLocalization ?? new Dictionary<string, string>();
             if (DefaultLocalization == null)
                 DefaultLocalization = new Dictionary<string, string>();
-            
+
             foreach (var l in DefaultLocalization)
-            {
                 localLocalization[l.Key] = l.Value;
-            }
-            
+
             string defaultTranslationFile = Path.Combine(translationsDirectory, "locale.en.json");
             if (!File.Exists(defaultTranslationFile))
             {
@@ -192,7 +230,6 @@ namespace Tavstal.TLibrary.Models.Plugin
                         });
 
                     }
-
             
             string locale = Config.Locale;
             if (File.Exists(Path.Combine(translationsDirectory, $"locale.{locale}.json")))
@@ -222,7 +259,6 @@ namespace Tavstal.TLibrary.Models.Plugin
             }
 
             Localization = localLocalization;
-
         }
 
         /// <summary>
@@ -270,7 +306,7 @@ namespace Tavstal.TLibrary.Models.Plugin
         public string Localize(bool AddPrefix, string translationKey, params object[] args)
         {
             if (!Localization.TryGetValue(translationKey, out string localization))
-                localization = $"<color=#FFAA00>[WARNING]</color> <color=#FFFF55>Untranslated key found in {GetPluginName()}:</color> <color=#FF5555>{translationKey}</color>";
+                localization = $"<color=#FFAA00>[WARNING]</color> <color=#FFFF55>Untranslated key found in {PluginName}:</color> <color=#FF5555>{translationKey}</color>";
 
             if (AddPrefix)
             {
