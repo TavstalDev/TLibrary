@@ -165,7 +165,7 @@ namespace Tavstal.TLibrary.Models.Commands
                     if (!(ExecutionRequested(caller, args).Result))
                         await ExecuteHelp(caller, true, null, null);
                 }
-            }).GetAwaiter().GetResult();
+            });
         }
 
         private SubCommand GetSubCommandByName(string arg)
