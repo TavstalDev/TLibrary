@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Tavstal.TLibrary
@@ -61,6 +62,42 @@ namespace Tavstal.TLibrary
             {
                 Instance._executionQueue.Enqueue(action);
             }
+        }
+        
+        /// <summary>
+        /// Executes a function on the main thread and returns its result.
+        /// </summary>
+        /// <typeparam name="T">The return type of the function to execute.</typeparam>
+        /// <param name="func">The function to be executed on the main thread.</param>
+        /// <returns>
+        /// The result of the executed function of type <typeparamref name="T"/>.
+        /// </returns>
+        public static T RunOnMainThread<T>(Func<T> func)
+        {
+            if (!Application.isPlaying)
+                return default;
+
+            var completionSource = new TaskCompletionSource<T>();
+
+            // Enqueue the function to be executed on the main thread
+            Instance._executionQueue.Enqueue(() =>
+            {
+                try
+                {
+                    // Execute the function and set the result
+                    T result = func();
+                    completionSource.SetResult(result);
+                }
+                catch (Exception ex)
+                {
+                    // Set the exception if something goes wrong
+                    completionSource.SetException(ex);
+                }
+            });
+
+            // Wait for the result to be set
+            completionSource.Task.Wait();
+            return completionSource.Task.Result;
         }
     }
 
