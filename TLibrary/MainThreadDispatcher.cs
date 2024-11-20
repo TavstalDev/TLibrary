@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
+using SDG.Unturned;
+using Tavstal.TLibrary.Helpers.General;
 using UnityEngine;
+using Action = System.Action;
 
 namespace Tavstal.TLibrary
 {
@@ -61,6 +65,42 @@ namespace Tavstal.TLibrary
             {
                 Instance._executionQueue.Enqueue(action);
             }
+        }
+
+        /// <summary>
+        /// Executes an action on the main thread asynchronously.
+        /// </summary>
+        /// <param name="action">The action to be executed on the main thread.</param>
+        /// <returns>
+        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, containing 
+        /// a <see cref="bool"/> that indicates whether the action was successfully executed.
+        /// </returns>
+        public static Task<bool> RunOnMainThreadAsync(Action action)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            
+            if (Application.isPlaying)
+            {
+                Instance._executionQueue.Enqueue(() =>
+                {
+                    try
+                    {
+                        // Execute the provided action
+                        action();
+                        // Signal success
+                        tcs.SetResult(true);
+                    }
+                    catch (Exception ex)
+                    {
+                        LoggerHelper.LogException("Error while running async action on main thread");
+                        tcs.SetException(ex);
+                    }
+                });
+            }
+            else
+                tcs.SetResult(false);
+            
+            return tcs.Task;
         }
     }
 
