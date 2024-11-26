@@ -82,5 +82,10 @@ namespace Tavstal.TLibrary.Models.Economy
         {
             return Number.Insert(12, " ").Insert(8, " ").Insert(4, " ");
         }
+
+        public string GetShortIban()
+        {
+            return Iban.Substring(0, 17);
+        }
     }
 }
