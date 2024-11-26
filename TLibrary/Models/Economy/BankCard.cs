@@ -12,18 +12,24 @@ namespace Tavstal.TLibrary.Models.Economy
         /// <summary>
         /// Id of the card
         /// </summary>
-        [SqlMember(columnType: "varchar(32)", isPrimaryKey: true)]
-        public string Id { get; set; }
+        [SqlMember(columnType: "varchar(34)", isPrimaryKey: true)]
+        public string Iban { get; set; }
         /// <summary>
-        /// Pincode of the card
+        /// Number of the card.
+        /// Example: 1234123412341234
+        /// </summary>
+        [SqlMember(columnType: "varchar(16)", isPrimaryKey: true)]
+        public string Number { get; set; }
+        /// <summary>
+        /// Card Verification Code of the card
+        /// </summary>
+        [SqlMember(columnType: "varchar(3)")]
+        public string Cvc { get; set; }
+        /// <summary>
+        /// Pin code of the card
         /// </summary>
         [SqlMember(columnType: "varchar(8)")]
         public string PinCode { get; set; }
-        /// <summary>
-        /// Pincode of the card
-        /// </summary>
-        [SqlMember(columnType: "varchar(3)")]
-        public string SecurityCode { get; set; }
         /// <summary>
         /// SteamId of the card holderId
         /// </summary>
@@ -33,7 +39,7 @@ namespace Tavstal.TLibrary.Models.Economy
         /// Balance use of the card
         /// </summary>
         [SqlMember(columnType: "decimal(18,2)")]
-        public decimal BalanceUse { get; set; }
+        public decimal BalanceUsed { get; set; }
         /// <summary>
         /// Balance limit of the card
         /// </summary>
@@ -49,39 +55,32 @@ namespace Tavstal.TLibrary.Models.Economy
         /// <br/>Note: If it's true then the card shouldn't be able to be used outside of that specific ATM
         /// </summary>
         [SqlMember(columnType: "tinyint(1)")]
-        public bool IsInATM { get; set; }
+        public bool IsInAtm { get; set; }
         /// <summary>
         /// The date when the card expires and can not be used anymore
         /// </summary>
         [SqlMember]
         public DateTime ExpireDate { get; set; }
 
-        public BankCard(string cardId, string securityCode, string pinCode, ulong holderId, decimal balance, decimal maxBalance, DateTime expireDate)
-        {
-            Id = cardId;
-            SecurityCode = securityCode;
-            PinCode = pinCode;
-            HolderId = holderId;
-            BalanceUse = balance;
-            BalanceLimit = maxBalance;
-            ExpireDate = expireDate;
-            IsInATM = false;
-            IsActive = false;
-        }
-
-        public BankCard(string cardId, string securityCode, string pinCode, ulong holderId, decimal balance, decimal maxBalance, DateTime expireDate, bool isActive, bool isInATM)
-        {
-            Id = cardId;
-            SecurityCode = securityCode;
-            PinCode = pinCode;
-            HolderId = holderId;
-            BalanceUse = balance;
-            BalanceLimit = maxBalance;
-            ExpireDate = expireDate;
-            IsInATM = isInATM;
-            IsActive = isActive;
-        }
-
         public BankCard() { }
+
+        public BankCard(string iban, string number, string cvc, string pinCode, ulong holderId, decimal balanceUsed, decimal balanceLimit, bool isActive, bool isInAtm, DateTime expireDate)
+        {
+            Iban = iban;
+            Number = number;
+            Cvc = cvc;
+            PinCode = pinCode;
+            HolderId = holderId;
+            BalanceUsed = balanceUsed;
+            BalanceLimit = balanceLimit;
+            IsActive = isActive;
+            IsInAtm = isInAtm;
+            ExpireDate = expireDate;
+        }
+
+        public string GetFormatedNumber()
+        {
+            return Number.Insert(12, " ").Insert(8, " ").Insert(4, " ");
+        }
     }
 }
