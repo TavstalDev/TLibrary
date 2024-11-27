@@ -98,6 +98,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 case "REAL":
                     return typeof(float);
                 case "FLOAT":
+                case "DOUBLE":
                     return typeof(double);
                 case "DECIMAL":
                     return typeof(decimal);
