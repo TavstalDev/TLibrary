@@ -12,7 +12,7 @@ namespace Tavstal.TLibrary.Models.Economy
     [Serializable]
     public class Transaction : ITransaction
     {
-        [SqlMember(isPrimaryKey: true)]
+        [SqlMember(columnType: "varchar(32)", isPrimaryKey: true)]
         public Guid Id { get; set; }
         /// <summary>
         /// Type of the transaction to check the transaction was sent or recieved by the payee
