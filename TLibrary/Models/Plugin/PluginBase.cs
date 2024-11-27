@@ -305,17 +305,27 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// <returns>A <see cref="string"/> containing the translated text on success, or the translationKey on failure.</returns>
         public string Localize(bool AddPrefix, string translationKey, params object[] args)
         {
-            if (!Localization.TryGetValue(translationKey, out string localization))
-                localization = $"<color=#FFAA00>[WARNING]</color> <color=#FFFF55>Untranslated key found in {PluginName}:</color> <color=#FF5555>{translationKey}</color>";
-
-            if (AddPrefix)
+            try
             {
-                if (Localization.TryGetValue("prefix", out string prefixLocalization))
-                    return prefixLocalization + string.Format(localization, args);
+                if (!Localization.TryGetValue(translationKey, out string localization))
+                    localization =
+                        $"<color=#FFAA00>[WARNING]</color> <color=#FFFF55>Untranslated key found in {PluginName}:</color> <color=#FF5555>{translationKey}</color>";
+
+                if (AddPrefix)
+                {
+                    if (Localization.TryGetValue("prefix", out string prefixLocalization))
+                        return prefixLocalization + string.Format(localization, args);
+                    return string.Format(localization, args);
+                }
+
                 return string.Format(localization, args);
             }
-
-            return string.Format(localization, args);
+            catch (Exception ex)
+            {
+               Logger.LogException($"Failed to localize '{translationKey}' key:");
+               Logger.LogError(ex);
+               return string.Empty;
+            }
         }
 
         /// <summary>
