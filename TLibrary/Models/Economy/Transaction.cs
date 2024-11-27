@@ -13,7 +13,7 @@ namespace Tavstal.TLibrary.Models.Economy
     public class Transaction : ITransaction
     {
         [SqlMember(columnType: "varchar(36)", isPrimaryKey: true)]
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         /// <summary>
         /// Type of the transaction to check the transaction was sent or recieved by the payee
         /// <br/>For values check <see cref="ETransaction"/>
@@ -51,9 +51,21 @@ namespace Tavstal.TLibrary.Models.Economy
         [SqlMember]
         public DateTime Date { get; set; }
 
-        public Transaction(Guid id, ETransaction type, EPaymentMethod method, string storename, ulong payer, ulong payee, decimal amount, DateTime date) 
+        public Transaction(string id, ETransaction type, EPaymentMethod method, string storename, ulong payer, ulong payee, decimal amount, DateTime date) 
         {
             Id = id;
+            Type = type; 
+            PaymentMethod = method; 
+            StoreName = storename; 
+            PayerId = payer; 
+            PayeeId = payee;
+            Amount = amount; 
+            Date = date; 
+        }
+        
+        public Transaction(ETransaction type, EPaymentMethod method, string storename, ulong payer, ulong payee, decimal amount, DateTime date) 
+        {
+            Id = Guid.NewGuid().ToString();
             Type = type; 
             PaymentMethod = method; 
             StoreName = storename; 

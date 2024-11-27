@@ -4,7 +4,7 @@ namespace Tavstal.TLibrary.Models.Economy
 {
     public interface ITransaction
     {
-        Guid Id { get; set; }
+        string Id { get; set; }
         ETransaction Type { get; set; }
         EPaymentMethod PaymentMethod { get; set; }
         string StoreName { get; set; }
