@@ -18,7 +18,7 @@ namespace Tavstal.TLibrary.Models.Economy
         /// Number of the card.
         /// Example: 1234123412341234
         /// </summary>
-        [SqlMember(columnType: "varchar(16)", isPrimaryKey: true)]
+        [SqlMember(columnType: "varchar(16)", isUniqueKey: true)]
         public string Number { get; set; }
         /// <summary>
         /// Card Verification Code of the card
