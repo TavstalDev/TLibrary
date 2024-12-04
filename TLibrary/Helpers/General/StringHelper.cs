@@ -7,8 +7,8 @@ namespace Tavstal.TLibrary.Helpers.General
 {
     public static class StringHelper
     {
-        private static readonly string _chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        private static readonly string _charsNoNums = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        private static readonly string Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        private static readonly string CharsNoNums = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
         /// <summary>
         /// Retrieves a random character from a predefined set of characters.
@@ -16,7 +16,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <returns>A <see cref="char"/> representing the randomly selected character.</returns>
         public static char GetRandomChar()
         {
-            return _chars.ElementAt(MathHelper.Next(_chars.Length - 1));
+            return Chars.ElementAt(MathHelper.Next(Chars.Length - 1));
         }
 
         /// <summary>
@@ -33,9 +33,9 @@ namespace Tavstal.TLibrary.Helpers.General
             {
                 char c;
                 if (includeNums)
-                    c = _chars.ElementAt(MathHelper.Next(_chars.Length - 1));
+                    c = Chars.ElementAt(MathHelper.Next(Chars.Length - 1));
                 else
-                    c = _charsNoNums.ElementAt(MathHelper.Next(_charsNoNums.Length - 1));
+                    c = CharsNoNums.ElementAt(MathHelper.Next(CharsNoNums.Length - 1));
 
                 if (key.Contains(c))
                     i--;
@@ -57,7 +57,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
             for (int i = 0; i < length; i++)
             {
-                char c = _chars.ToLower().ElementAt(MathHelper.Next(_chars.Length - 1));
+                char c = Chars.ToLower().ElementAt(MathHelper.Next(Chars.Length - 1));
                 if (key.Contains(c))
                     i--;
                 else
@@ -78,7 +78,7 @@ namespace Tavstal.TLibrary.Helpers.General
 
             for (int i = 0; i < length; i++)
             {
-                char c = _chars.ToUpper().ElementAt(MathHelper.Next(_chars.Length - 1));
+                char c = Chars.ToUpper().ElementAt(MathHelper.Next(Chars.Length - 1));
                 if (key.Contains(c))
                     i--;
                 else

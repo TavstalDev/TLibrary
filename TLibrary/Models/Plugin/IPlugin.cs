@@ -15,7 +15,7 @@
 
         void InvokeAction(float delay, System.Action action);
 
-        string Localize(bool AddPrefix, string translationKey, params object[] args);
+        string Localize(bool addPrefix, string translationKey, params object[] args);
 
         string Localize(string translationKey, params object[] args);
     }

@@ -72,6 +72,7 @@ namespace Tavstal.TLibrary.Extensions
         {
             try
             {
+                // ReSharper disable once UnusedVariable
                 MailAddress mail = new MailAddress(str);
                 return true;
             }

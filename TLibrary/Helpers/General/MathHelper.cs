@@ -7,7 +7,7 @@ namespace Tavstal.TLibrary.Helpers.General
     public static class MathHelper
     {
         private static System.Random _random;
-        private static readonly object syncObj = new object();
+        private static readonly object SyncObj = new object();
 
         /// <summary>
         /// Calculates the center point of an array of Vector3 points.
@@ -57,7 +57,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <returns>A random integer between the specified minimum and maximum values.</returns>
         public static int Next(int min, int max)
         {
-            lock (syncObj)
+            lock (SyncObj)
             {
                 if (_random == null)
                     _random = new System.Random(); // Or exception...
@@ -72,7 +72,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <returns>A random integer between 0 (inclusive) and the specified maximum value (exclusive).</returns>
         public static int Next(int max)
         {
-            lock (syncObj)
+            lock (SyncObj)
             {
                 if (_random == null)
                     _random = new System.Random(); // Or exception...
@@ -98,7 +98,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <returns>A random integer between 0 (inclusive) and the specified maximum value (exclusive).</returns>
         public static uint Next()
         {
-            lock (syncObj)
+            lock (SyncObj)
             {
                 if (_random == null)
                     _random = new System.Random();
@@ -126,7 +126,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <returns>A random double value within the specified range.</returns>
         public static double Next(double min, double max)
         {
-            lock (syncObj)
+            lock (SyncObj)
             {
                 if (_random == null)
                     _random = new System.Random(); // Or exception...
@@ -141,7 +141,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <returns>A random double value within the range of [0, max).</returns>
         public static double Next(double max)
         {
-            lock (syncObj)
+            lock (SyncObj)
             {
                 if (_random == null)
                     _random = new System.Random(); // Or exception...
@@ -169,7 +169,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <returns>A random float value within the specified range.</returns>
         public static float Next(float min, float max)
         {
-            lock (syncObj)
+            lock (SyncObj)
             {
                 if (_random == null)
                     _random = new System.Random(); // Or exception...
@@ -184,7 +184,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <returns>A random float value between 0 (inclusive) and the specified maximum value (exclusive).</returns>
         public static float Next(float max)
         {
-            lock (syncObj)
+            lock (SyncObj)
             {
                 if (_random == null)
                     _random = new System.Random(); // Or exception...

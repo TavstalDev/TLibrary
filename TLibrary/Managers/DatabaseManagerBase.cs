@@ -12,6 +12,7 @@ namespace Tavstal.TLibrary.Managers
     /// </summary>
     public abstract class DatabaseManagerBase : IDatabaseManager
     {
+        // ReSharper disable once InconsistentNaming
         public IPlugin _plugin { get; }
         public IConfigurationBase _configuration { get; }
 

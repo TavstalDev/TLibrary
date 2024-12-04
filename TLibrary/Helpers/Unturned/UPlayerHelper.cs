@@ -70,15 +70,12 @@ namespace Tavstal.TLibrary.Helpers.Unturned
             try
             {
                 var searchItems = inventory.items;
-                foreach (Items _items in searchItems)
+                foreach (Items item in searchItems)
                 {
-                    if (_items == null)
+                    if (item?.items == null)
                         continue;
 
-                    if (_items.items == null)
-                        continue;
-
-                    var items = _items.items;
+                    var items = item.items;
                     for (byte b = 0; b < items.Count; b = (byte)(b + 1))
                     {
                         if (!items.IsValidIndex(b))
@@ -89,7 +86,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
                             ItemAsset itemAsset = UAssetHelper.FindItemAsset(itemJar.item.id);
                             if (itemAsset != null && itemAsset.type == type)
                             {
-                                search.Add(new InventorySearch(_items.page, itemJar));
+                                search.Add(new InventorySearch(item.page, itemJar));
                             }
                         }
                     }
@@ -115,22 +112,19 @@ namespace Tavstal.TLibrary.Helpers.Unturned
             try
             {
                 var searchItems = inventory.items;
-                foreach (Items _items in searchItems)
+                foreach (Items item in searchItems)
                 {
-                    if (_items == null)
+                    if (item?.items == null)
                         continue;
 
-                    if (_items.items == null)
-                        continue;
-
-                    var items = _items.items.FindAll(x => x.item.id == itemID);
+                    var items = item.items.FindAll(x => x.item.id == itemID);
                     for (byte b = 0; b < items.Count; b = (byte)(b + 1))
                     {
                         if (!items.IsValidIndex(b))
                             continue;
                         ItemJar itemJar = items[b];
                         if (itemJar.item.amount > 0 || findEmpty)
-                            search.Add(new InventorySearch(_items.page, itemJar));
+                            search.Add(new InventorySearch(item.page, itemJar));
                     }
                 }
             }
@@ -280,9 +274,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
 
                     if (item == null)
                         continue;
-
-                    ItemAsset asset = Assets.find(EAssetType.ITEM, item.id) as ItemAsset;
-
+                    
                     if (item.id != itemID)
                         continue;
 

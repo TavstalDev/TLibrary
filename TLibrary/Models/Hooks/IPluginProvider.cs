@@ -11,9 +11,9 @@ namespace Tavstal.TLibrary.Models.Hooks
         /// Gets the config value from the config object
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="VariableName"></param>
+        /// <param name="variableName"></param>
         /// <returns></returns>
-        T GetConfigValue<T>(string VariableName);
+        T GetConfigValue<T>(string variableName);
         /// <summary>
         /// Gets the config object as a <see cref="JObject"/>
         /// </summary>

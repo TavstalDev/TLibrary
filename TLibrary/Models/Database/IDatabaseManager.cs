@@ -12,6 +12,7 @@ namespace Tavstal.TLibrary.Models.Database
         /// <summary>
         /// The configuration of the plugin.
         /// </summary>
+        // ReSharper disable once InconsistentNaming
         IConfigurationBase _configuration { get; }
 
         /// <summary>

@@ -7,6 +7,7 @@ namespace Tavstal.TLibrary.Models.Plugin
     /// <summary>
     /// Logger helper used to log messages to console and log file.
     /// </summary>
+    // ReSharper disable once InconsistentNaming
     public class TLogger
     {
         /// <summary>
@@ -219,8 +220,8 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// </summary>
         public void LogLateInit()
         {
-            ConsoleColor oldFGColor = Console.ForegroundColor;
-            ConsoleColor oldBGColor = Console.BackgroundColor;
+            ConsoleColor oldFgColor = Console.ForegroundColor;
+            ConsoleColor oldBgColor = Console.BackgroundColor;
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.DarkMagenta;
             string text = $"######## {_pluginName} LATE INIT ########";
@@ -237,8 +238,8 @@ namespace Tavstal.TLibrary.Models.Plugin
             {
                 Rocket.Core.Logging.Logger.Log(text);
             }
-            Console.ForegroundColor = oldFGColor;
-            Console.BackgroundColor = oldBGColor;
+            Console.ForegroundColor = oldFgColor;
+            Console.BackgroundColor = oldBgColor;
         }
 
         /// <summary>

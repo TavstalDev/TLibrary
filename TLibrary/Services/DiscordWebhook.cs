@@ -23,7 +23,7 @@ namespace Tavstal.TLibrary.Services
         private readonly string _webhookUrl;
         private readonly string _webhookName;
         private readonly string _webhookAvatarUrl;
-        private static readonly Encoding _encoding = Encoding.UTF8;
+        private static readonly Encoding Encoding = Encoding.UTF8;
 
         public DiscordWebhook(string url)
         {
@@ -95,7 +95,11 @@ namespace Tavstal.TLibrary.Services
                 return null;
             }
 
-            StreamReader responseReader = new StreamReader(webResponse.GetResponseStream());
+            var responseStream = webResponse.GetResponseStream();
+            if (responseStream == null)
+                return null;
+            
+            StreamReader responseReader = new StreamReader(responseStream);
             string fullResponse = responseReader.ReadToEnd();
             webResponse.Close();
 
@@ -133,10 +137,15 @@ namespace Tavstal.TLibrary.Services
             catch (WebException ex)
             {
                 using (var stream = ex.Response.GetResponseStream())
-                using (var reader = new StreamReader(stream))
                 {
-                    LoggerHelper.LogError(reader.ReadToEnd());
+                    if (stream == null)
+                        return false;
+                    using (var reader = new StreamReader(stream))
+                    {
+                        LoggerHelper.LogError(reader.ReadToEnd());
+                    }
                 }
+
                 return false;
             }
             return webResponse.StatusCode == HttpStatusCode.OK || webResponse.StatusCode == HttpStatusCode.Created || webResponse.StatusCode == HttpStatusCode.NoContent;
@@ -166,10 +175,15 @@ namespace Tavstal.TLibrary.Services
             catch (WebException ex)
             {
                 using (var stream = ex.Response.GetResponseStream())
-                using (var reader = new StreamReader(stream))
                 {
-                    LoggerHelper.LogError(reader.ReadToEnd());
+                    if (stream == null)
+                        return false;
+                    using (var reader = new StreamReader(stream))
+                    {
+                        LoggerHelper.LogError(reader.ReadToEnd());
+                    }
                 }
+
                 return false;
             }
             return webResponse.StatusCode == HttpStatusCode.OK || webResponse.StatusCode == HttpStatusCode.Created || webResponse.StatusCode == HttpStatusCode.NoContent;
@@ -204,14 +218,23 @@ namespace Tavstal.TLibrary.Services
             catch (WebException ex)
             {
                 using (var stream = ex.Response.GetResponseStream())
-                using (var reader = new StreamReader(stream))
                 {
-                    LoggerHelper.LogError(reader.ReadToEnd());
+                    if (stream == null)
+                        return null;
+                    using (var reader = new StreamReader(stream))
+                    {
+                        LoggerHelper.LogError(reader.ReadToEnd());
+                    }
                 }
+
                 return null;
             }
+            
+            var responseStream = webResponse.GetResponseStream();
+            if (responseStream == null)
+                return null;
 
-            StreamReader responseReader = new StreamReader(webResponse.GetResponseStream());
+            StreamReader responseReader = new StreamReader(responseStream);
             string fullResponse = responseReader.ReadToEnd();
             webResponse.Close();
 
@@ -308,14 +331,14 @@ namespace Tavstal.TLibrary.Services
         private byte[] GetMultipartFormData(Dictionary<string, object> postParameters, string boundary)
         {
             Stream formDataStream = new MemoryStream();
-            bool needsCLRF = false;
+            bool needsClrf = false;
 
             foreach (var param in postParameters)
             {
-                if (needsCLRF)
-                    formDataStream.Write(_encoding.GetBytes("\r\n"), 0, _encoding.GetByteCount("\r\n"));
+                if (needsClrf)
+                    formDataStream.Write(Encoding.GetBytes("\r\n"), 0, Encoding.GetByteCount("\r\n"));
 
-                needsCLRF = true;
+                needsClrf = true;
 
                 if (param.Value is FileParameter fileToUpload)
                 {
@@ -325,7 +348,7 @@ namespace Tavstal.TLibrary.Services
                         fileToUpload.FileName ?? param.Key,
                         fileToUpload.ContentType ?? "application/octet-stream");
 
-                    formDataStream.Write(_encoding.GetBytes(header), 0, _encoding.GetByteCount(header));
+                    formDataStream.Write(Encoding.GetBytes(header), 0, Encoding.GetByteCount(header));
                     formDataStream.Write(fileToUpload.File, 0, fileToUpload.File.Length);
                 }
                 else if (param.Value is JsonParameter jsonParam)
@@ -335,7 +358,7 @@ namespace Tavstal.TLibrary.Services
                         param.Key,
                         jsonParam.Content,
                         jsonParam.ContentType ?? "application/json");
-                    formDataStream.Write(_encoding.GetBytes(postData), 0, _encoding.GetByteCount(postData));
+                    formDataStream.Write(Encoding.GetBytes(postData), 0, Encoding.GetByteCount(postData));
                 }
                 else
                 {
@@ -343,18 +366,18 @@ namespace Tavstal.TLibrary.Services
                         boundary,
                         param.Key,
                         param.Value);
-                    formDataStream.Write(_encoding.GetBytes(postData), 0, _encoding.GetByteCount(postData));
+                    formDataStream.Write(Encoding.GetBytes(postData), 0, Encoding.GetByteCount(postData));
                 }
             }
 
             // Add the end of the request.  Start with a newline
             string footer = "\r\n--" + boundary + "--\r\n";
-            formDataStream.Write(_encoding.GetBytes(footer), 0, _encoding.GetByteCount(footer));
+            formDataStream.Write(Encoding.GetBytes(footer), 0, Encoding.GetByteCount(footer));
 
             // Dump the Stream into a byte[]
             formDataStream.Position = 0;
             byte[] formData = new byte[formDataStream.Length];
-            formDataStream.Read(formData, 0, formData.Length);
+            var read = formDataStream.Read(formData, 0, formData.Length);
             formDataStream.Close();
 
             return formData;
@@ -403,14 +426,23 @@ namespace Tavstal.TLibrary.Services
             catch (WebException ex)
             {
                 using (var stream = ex.Response.GetResponseStream())
-                using (var reader = new StreamReader(stream))
                 {
-                    LoggerHelper.LogError(await reader.ReadToEndAsync());
+                    if (stream == null)
+                        return null;
+                    using (var reader = new StreamReader(stream))
+                    {
+                        LoggerHelper.LogError(await reader.ReadToEndAsync());
+                    }
                 }
+
                 return null;
             }
 
-            StreamReader responseReader = new StreamReader(webResponse.GetResponseStream());
+            var responseStream = webResponse.GetResponseStream();
+            if (responseStream == null)
+                return null;
+            
+            StreamReader responseReader = new StreamReader(responseStream);
             string fullResponse = await responseReader.ReadToEndAsync();
             webResponse.Close();
 
@@ -448,10 +480,15 @@ namespace Tavstal.TLibrary.Services
             catch (WebException ex)
             {
                 using (var stream = ex.Response.GetResponseStream())
-                using (var reader = new StreamReader(stream))
                 {
-                    LoggerHelper.LogError(await reader.ReadToEndAsync());
+                    if (stream == null)
+                        return false;
+                    using (var reader = new StreamReader(stream))
+                    {
+                        LoggerHelper.LogError(await reader.ReadToEndAsync());
+                    }
                 }
+
                 return false;
             }
             return webResponse.StatusCode == HttpStatusCode.OK || webResponse.StatusCode == HttpStatusCode.Created || webResponse.StatusCode == HttpStatusCode.NoContent;
@@ -481,10 +518,15 @@ namespace Tavstal.TLibrary.Services
             catch (WebException ex)
             {
                 using (var stream = ex.Response.GetResponseStream())
-                using (var reader = new StreamReader(stream))
                 {
-                    LoggerHelper.LogError(await reader.ReadToEndAsync());
+                    if (stream == null)
+                        return false;
+                    using (var reader = new StreamReader(stream))
+                    {
+                        LoggerHelper.LogError(await reader.ReadToEndAsync());
+                    }
                 }
+
                 return false;
             }
             return webResponse.StatusCode == HttpStatusCode.OK || webResponse.StatusCode == HttpStatusCode.Created || webResponse.StatusCode == HttpStatusCode.NoContent;
@@ -519,14 +561,23 @@ namespace Tavstal.TLibrary.Services
             catch (WebException ex)
             {
                 using (var stream = ex.Response.GetResponseStream())
-                using (var reader = new StreamReader(stream))
                 {
-                    LoggerHelper.LogError(await reader.ReadToEndAsync());
+                    if (stream == null)
+                        return null;
+                    using (var reader = new StreamReader(stream))
+                    {
+                        LoggerHelper.LogError(await reader.ReadToEndAsync());
+                    }
                 }
+
                 return null;
             }
+            
+            var responseStream = webResponse.GetResponseStream();
+            if (responseStream == null)
+                return null;
 
-            StreamReader responseReader = new StreamReader(webResponse.GetResponseStream());
+            StreamReader responseReader = new StreamReader(responseStream);
             string fullResponse = await responseReader.ReadToEndAsync();
             webResponse.Close();
 
@@ -623,14 +674,14 @@ namespace Tavstal.TLibrary.Services
         private async Task<byte[]> GetMultipartFormDataAsync(Dictionary<string, object> postParameters, string boundary)
         {
             Stream formDataStream = new MemoryStream();
-            bool needsCLRF = false;
+            bool needsClrf = false;
 
             foreach (var param in postParameters)
             {
-                if (needsCLRF)
-                    await formDataStream.WriteAsync(_encoding.GetBytes("\r\n"), 0, _encoding.GetByteCount("\r\n"));
+                if (needsClrf)
+                    await formDataStream.WriteAsync(Encoding.GetBytes("\r\n"), 0, Encoding.GetByteCount("\r\n"));
 
-                needsCLRF = true;
+                needsClrf = true;
 
                 switch (param.Value)
                 {
@@ -639,7 +690,7 @@ namespace Tavstal.TLibrary.Services
                         string header =
                             $"--{boundary}\r\nContent-Disposition: form-data; name=\"{param.Key}\"; filename=\"{fileToUpload.FileName ?? param.Key}\"\r\nContent-Type: {fileToUpload.ContentType ?? "application/octet-stream"}\r\n\r\n";
 
-                        await formDataStream.WriteAsync(_encoding.GetBytes(header), 0, _encoding.GetByteCount(header));
+                        await formDataStream.WriteAsync(Encoding.GetBytes(header), 0, Encoding.GetByteCount(header));
                         await formDataStream.WriteAsync(fileToUpload.File, 0, fileToUpload.File.Length);
                         break;
                     }
@@ -650,14 +701,14 @@ namespace Tavstal.TLibrary.Services
                             param.Key,
                             jsonParam.Content,
                             jsonParam.ContentType ?? "application/json");
-                        await formDataStream.WriteAsync(_encoding.GetBytes(postData), 0, _encoding.GetByteCount(postData));
+                        await formDataStream.WriteAsync(Encoding.GetBytes(postData), 0, Encoding.GetByteCount(postData));
                         break;
                     }
                     default:
                     {
                         string postData =
                             $"--{boundary}\r\nContent-Disposition: form-data; name=\"{param.Key}\"\r\n\r\n{param.Value}";
-                        await formDataStream.WriteAsync(_encoding.GetBytes(postData), 0, _encoding.GetByteCount(postData));
+                        await formDataStream.WriteAsync(Encoding.GetBytes(postData), 0, Encoding.GetByteCount(postData));
                         break;
                     }
                 }
@@ -665,12 +716,12 @@ namespace Tavstal.TLibrary.Services
 
             // Add the end of the request.  Start with a newline
             string footer = "\r\n--" + boundary + "--\r\n";
-            await formDataStream.WriteAsync(_encoding.GetBytes(footer), 0, _encoding.GetByteCount(footer));
+            await formDataStream.WriteAsync(Encoding.GetBytes(footer), 0, Encoding.GetByteCount(footer));
 
             // Dump the Stream into a byte[]
             formDataStream.Position = 0;
             byte[] formData = new byte[formDataStream.Length];
-            await formDataStream.ReadAsync(formData, 0, formData.Length);
+            var readAsync = await formDataStream.ReadAsync(formData, 0, formData.Length);
             formDataStream.Close();
 
             return formData;

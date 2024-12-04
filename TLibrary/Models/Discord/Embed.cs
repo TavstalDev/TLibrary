@@ -48,7 +48,7 @@ namespace Tavstal.TLibrary.Models.Discord
             Fields = fields;
         }
 
-        public string GetISODateTime()
+        public string GetIsoDateTime()
         {
             return TimeStamp.ToString("s");
         }

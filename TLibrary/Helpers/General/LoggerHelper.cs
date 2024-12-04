@@ -104,8 +104,8 @@ namespace Tavstal.TLibrary.Helpers.General
 
         public static void LogLateInit()
         {
-            ConsoleColor oldFGColor = Console.ForegroundColor;
-            ConsoleColor oldBGColor = Console.BackgroundColor;
+            ConsoleColor oldFgColor = Console.ForegroundColor;
+            ConsoleColor oldBgColor = Console.BackgroundColor;
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.DarkMagenta;
             string text = $"######## {Name} LATE INIT ########";
@@ -122,8 +122,8 @@ namespace Tavstal.TLibrary.Helpers.General
             {
                 Rocket.Core.Logging.Logger.Log(text);
             }
-            Console.ForegroundColor = oldFGColor;
-            Console.BackgroundColor = oldBGColor;
+            Console.ForegroundColor = oldFgColor;
+            Console.BackgroundColor = oldBgColor;
         }
 
         public static void LogCommand(object message, ConsoleColor color = ConsoleColor.Blue, string prefix = "[Command] >")
