@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("TLibrary")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("RocketMod 4 Plugin Library used to make plugin development easier.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Tavstal")]
 [assembly: AssemblyProduct("TLibrary")]
-[assembly: AssemblyCopyright("Copyright © 2024 Tavstal")]
+[assembly: AssemblyCopyright("Copyright © 2025 Tavstal")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("en")]
 
