@@ -354,6 +354,11 @@ namespace Tavstal.TLibrary.Models.Plugin
             { "error_command_no_permission", "&cYou do not have enough permission to execute this command." },
             { "error_command_syntax", "&cWrong syntax! Usage: /{0} {1}" },
             { "error_subcommand_not_found", "&cThe '/{0}' command does not have '{1}' subcommand." },
+            { "error_arg_not_integer", "&cYou must provide a valid integer as argument for '{0}'." },
+            { "error_arg_not_byte", "&cYou must provide a valid byte as argument for '{0}'. (Value is between 0-255)" },
+            { "error_arg_not_decimal", "&cYou must provide a valid decimal as argument for '{0}'." },
+            { "error_arg_not_string", "&cYou must provide a valid string as argument for '{0}'." },
+            { "error_arg_not_number", "&cYou must provide a valid number as argument for '{0}'." },
             { "success_command_help", "&aUsage: /{0} {1}" },
         };
         
