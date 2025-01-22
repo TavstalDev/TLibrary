@@ -506,5 +506,23 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="visibility">The visibility state to set.</param>
         public static void SendUIEffectVisibility(ushort key, ITransportConnection transportConnection, bool reliable,
             string childNameOrPath, bool visibility) => SendUIEffectVisibility((short)key, transportConnection, reliable, childNameOrPath, visibility);
+
+        /// <summary>
+        /// Clears a specific effect by its ID for the specified transport connection.
+        /// </summary>
+        /// <param name="key">The ID of the effect to clear.</param>
+        /// <param name="transportConnection">The transport connection to clear the effect for.</param>
+        public static void AskEffectClearByID(ushort key, ITransportConnection transportConnection)
+        {
+            MainThreadDispatcher.RunOnMainThread(() => EffectManager.askEffectClearByID(key, transportConnection));
+        }
+
+        /// <summary>
+        /// Clears all effects for all transport connections.
+        /// </summary>
+        public static void AskEffectClearAll()
+        {
+            MainThreadDispatcher.RunOnMainThread(EffectManager.askEffectClearAll);
+        }
     }
 }
