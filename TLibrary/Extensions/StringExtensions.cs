@@ -52,6 +52,19 @@ namespace Tavstal.TLibrary.Extensions
         {
             return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(str.ToLowerInvariant());
         }
+        
+        /// <summary>
+        /// Converts the first character of the input string to uppercase.
+        /// </summary>
+        /// <param name="input">The input string to process.</param>
+        /// <returns>A new string with the first character converted to uppercase.</returns>
+        public static string UppercaseFirstChar(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            return char.ToUpper(input[0]) + input.Substring(1);
+        }
 
         /// <summary>
         /// Checks if a string is a valid hyperlink.
