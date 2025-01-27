@@ -58,7 +58,7 @@ namespace Tavstal.TLibrary.Extensions
         /// </summary>
         /// <param name="input">The input string to process.</param>
         /// <returns>A new string with the first character converted to uppercase.</returns>
-        public static string UppercaseFirstChar(string input)
+        public static string UppercaseFirstChar(this string input)
         {
             if (string.IsNullOrEmpty(input))
                 return input;
