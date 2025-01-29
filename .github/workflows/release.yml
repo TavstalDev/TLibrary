@@ -65,22 +65,24 @@ jobs:
             exit 1
         }
         
-        if (Test-Path ${{ env.LIBRARY_PATH }}) {
-            Write-Output "Library DLL found: ${{ env.LIBRARY_PATH }}"
-            $libraryVersion = (Get-Item ${{ env.LIBRARY_PATH }}).VersionInfo.FileVersion
-
-            if ($libraryVersion) {
-                Write-Output "Extracted library version: $libraryVersion"
-                echo "Setting LIBRARY_VERSION=$libraryVersion in GITHUB_ENV"
-        
-                $commitDesc="${{ env.COMMIT_EXTRA_DESC }}"
-                echo "Debug 1: $commitDesc"
-                # Replace the placeholder
-                $updatedCommitDesc=$(echo "$commitDesc" | sed "s/VERSION_PLACEHOLDER/$libraryVersion/")
-                echo "Debug 2: $updatedCommitDesc"
-                echo "Debug 3: $COMMIT_EXTRA_DESC"
-                Add-Content -Path $env:GITHUB_ENV -Value "COMMIT_EXTRA_DESC=$updatedCommitDesc"
-            }
+        if (![string]::IsNullOrEmpty("${{ env.LIBRARY_PATH }}")) {
+          if (Test-Path ${{ env.LIBRARY_PATH }}) {
+              Write-Output "Library DLL found: ${{ env.LIBRARY_PATH }}"
+              $libraryVersion = (Get-Item ${{ env.LIBRARY_PATH }}).VersionInfo.FileVersion
+  
+              if ($libraryVersion) {
+                  Write-Output "Extracted library version: $libraryVersion"
+                  echo "Setting LIBRARY_VERSION=$libraryVersion in GITHUB_ENV"
+          
+                  $commitDesc="${{ env.COMMIT_EXTRA_DESC }}"
+                  echo "Debug 1: $commitDesc"
+                  # Replace the placeholder
+                  $updatedCommitDesc=$(echo "$commitDesc" | sed "s/VERSION_PLACEHOLDER/$libraryVersion/")
+                  echo "Debug 2: $updatedCommitDesc"
+                  echo "Debug 3: $COMMIT_EXTRA_DESC"
+                  Add-Content -Path $env:GITHUB_ENV -Value "COMMIT_EXTRA_DESC=$updatedCommitDesc"
+              }
+          }
         }
       shell: powershell
         
