@@ -137,21 +137,21 @@ jobs:
     # Step 9: Copy the original ZIP and insert the built DLL
     - name: Modify ZIP with Built DLL
       run: |
-        $zipFilePath = "$PWD\\ibraries.zip
-        $dllPath = "${{ env.DLL_PATH }}"
-        $outputZipFilePath = "$PWD\\TLibrary\\bin\\Release\\net48\\NewLibraries.zip
+        $zipFilePath = "./Libraries.zip"
+        $dllPath = ${{ env.DLL_PATH }}
+        $outputZipFilePath = "./TLibrary/bin/Release/net48/NewLibraries.zip"
 
         # Extract original ZIP contents (if needed)
         Write-Output "Extracting ZIP file: $zipFilePath"
-        Expand-Archive -Path $zipFilePath -DestinationPath "$PWD\\extracted-folder"
+        Expand-Archive -Path $zipFilePath -DestinationPath "./TLibrary/bin/Release/net48/extracted-folder"
 
         # Copy the newly built DLL into the extracted folder
         Write-Output "Copying DLL into extracted folder"
-        Copy-Item $dllPath -Destination "$PWD\\extracted-folder\\TLibrary.dll"
+        Copy-Item $dllPath -Destination "./TLibrary/bin/Release/net48/extracted-folder/TLibrary.dll"
 
         # Recreate the ZIP with the DLL included
         Write-Output "Creating modified ZIP file"
-        Compress-Archive -Path "$PWD\\extracted-folder\\*" -DestinationPath $outputZipFilePath
+        Compress-Archive -Path "./TLibrary/bin/Release/net48/extracted-folder/*" -DestinationPath $outputZipFilePath
       
     # Step 10: Create a GitHub release (or update an existing one)
     - name: Create GitHub Release
