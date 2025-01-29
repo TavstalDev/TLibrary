@@ -133,8 +133,27 @@ jobs:
         EOF
         "@
         exit 0
+        
+    # Step 9: Copy the original ZIP and insert the built DLL
+    - name: Modify ZIP with Built DLL
+      run: |
+        $zipFilePath = ./Libraries.zip
+        $dllPath = "${{ env.DLL_PATH }}"
+        $outputZipFilePath = ./TLibrary/bin/Release/net48/NewLibraries.zip
+
+        # Extract original ZIP contents (if needed)
+        Write-Output "Extracting ZIP file: $zipFilePath"
+        Expand-Archive -Path $zipFilePath -DestinationPath "extracted-folder"
+
+        # Copy the newly built DLL into the extracted folder
+        Write-Output "Copying DLL into extracted folder"
+        Copy-Item $dllPath -Destination "extracted-folder/TLibrary.dll"
+
+        # Recreate the ZIP with the DLL included
+        Write-Output "Creating modified ZIP file"
+        Compress-Archive -Path "extracted-folder/*" -DestinationPath $outputZipFilePath
       
-    # Step 9: Create a GitHub release (or update an existing one)
+    # Step 10: Create a GitHub release (or update an existing one)
     - name: Create GitHub Release
       id: create_release
       uses: actions/create-release@v1
@@ -151,7 +170,7 @@ jobs:
           Changes pushed to branch `${{ github.ref_name }}`
           ${{ env.COMMITS}}
       
-    # Step 10: Upload the DLL to the release
+    # Step 11: Upload the DLL to the release
     - name: Upload DLL to Release
       uses: actions/upload-release-asset@v1
       env:
@@ -161,3 +180,14 @@ jobs:
         asset_path: ${{ env.DLL_PATH }}
         asset_name: ${{ env.DLL_NAME }}
         asset_content_type: application/octet-stream
+          
+    # Step 12: Upload the modified ZIP to the GitHub release
+    - name: Upload ZIP to Release
+      uses: actions/upload-release-asset@v1
+      env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./TLibrary/bin/Release/net48/NewLibraries.zip
+        asset_name: Libraries.zip
+        asset_content_type: application/zip
