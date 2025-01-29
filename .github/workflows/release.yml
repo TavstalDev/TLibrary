@@ -138,7 +138,7 @@ jobs:
     - name: Modify ZIP with Built DLL
       run: |
         $zipFilePath = "./Libraries.zip"
-        $dllPath = ${{ env.DLL_PATH }}
+        $dllPath = "${{ env.DLL_PATH }}"
         $outputZipFilePath = "./TLibrary/bin/Release/net48/NewLibraries.zip"
 
         # Extract original ZIP contents (if needed)
