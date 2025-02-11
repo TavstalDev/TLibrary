@@ -195,6 +195,9 @@ namespace Tavstal.TLibrary.Models.Plugin
             // Log missing fields
             foreach (var field in Config.GetType().GetProperties())
             {
+                if (field.Name == "FileName" || field.Name == "FilePath")
+                    continue;
+                
                 if (field.GetValue(Config) != null)
                     continue;
                 
@@ -203,6 +206,9 @@ namespace Tavstal.TLibrary.Models.Plugin
             
             foreach (var field in Config.GetType().GetFields())
             {
+                if (field.Name == "FileName" || field.Name == "FilePath")
+                    continue;
+                
                 if (field.GetValue(Config) != null)
                     continue;
                 
