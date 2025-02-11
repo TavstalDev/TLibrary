@@ -192,6 +192,24 @@ namespace Tavstal.TLibrary.Models.Plugin
                 }
             }
             
+            // Log missing fields
+            foreach (var field in Config.GetType().GetProperties())
+            {
+                if (field.GetValue(Config) != null)
+                    continue;
+                
+                Logger.LogWarning($"The config field '{field.Name}' is missing in '{PluginName}' configuration.");
+            }
+            
+            foreach (var field in Config.GetType().GetFields())
+            {
+                if (field.GetValue(Config) != null)
+                    continue;
+                
+                Logger.LogWarning($"The config field '{field.Name}' is missing in '{PluginName}' configuration.");
+            }
+            
+            
             _logger.SetDebugMode(Config.DebugMode);
 
             Dictionary<string, string> localLocalization = CommonLocalization ?? new Dictionary<string, string>();
