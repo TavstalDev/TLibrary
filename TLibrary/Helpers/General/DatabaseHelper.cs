@@ -172,7 +172,7 @@ namespace Tavstal.TLibrary.Helpers.General
             try
             {
                 if (!reader.HasRows)
-                    return default;
+                    return null;
 
                 T obj = Activator.CreateInstance<T>();
 
@@ -219,7 +219,7 @@ namespace Tavstal.TLibrary.Helpers.General
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
-                return default;
+                return null;
             }
         }
 
@@ -234,7 +234,7 @@ namespace Tavstal.TLibrary.Helpers.General
             try
             {
                 if (!reader.HasRows)
-                    return default;
+                    return null;
 
                 T obj = Activator.CreateInstance<T>();
 
@@ -281,7 +281,7 @@ namespace Tavstal.TLibrary.Helpers.General
             {
                 LoggerHelper.LogException("Error in TLibrary:");
                 LoggerHelper.LogError(ex);
-                return default;
+                return null;
             }
         }
 
@@ -908,7 +908,7 @@ namespace Tavstal.TLibrary.Helpers.General
                 return false;
             }
         }
-
+        
         /// <summary>
         /// Adds a new row to the MySQL database table associated with the type T.
         /// The row data is provided as an object of type T.
@@ -1040,7 +1040,236 @@ namespace Tavstal.TLibrary.Helpers.General
                 return false;
             }
         }
+        
+        /// <summary>
+        /// Adds a new row to the MySQL database table with the specified name and returns the inserted row as an object of type T.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="tableName">The name of the table to which the row will be added.</param>
+        /// <param name="value">The object representing the row data to be added.</param>
+        /// <returns>An object of type T representing the inserted row, or default(T) if the insertion fails.</returns>
+        public static async Task<T> AddTableRowWithResultAsync<T>(this MySqlConnection connection, string tableName, T value) where T : class
+        {
+            if (connection == null)
+                return null;
 
+            string commandText = "not_created";
+            try
+            {
+                var schemaType = typeof(T);
+                string paramString = string.Empty;
+                string keyString = string.Empty;
+
+                foreach (var prop in schemaType.GetProperties())
+                {
+                    if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                        continue;
+
+                    var memberAttribute = prop.GetCustomAttribute<SqlMemberAttribute>();
+                    string propName = prop.Name;
+
+                    if (memberAttribute != null)
+                    {
+                        if (memberAttribute.ShouldAutoIncrement)
+                            continue;
+
+                        if (!memberAttribute.ColumnName.IsNullOrEmpty())
+                            propName = memberAttribute.ColumnName;
+                    }
+
+                    keyString += $"{propName},";
+                    bool isNull = false;
+                    if (prop.GetValue(value) == null)
+                    {
+                        isNull = true;
+                        paramString += "NULL,";
+                    }
+
+
+                    if (!isNull)
+                    {
+                        if (prop.PropertyType == typeof(bool) || prop.PropertyType.IsEnum)
+                            paramString += $"'{Convert.ToInt32(prop.GetValue(value))}',";
+                        else if (prop.PropertyType == typeof(DateTime))
+                            paramString += $"'{(DateTime)prop.GetValue(value):yyyy-MM-dd HH:mm:ss.fff}',";
+                        else if (prop.PropertyType == typeof(string))
+                            paramString += $"'{ConvertIllegalCharsToSql((string)prop.GetValue(value))}',";
+                        else
+                            paramString += $"'{prop.GetValue(value)}',";
+                    }
+                }
+
+                paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
+                keyString = keyString.Remove(keyString.LastIndexOf(','), 1);
+
+                await connection.OpenSafeAsync();
+                T result = null;
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = $"INSERT INTO {tableName} ({keyString}) VALUES({paramString});";
+                    commandText = command.CommandText;
+                    
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            result = reader.ConvertToObject<T>();
+                        }
+                    }
+                }
+                await connection.CloseAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogException($"SQL Command: {commandText}");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    await connection.CloseAsync();
+                return null;
+            }
+        }
+        
+        /// <summary>
+        /// Adds a new row to the MySQL database table associated with the type T and returns the inserted row as an object of type T.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="value">The object representing the row data to be added.</param>
+        /// <returns>An object of type T representing the inserted row, or null if the insertion fails.</returns>
+        public static async Task<T> AddTableRowWithResultAsync<T>(this MySqlConnection connection, T value) where T : class
+        {
+            if (connection == null)
+                return null;
+
+            try
+            {
+                var schemaType = typeof(T);
+                var tableAttribute = schemaType.GetCustomAttribute<SqlNameAttribute>();
+                if (tableAttribute == null)
+                    throw new ArgumentNullException("The given schemaObj does not have SqlNameAttribute.");
+                return await AddTableRowWithResultAsync(connection, tableAttribute.Name, value);
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    await connection.CloseAsync();
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Adds multiple new rows to the MySQL database table with the specified name and returns the inserted rows as a list of objects of type T.
+        /// </summary>
+        /// <typeparam name="T">The type of object associated with the table.</typeparam>
+        /// <param name="connection">The MySqlConnection to the MySQL database.</param>
+        /// <param name="tableName">The name of the table to which the rows will be added.</param>
+        /// <param name="values">The list of objects representing the row data to be added.</param>
+        /// <returns>A list of objects of type T representing the inserted rows, or null if the insertion fails.</returns>
+        public static async Task<List<T>> AddTableRowsWithResultAsync<T>(this MySqlConnection connection, string tableName, List<T> values) where T : class
+        {
+            if (connection == null)
+                return null;
+
+            if (values == null)
+                return null;
+
+            if (values.Count == 0)
+                return null;
+
+            string commandText = "not_created";
+            try
+            {
+                var schemaType = typeof(T);
+                string paramString = string.Empty;
+                string keyString = string.Empty;
+                var properties = schemaType.GetProperties();
+
+                foreach (var value in values)
+                {
+                    paramString += "(";
+                    foreach (var prop in properties)
+                    {
+                        if (prop.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                            continue;
+
+                        var memberAttribute = prop.GetCustomAttribute<SqlMemberAttribute>();
+                        string propName = prop.Name;
+
+                        if (memberAttribute != null)
+                        {
+                            if (memberAttribute.ShouldAutoIncrement)
+                                continue;
+
+                            if (!memberAttribute.ColumnName.IsNullOrEmpty())
+                                propName = memberAttribute.ColumnName;
+                        }
+
+                        if (!keyString.Contains(propName))
+                            keyString += $"{propName},";
+
+                        bool isNull = false;
+                        if (prop.GetValue(value) == null)
+                        {
+                            isNull = true;
+                            paramString += "NULL,";
+                        }
+
+                        if (!isNull)
+                        {
+                            if (prop.PropertyType == typeof(bool) || prop.PropertyType.IsEnum)
+                                paramString += $"'{Convert.ToInt32(prop.GetValue(value))}',";
+                            else if (prop.PropertyType == typeof(DateTime))
+                                paramString += $"'{(DateTime)prop.GetValue(value):yyyy-MM-dd HH:mm:ss.fff}',";
+                            else if (prop.PropertyType == typeof(string))
+                                paramString += $"'{ConvertIllegalCharsToSql((string)prop.GetValue(value))}',";
+                            else
+                                paramString += $"'{prop.GetValue(value)}',";
+                        }
+                    }
+                    if (paramString.LastIndexOf(',') > 0)
+                        paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
+                    paramString += "),";
+                }
+
+                if (paramString.LastIndexOf(',') > 0)
+                    paramString = paramString.Remove(paramString.LastIndexOf(','), 1);
+                if (keyString.LastIndexOf(',') > 0)
+                    keyString = keyString.Remove(keyString.LastIndexOf(','), 1);
+
+                await connection.OpenSafeAsync();
+                List<T> result = new List<T>();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = $"INSERT INTO {tableName} ({keyString}) VALUES{paramString};";
+                    commandText = command.CommandText;
+                    
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            result.Add(reader.ConvertToObject<T>());
+                        }
+                    }
+                }
+                await connection.CloseAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogException("Error in TLibrary:");
+                LoggerHelper.LogException($"SQL Command: {commandText}");
+                LoggerHelper.LogError(ex);
+                if (connection.State != ConnectionState.Closed)
+                    await connection.CloseAsync();
+                return null;
+            }
+        }
+        
         /// <summary>
         /// Updates an existing row in the MySQL database table associated with the type T.
         /// The row data is provided as an object of type T, and the update is performed based on the provided WHERE clause and parameters.
