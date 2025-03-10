@@ -1,5 +1,5 @@
 # TLibrary
-RocketMod 4 Plugin Library used to make plugin development easier.
+A helper library for RocketMod 4 that makes plugin development easier and faster.
 
 # Features
 - Easier SQL Database Managment. <a href="https://github.com/TavstalDev/TLibrary/blob/master/TLibrary/Helpers/General/DatabaseHelper.cs">See</a>
