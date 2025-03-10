@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using Tavstal.TLibrary.Extensions;
 
 namespace Tavstal.TLibrary.Models.Plugin
 {
@@ -181,7 +182,11 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// <param name="prefix"></param>
         public void LogRich(object message, string prefix = "&a[INFO] >&f")
         {
-            string text = $"&b[{_pluginName}] {prefix} {message}";
+            string text;
+            if (_moduleName.IsNullOrEmpty())
+                text = $"&b[{_pluginName}] {prefix} {message}";
+            else
+                text = $"&b[{_pluginName}] [{_moduleName}] {prefix} {message}";
             try
             {
                 ConsoleColor oldColor = Console.ForegroundColor;
