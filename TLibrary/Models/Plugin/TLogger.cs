@@ -14,24 +14,84 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// Name of the plugin that uses the logger.
         /// </summary>
         private readonly string _pluginName;
+
+        /// <summary>
+        /// The name of the module associated with the logger.
+        /// </summary>
+        private readonly string _moduleName;
+
         /// <summary>
         /// Should show debug messages?
         /// </summary>
         private bool _isDebugEnabled;
+
         /// <summary>
         /// Should show debug messages?
         /// </summary>
         public bool IsDebugEnabled => _isDebugEnabled;
 
-        public TLogger(string pluginName, bool isDebugEnabled)
+        /// <summary>
+        /// Initializes a new instance of the TLogger class with the specified plugin name and debug mode.
+        /// </summary>
+        /// <param name="pluginName">The name of the plugin that uses the logger.</param>
+        /// <param name="isDebugEnabled">A boolean value indicating whether debug mode is enabled.</param>
+        public TLogger(string pluginName, bool isDebugEnabled) : this(pluginName, "", isDebugEnabled)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the TLogger class with the specified plugin and debug mode.
+        /// </summary>
+        /// <param name="plugin">The plugin that uses the logger.</param>
+        /// <param name="isDebugEnabled">A boolean value indicating whether debug mode is enabled.</param>
+        public TLogger(IPlugin plugin, bool isDebugEnabled) : this(plugin.GetPluginName(), "", isDebugEnabled)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the TLogger class with the specified plugin name, module type, and debug mode.
+        /// </summary>
+        /// <param name="pluginName">The name of the plugin that uses the logger.</param>
+        /// <param name="module">The type of the module associated with the logger.</param>
+        /// <param name="isDebugEnabled">A boolean value indicating whether debug mode is enabled.</param>
+        public TLogger(string pluginName, Type module, bool isDebugEnabled) : this(pluginName, module.Name,
+            isDebugEnabled)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the TLogger class with the specified plugin, module type, and debug mode.
+        /// </summary>
+        /// <param name="plugin">The plugin that uses the logger.</param>
+        /// <param name="module">The type of the module associated with the logger.</param>
+        /// <param name="isDebugEnabled">A boolean value indicating whether debug mode is enabled.</param>
+        public TLogger(IPlugin plugin, Type module, bool isDebugEnabled) : this(plugin, module.Name, isDebugEnabled)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the TLogger class with the specified plugin name, module name, and debug mode.
+        /// </summary>
+        /// <param name="pluginName">The name of the plugin that uses the logger.</param>
+        /// <param name="moduleName">The name of the module associated with the logger.</param>
+        /// <param name="isDebugEnabled">A boolean value indicating whether debug mode is enabled.</param>
+        public TLogger(string pluginName, string moduleName, bool isDebugEnabled)
         {
             _pluginName = pluginName;
+            _moduleName = moduleName;
             _isDebugEnabled = isDebugEnabled;
         }
 
-        public TLogger(IPlugin plugin, bool isDebugEnabled)
+        /// <summary>
+        /// Initializes a new instance of the TLogger class with the specified plugin, module name, and debug mode.
+        /// </summary>
+        /// <param name="plugin">The plugin that uses the logger.</param>
+        /// <param name="moduleName">The name of the module associated with the logger.</param>
+        /// <param name="isDebugEnabled">A boolean value indicating whether debug mode is enabled.</param>
+        public TLogger(IPlugin plugin, string moduleName, bool isDebugEnabled)
         {
             _pluginName = plugin.GetPluginName();
+            _moduleName = moduleName;
             _isDebugEnabled = isDebugEnabled;
         }
 
@@ -45,6 +105,30 @@ namespace Tavstal.TLibrary.Models.Plugin
         {
             return new TLogger(pluginName, isDebugEnabled);
         }
+        
+        /// <summary>
+        /// Creates a new instance of the TLogger class with the specified plugin name, module name, and debug mode.
+        /// </summary>
+        /// <param name="pluginName">The name of the plugin that uses the logger.</param>
+        /// <param name="moduleName">The name of the module associated with the logger.</param>
+        /// <param name="isDebugEnabled">A boolean value indicating whether debug mode is enabled.</param>
+        /// <returns>A new instance of the TLogger class.</returns>
+        public static TLogger CreateInstance(string pluginName, string moduleName, bool isDebugEnabled)
+        {
+            return new TLogger(pluginName, moduleName, isDebugEnabled);
+        }
+
+        /// <summary>
+        /// Creates a new instance of the TLogger class with the specified plugin name, module type, and debug mode.
+        /// </summary>
+        /// <param name="pluginName">The name of the plugin that uses the logger.</param>
+        /// <param name="module">The type of the module associated with the logger.</param>
+        /// <param name="isDebugEnabled">A boolean value indicating whether debug mode is enabled.</param>
+        /// <returns>A new instance of the TLogger class.</returns>
+        public static TLogger CreateInstance(string pluginName, Type module, bool isDebugEnabled)
+        {
+            return new TLogger(pluginName, module.Name, isDebugEnabled);
+        }
 
         /// <summary>
         /// Static method to create a new instance of the logger.
@@ -55,6 +139,30 @@ namespace Tavstal.TLibrary.Models.Plugin
         public static TLogger CreateInstance(IPlugin plugin, bool isDebugEnabled)
         {
             return new TLogger(plugin.GetPluginName(), isDebugEnabled);
+        }
+        
+        /// <summary>
+        /// Creates a new instance of the TLogger class with the specified plugin, module name, and debug mode.
+        /// </summary>
+        /// <param name="plugin">The plugin that uses the logger.</param>
+        /// <param name="moduleName">The name of the module associated with the logger.</param>
+        /// <param name="isDebugEnabled">A boolean value indicating whether debug mode is enabled.</param>
+        /// <returns>A new instance of the TLogger class.</returns>
+        public static TLogger CreateInstance(IPlugin plugin, string moduleName, bool isDebugEnabled)
+        {
+            return new TLogger(plugin.GetPluginName(), moduleName, isDebugEnabled);
+        }
+
+        /// <summary>
+        /// Creates a new instance of the TLogger class with the specified plugin, module type, and debug mode.
+        /// </summary>
+        /// <param name="plugin">The plugin that uses the logger.</param>
+        /// <param name="module">The type of the module associated with the logger.</param>
+        /// <param name="isDebugEnabled">A boolean value indicating whether debug mode is enabled.</param>
+        /// <returns>A new instance of the TLogger class.</returns>
+        public static TLogger CreateInstance(IPlugin plugin, Type module, bool isDebugEnabled)
+        {
+            return new TLogger(plugin.GetPluginName(), module.Name, isDebugEnabled);
         }
 
         /// <summary>
@@ -77,11 +185,14 @@ namespace Tavstal.TLibrary.Models.Plugin
             try
             {
                 ConsoleColor oldColor = Console.ForegroundColor;
-                using (StreamWriter streamWriter = File.AppendText(Path.Combine(Rocket.Core.Environment.LogsDirectory, Rocket.Core.Environment.LogFile)))
+                using (StreamWriter streamWriter = File.AppendText(Path.Combine(Rocket.Core.Environment.LogsDirectory,
+                           Rocket.Core.Environment.LogFile)))
                 {
-                    streamWriter.WriteLine(string.Concat("[", DateTime.Now, "] ", Helpers.General.FormatHelper.ClearFormaters(text)));
+                    streamWriter.WriteLine(string.Concat("[", DateTime.Now, "] ",
+                        Helpers.General.FormatHelper.ClearFormaters(text)));
                     streamWriter.Close();
                 }
+
                 Helpers.General.FormatHelper.SendFormatedConsole(text);
                 Console.ForegroundColor = oldColor;
             }
@@ -156,11 +267,13 @@ namespace Tavstal.TLibrary.Models.Plugin
             {
                 ConsoleColor oldColor = Console.ForegroundColor;
                 Console.ForegroundColor = color;
-                using (StreamWriter streamWriter = File.AppendText(Path.Combine(Rocket.Core.Environment.LogsDirectory, Rocket.Core.Environment.LogFile)))
+                using (StreamWriter streamWriter = File.AppendText(Path.Combine(Rocket.Core.Environment.LogsDirectory,
+                           Rocket.Core.Environment.LogFile)))
                 {
                     streamWriter.WriteLine(string.Concat("[", DateTime.Now, "] ", text));
                     streamWriter.Close();
                 }
+
                 Console.WriteLine(text);
                 Console.ForegroundColor = oldColor;
             }
@@ -187,7 +300,8 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// <param name="message"></param>
         /// <param name="color"></param>
         /// <param name="prefix"></param>
-        public void LogException(object message, ConsoleColor color = ConsoleColor.DarkYellow, string prefix = "[EXCEPTION] >")
+        public void LogException(object message, ConsoleColor color = ConsoleColor.DarkYellow,
+            string prefix = "[EXCEPTION] >")
         {
             Log(message, color, prefix);
         }
@@ -227,17 +341,20 @@ namespace Tavstal.TLibrary.Models.Plugin
             string text = $"######## {_pluginName} LATE INIT ########";
             try
             {
-                using (StreamWriter streamWriter = File.AppendText(Path.Combine(Rocket.Core.Environment.LogsDirectory, Rocket.Core.Environment.LogFile)))
+                using (StreamWriter streamWriter = File.AppendText(Path.Combine(Rocket.Core.Environment.LogsDirectory,
+                           Rocket.Core.Environment.LogFile)))
                 {
                     streamWriter.WriteLine(string.Concat("[", DateTime.Now, "] ", $"[{_pluginName}] {text}"));
                     streamWriter.Close();
                 }
+
                 Console.WriteLine(text);
             }
             catch
             {
                 Rocket.Core.Logging.Logger.Log(text);
             }
+
             Console.ForegroundColor = oldFgColor;
             Console.BackgroundColor = oldBgColor;
         }

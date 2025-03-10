@@ -10,6 +10,7 @@ namespace Tavstal.TLibrary.Managers
     /// <summary>
     /// Manages hooks for plugins.
     /// </summary>
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class HookManager
     {
         private readonly TLogger _logger;
@@ -17,7 +18,7 @@ namespace Tavstal.TLibrary.Managers
         public IEnumerable<Hook> Hooks => _hooks.Values;
 
         public HookManager(IPlugin plugin) {
-            _logger = plugin.GetLogger();
+            _logger = TLogger.CreateInstance("TLibrary", this.GetType(), plugin.GetLogger().IsDebugEnabled);
         }
 
         /// <summary>
