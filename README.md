@@ -1,5 +1,11 @@
 # TLibrary
 
+![Release (latest by date)](https://img.shields.io/github/v/release/TavstalDev/TLibrary?style=flat-square)
+![Workflow Status](https://img.shields.io/github/actions/workflow/status/TavstalDev/TLibrary/release.yml?branch=stable&label=build&style=flat-square)
+![License](https://img.shields.io/github/license/TavstalDev/TLibrary)
+![Downloads](https://img.shields.io/github/downloads/TavstalDev/TLibrary/total?style=flat-square)
+![Isues](https://img.shields.io/github/issues/TavstalDev/TLibrary)
+
 TLibrary is a versatile Unturned RocketMod 4 library designed to provide a range of helper functions and extensions for various tasks. It is intended to simplify common operations and enhance productivity.
 
 ### Features
