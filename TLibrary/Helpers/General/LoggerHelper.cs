@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace Tavstal.TLibrary.Helpers.General
