@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
 using Rocket.Core.Plugins;
 using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Managers;
@@ -195,7 +197,7 @@ namespace Tavstal.TLibrary.Models.Plugin
             // Log missing fields
             foreach (var field in Config.GetType().GetProperties())
             {
-                if (field.Name == "FileName" || field.Name == "FilePath")
+                if (field.GetCustomAttribute<JsonIgnoreAttribute>() != null)
                     continue;
                 
                 if (field.GetValue(Config) != null)
@@ -206,7 +208,7 @@ namespace Tavstal.TLibrary.Models.Plugin
             
             foreach (var field in Config.GetType().GetFields())
             {
-                if (field.Name == "FileName" || field.Name == "FilePath")
+                if (field.GetCustomAttribute<JsonIgnoreAttribute>() != null)
                     continue;
                 
                 if (field.GetValue(Config) != null)
