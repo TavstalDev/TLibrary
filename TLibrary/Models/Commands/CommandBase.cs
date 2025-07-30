@@ -61,7 +61,7 @@ namespace Tavstal.TLibrary.Models.Commands
         /// <param name="args"></param>
         /// <returns></returns>
         protected abstract Task<bool> ExecutionRequested(IRocketPlayer caller, string[] args);
-
+        
         /// <summary>
         /// Called when the command is executed with help subcommand
         /// </summary>
@@ -72,12 +72,6 @@ namespace Tavstal.TLibrary.Models.Commands
         protected virtual Task ExecuteHelp(IRocketPlayer caller, bool isError, string subcommand, string[] args)
         {
             string translation = isError ? "error_command_syntax" : "success_command_help";
-            if (args == null || args.Length == 0)
-            {
-                Plugin.SendCommandReply(caller, translation, Name, Syntax);
-                return Task.CompletedTask;
-            }
-
             if (subcommand != null)
             {
                 SubCommand subCommand = GetSubCommandByName(subcommand);
@@ -87,7 +81,7 @@ namespace Tavstal.TLibrary.Models.Commands
                     return Task.CompletedTask;
                 }
             }
-
+            
             Plugin.SendCommandReply(caller, translation, Name, Syntax);
             return Task.CompletedTask;
         }
