@@ -50,8 +50,8 @@ namespace Tavstal.TLibrary.Models.Hooks
             }
             catch (Exception ex)
             {
-                Plugin.GetLogger().LogError($"Failed to load '{Name}' hook.");
-                Plugin.GetLogger().LogException(ex.ToString());
+                Plugin.GetLogger().Error($"Failed to load '{Name}' hook.");
+                Plugin.GetLogger().Exception(ex.ToString());
             }
         }
 
@@ -69,8 +69,8 @@ namespace Tavstal.TLibrary.Models.Hooks
             catch (Exception ex)
             {
                 IsLoaded = false;
-                Plugin.GetLogger().LogError($"Failed to unload '{Name}' hook.");
-                Plugin.GetLogger().LogException(ex.ToString());
+                Plugin.GetLogger().Error($"Failed to unload '{Name}' hook.");
+                Plugin.GetLogger().Exception(ex.ToString());
             }
         }
 

@@ -45,7 +45,7 @@ namespace Tavstal.TLibrary.Managers
             }
             catch (Exception ex)
             {
-                _plugin.GetLogger().LogException(ex.ToString());
+                _plugin.GetLogger().Exception(ex.ToString());
             }
             return mySqlConnection;
         }

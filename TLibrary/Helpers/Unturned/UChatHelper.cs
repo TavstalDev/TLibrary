@@ -61,7 +61,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
                     player.SteamPlayer());
             }
             else
-                plugin.GetLogger().LogRichCommand(plugin.Localize(false, translation, args));
+                plugin.GetLogger().RichCommand(plugin.Localize(false, translation, args));
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
             else if (toPlayer is UnturnedPlayer player)
                 ServerSendChatMessage(FormatHelper.FormatTextV2(string.Format(translation, args)), icon, null, player.SteamPlayer());
             else
-                plugin.GetLogger().LogRichCommand(string.Format(translation, args));
+                plugin.GetLogger().RichCommand(string.Format(translation, args));
         }
 
         /// <summary>

@@ -29,20 +29,20 @@ namespace Tavstal.TLibrary.Managers
         {
             if (!typeof(Hook).IsAssignableFrom(type))
             {
-                _logger.LogException("'{0}' is not a hook.");
+                _logger.Exception("'{0}' is not a hook.");
                 return;
             }
 
             if (type.IsAbstract)
             {
-                _logger.LogException($"Cannot register {type.Name} because it is abstract.");
+                _logger.Exception($"Cannot register {type.Name} because it is abstract.");
                 return;
             }
 
             var hook = CreateInstance<Hook>(type);
             if (_hooks.ContainsKey(hook.Name))
             {
-                _logger.LogException("Hook with '{0}' name already exists.");
+                _logger.Exception("Hook with '{0}' name already exists.");
                 return;
             }
 
@@ -64,7 +64,7 @@ namespace Tavstal.TLibrary.Managers
                 {
                     if (_hooks.ContainsKey(hook.Name))
                     {
-                        _logger.LogException($"Hook with '{hook.Name}' name already exists.");
+                        _logger.Exception($"Hook with '{hook.Name}' name already exists.");
                         continue;
                     }
 
@@ -80,8 +80,8 @@ namespace Tavstal.TLibrary.Managers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogException($"Failed to add the '{hook.Name}' hook to the library.");
-                    _logger.LogError(ex);
+                    _logger.Exception($"Failed to add the '{hook.Name}' hook to the library.");
+                    _logger.Error(ex);
                 }
             }
         }
@@ -94,20 +94,20 @@ namespace Tavstal.TLibrary.Managers
         {
             if (type != typeof(Hook))
             {
-                _logger.LogException($"'{type.Name}' is not a hook.");
+                _logger.Exception($"'{type.Name}' is not a hook.");
                 return;
             }
 
             if (!_hooks.Any(x => x.Value.GetType() == type))
             {
-                _logger.LogException($"'{type.Name}' is not loaded.");
+                _logger.Exception($"'{type.Name}' is not loaded.");
                 return;
             }
 
             var hook = _hooks.Values.FirstOrDefault(x => x.GetType() == type);
             if (hook == null)
             {
-                _logger.LogException($"'{type.Name}' is not found.");
+                _logger.Exception($"'{type.Name}' is not found.");
                 return;
             }
 
@@ -186,8 +186,8 @@ namespace Tavstal.TLibrary.Managers
             }
             catch (Exception ex)
             {
-                _logger.LogException($"Failed to create instance for '{type.Name}' hook.");
-                _logger.LogError(ex);
+                _logger.Exception($"Failed to create instance for '{type.Name}' hook.");
+                _logger.Error(ex);
                 return default;
             }
         }

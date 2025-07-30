@@ -174,22 +174,26 @@ namespace Tavstal.TLibrary.Models.Plugin
         {
             _isDebugEnabled = isActive;
         }
-
+        
         /// <summary>
-        /// Logs a rich message to the console and the log file
+        /// Logs a rich formatted message to the console and log file.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="prefix"></param>
+        /// <param name="message">The message to be logged.</param>
+        /// <param name="prefix">The prefix for the log message. Defaults to "&amp;a[INFO] >&amp;f".</param>
         public void LogRich(object message, string prefix = "&a[INFO] >&f")
         {
             string text;
-            if (_moduleName.IsNullOrEmpty())
-                text = $"&b[{_pluginName}] {prefix} {message}";
+            if (string.IsNullOrEmpty(prefix))
+            {
+                text = _moduleName.IsNullOrEmpty() ? $"&b[{_pluginName}] {message}" : $"&b[{_pluginName}] [{_moduleName}] {message}";
+            }
             else
-                text = $"&b[{_pluginName}] [{_moduleName}] {prefix} {message}";
+            {
+                text = _moduleName.IsNullOrEmpty() ? $"&b[{_pluginName}] {prefix} {message}" : $"&b[{_pluginName}] [{_moduleName}] {prefix} {message}";
+            }
+
             try
             {
-                ConsoleColor oldColor = Console.ForegroundColor;
                 using (StreamWriter streamWriter = File.AppendText(Path.Combine(Rocket.Core.Environment.LogsDirectory,
                            Rocket.Core.Environment.LogFile)))
                 {
@@ -199,7 +203,7 @@ namespace Tavstal.TLibrary.Models.Plugin
                 }
 
                 Helpers.General.FormatHelper.SendFormatedConsole(text);
-                Console.ForegroundColor = oldColor;
+                Console.ResetColor();
             }
             catch
             {
@@ -208,69 +212,67 @@ namespace Tavstal.TLibrary.Models.Plugin
         }
 
         /// <summary>
-        /// Logs a rich message to the console as warning
+        /// Logs a rich formatted warning message to the console and log file.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="prefix"></param>
-        public void LogRichWarning(object message, string prefix = "&e[WARNING] >&f")
+        /// <param name="message">The warning message to be logged.</param>
+        /// <param name="prefix">The prefix for the log message. Defaults to "&amp;e[WARNING] >&amp;f".</param>
+        public void RichWarning(object message, string prefix = "&e[WARNING] >&f")
         {
             LogRich(message, prefix);
         }
 
         /// <summary>
-        /// Logs a rich message to the console as exception
+        /// Logs a rich formatted exception message to the console and log file.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="prefix"></param>
-        public void LogRichException(object message, string prefix = "&6[EXCEPTION] >&f")
+        /// <param name="message">The exception message to be logged.</param>
+        /// <param name="prefix">The prefix for the log message. Defaults to "&amp;6[EXCEPTION] >&amp;f".</param>
+        public void RichException(object message, string prefix = "&6[EXCEPTION] >&f")
         {
             LogRich(message, prefix);
         }
 
         /// <summary>
-        /// Logs a rich message to the console as error
+        /// Logs a rich formatted error message to the console and log file.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="prefix"></param>
-        public void LogRichError(object message, string prefix = "&c[ERROR] >&f")
+        /// <param name="message">The error message to be logged.</param>
+        /// <param name="prefix">The prefix for the log message. Defaults to "&amp;c[ERROR] >&amp;f".</param>
+        public void RichError(object message, string prefix = "&c[ERROR] >&f")
         {
             LogRich(message, prefix);
         }
 
         /// <summary>
-        /// Logs a rich message to the console as command response
+        /// Logs a rich formatted command message to the console and log file.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="prefix"></param>
-        public void LogRichCommand(object message, string prefix = "&9[COMMAND] >&f")
+        /// <param name="message">The command message to be logged.</param>
+        /// <param name="prefix">The prefix for the log message. Defaults to "&amp;9[COMMAND] >&amp;f".</param>
+        public void RichCommand(object message, string prefix = "&9[COMMAND] >&f")
         {
             LogRich(message, prefix);
         }
 
         /// <summary>
-        /// Logs a rich message to the console as debug
+        /// Logs a rich formatted debug message to the console and log file if debug mode is enabled.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="prefix"></param>
-        public void LogRichDebug(object message, string prefix = "&d[DEBUG] >&f")
+        /// <param name="message">The debug message to be logged.</param>
+        /// <param name="prefix">The prefix for the log message. Defaults to "&amp;d[DEBUG] >&amp;f".</param>
+        public void RichDebug(object message, string prefix = "&d[DEBUG] >&f")
         {
             if (_isDebugEnabled)
                 LogRich(message, prefix);
         }
 
         /// <summary>
-        /// Logs a message to the console and log file
+        /// Logs a message to the console and log file.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="color"></param>
-        /// <param name="prefix"></param>
+        /// <param name="message">The message to be logged.</param>
+        /// <param name="color">The color of the console text. Defaults to <see cref="ConsoleColor.Green"/>.</param>
+        /// <param name="prefix">The prefix for the log message. Defaults to "[INFO] >".</param>
         public void Log(object message, ConsoleColor color = ConsoleColor.Green, string prefix = "[INFO] >")
         {
-
-            string text = $"[{_pluginName}] {prefix} {message}";
+            var text = string.IsNullOrEmpty(prefix) ? $"[{_pluginName}] {message}" : $"[{_pluginName}] {prefix} {message}";
             try
             {
-                ConsoleColor oldColor = Console.ForegroundColor;
                 Console.ForegroundColor = color;
                 using (StreamWriter streamWriter = File.AppendText(Path.Combine(Rocket.Core.Environment.LogsDirectory,
                            Rocket.Core.Environment.LogFile)))
@@ -280,7 +282,7 @@ namespace Tavstal.TLibrary.Models.Plugin
                 }
 
                 Console.WriteLine(text);
-                Console.ForegroundColor = oldColor;
+                Console.ResetColor();
             }
             catch
             {
@@ -289,67 +291,77 @@ namespace Tavstal.TLibrary.Models.Plugin
         }
 
         /// <summary>
-        /// Logs a message to the console as warning
+        /// Logs an informational message to the console and log file.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="color"></param>
-        /// <param name="prefix"></param>
-        public void LogWarning(object message, ConsoleColor color = ConsoleColor.Yellow, string prefix = "[WARNING] >")
+        /// <param name="message">The informational message to be logged.</param>
+        /// <param name="color">The color of the console text. Defaults to <see cref="ConsoleColor.Green"/>.</param>
+        /// <param name="prefix">The prefix for the log message. Defaults to "[INFO] >".</param>
+        public void Info(object message, ConsoleColor color = ConsoleColor.Green, string prefix = "[INFO] >")
         {
             Log(message, color, prefix);
         }
 
         /// <summary>
-        /// Logs a message to the console as exception
+        /// Logs a warning message to the console and log file.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="color"></param>
-        /// <param name="prefix"></param>
-        public void LogException(object message, ConsoleColor color = ConsoleColor.DarkYellow,
-            string prefix = "[EXCEPTION] >")
+        /// <param name="message">The warning message to be logged.</param>
+        /// <param name="color">The color of the console text. Defaults to <see cref="ConsoleColor.Yellow"/>.</param>
+        /// <param name="prefix">The prefix for the log message. Defaults to "[WARNING] >".</param>
+        public void Warning(object message, ConsoleColor color = ConsoleColor.Yellow, string prefix = "[WARNING] >")
         {
             Log(message, color, prefix);
         }
 
         /// <summary>
-        /// Logs a message to the console as error
+        /// Logs an exception message to the console and log file.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="color"></param>
-        /// <param name="prefix"></param>
-        public void LogError(object message, ConsoleColor color = ConsoleColor.Red, string prefix = "[ERROR] >")
+        /// <param name="message">The exception message to be logged.</param>
+        /// <param name="color">The color of the console text. Defaults to <see cref="ConsoleColor.DarkYellow"/>.</param>
+        /// <param name="prefix">The prefix for the log message. Defaults to "[EXCEPTION] >".</param>
+        public void Exception(object message, ConsoleColor color = ConsoleColor.DarkYellow, string prefix = "[EXCEPTION] >")
         {
             Log(message, color, prefix);
         }
 
         /// <summary>
-        /// Logs a message to the console as command response
+        /// Logs an error message to the console and log file.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="color"></param>
-        /// <param name="prefix"></param>
-        public void LogDebug(object message, ConsoleColor color = ConsoleColor.Magenta, string prefix = "[DEBUG] >")
+        /// <param name="message">The error message to be logged.</param>
+        /// <param name="color">The color of the console text. Defaults to <see cref="ConsoleColor.Red"/>.</param>
+        /// <param name="prefix">The prefix for the log message. Defaults to "[ERROR] >".</param>
+        public void Error(object message, ConsoleColor color = ConsoleColor.Red, string prefix = "[ERROR] >")
+        {
+            Log(message, color, prefix);
+        }
+
+        /// <summary>
+        /// Logs a debug message to the console and log file if debug mode is enabled.
+        /// </summary>
+        /// <param name="message">The debug message to be logged.</param>
+        /// <param name="color">The color of the console text. Defaults to <see cref="ConsoleColor.Magenta"/>.</param>
+        /// <param name="prefix">The prefix for the log message. Defaults to "[DEBUG] >".</param>
+        public void Debug(object message, ConsoleColor color = ConsoleColor.Magenta, string prefix = "[DEBUG] >")
         {
             if (_isDebugEnabled)
                 Log(message, color, prefix);
         }
 
         /// <summary>
-        /// Logs the late init message to the console and log file
+        /// Logs a late initialization message to the console and log file.
         /// </summary>
-        public void LogLateInit()
+        public void LateInit()
         {
-            ConsoleColor oldFgColor = Console.ForegroundColor;
-            ConsoleColor oldBgColor = Console.BackgroundColor;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.BackgroundColor = ConsoleColor.DarkMagenta;
-            string text = $"######## {_pluginName} LATE INIT ########";
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            string text = $"\n" +
+                          "╔═══════════════════════════════════════╗\n" + 
+                         $"║       INITIATING: {_pluginName,-20}║\n" + 
+                          "╚═══════════════════════════════════════╝\n";
             try
             {
                 using (StreamWriter streamWriter = File.AppendText(Path.Combine(Rocket.Core.Environment.LogsDirectory,
                            Rocket.Core.Environment.LogFile)))
                 {
-                    streamWriter.WriteLine(string.Concat("[", DateTime.Now, "] ", $"[{_pluginName}] {text}"));
+                    streamWriter.WriteLine(string.Concat("[", DateTime.Now, "] ", text));
                     streamWriter.Close();
                 }
 
@@ -359,18 +371,16 @@ namespace Tavstal.TLibrary.Models.Plugin
             {
                 Rocket.Core.Logging.Logger.Log(text);
             }
-
-            Console.ForegroundColor = oldFgColor;
-            Console.BackgroundColor = oldBgColor;
+            Console.ResetColor();
         }
 
         /// <summary>
-        /// Logs the late init message to the console and log file
+        /// Logs a command message to the console and log file after processing its format.
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="color"></param>
-        /// <param name="prefix"></param>
-        public void LogCommand(object message, ConsoleColor color = ConsoleColor.Blue, string prefix = "[Command] >")
+        /// <param name="message">The command message to be logged.</param>
+        /// <param name="color">The color of the console text. Defaults to <see cref="ConsoleColor.Blue"/>.</param>
+        /// <param name="prefix">The prefix for the log message. Defaults to "[Command] >".</param>
+        public void Command(object message, ConsoleColor color = ConsoleColor.Blue, string prefix = "[Command] >")
         {
             string msg = message.ToString().Replace("((", "{").Replace("))", "}").Replace("[TShop]", "");
             int amount = msg.Split('{').Length;
