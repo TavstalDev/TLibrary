@@ -79,32 +79,105 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// </summary>
         public static TLogger Logger => _logger;
 
-        public static Version Version { get; } = Assembly.GetExecutingAssembly().GetName().Version;
-
-        public static DateTime BuildDate { get; } = new DateTime(2000, 1, 1).AddDays(Version.Build).AddSeconds(Version.Revision * 2);
+        private static DateTime _versioningDate = new DateTime(2000, 1, 1);
+        private static Version _libraryVersion;
+        private static Version _version;
+        private static DateTime _buildDate;
+        private static Version _displayVersion;
+        
+        public static Version LibraryVersion => _libraryVersion;
+        public static Version Version => _displayVersion;
+        public static DateTime BuildDate => _buildDate;
 
         /// <summary>
         /// Used when the plugin loads
         /// </summary>
         protected override void Load()
         {
-            if (!this.Name.IsNullOrEmpty())
-                _pluginName = this.Name;
-            _rootDirectory = System.IO.Directory.GetCurrentDirectory();
-            _pluginDirectory = Path.Combine(_rootDirectory, "Plugins", GetPluginName());
-            _logger = TLogger.CreateInstance(this, false);
-                
             try
             {
-                base.Load();
-                CheckPluginFiles();
-                OnLoad();
+                if (!this.Name.IsNullOrEmpty())
+                    _pluginName = this.Name;
+                _rootDirectory = System.IO.Directory.GetCurrentDirectory();
+                _pluginDirectory = Path.Combine(_rootDirectory, "Plugins", GetPluginName());
+                _logger = TLogger.CreateInstance(this, false);
+                
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                object[] versionAttributes;
 
+                // Get Library Version
+                try
+                {
+                    versionAttributes = assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
+                    if (versionAttributes.Length > 0)
+                    {
+                        AssemblyFileVersionAttribute versionAttribute =
+                            (AssemblyFileVersionAttribute)versionAttributes[0];
+                        _logger.Debug("Loading library version: " + versionAttribute.Version);
+                        _libraryVersion = new Version(versionAttribute.Version);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Exception("Failed to get library version:");
+                    _logger.Error(ex);
+                }
+
+                assembly = this.Assembly;
+
+                // Get Plugin Build Version
+                try
+                {
+                    _version = assembly.GetName().Version;
+                    _buildDate = _versioningDate.AddDays(_version.Build).AddSeconds(_version.Revision * 2);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Exception("Failed to get plugin build version:");
+                    _logger.Error(ex);
+                }
+
+                // Get Plugin Display Version
+                try
+                {
+                    versionAttributes =
+                        assembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
+                    if (versionAttributes.Length > 0)
+                    {
+                        AssemblyInformationalVersionAttribute informationalVersionAttribute =
+                            (AssemblyInformationalVersionAttribute)versionAttributes[0];
+                        _logger.Debug("Loading plugin display version: " + informationalVersionAttribute.InformationalVersion);
+                        _displayVersion = new Version(informationalVersionAttribute.InformationalVersion);
+                    }
+                    else
+                    {
+                        _logger.Debug("No plugin display version found, using default version.");
+                        _displayVersion = new Version(1, 0, 0, 0);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Exception("Failed to get plugin display version:");
+                    _logger.Error(ex);
+                }
+
+                try
+                {
+                    base.Load();
+                    CheckPluginFiles();
+                    OnLoad();
+
+                }
+                catch (Exception ex)
+                {
+                    _logger.Exception($"Failed to load {Name}");
+                    _logger.Error(ex);
+                }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                _logger.LogException($"Failed to load {Name}");
-                _logger.LogError(ex);
+                _logger.Exception($"Unexpected error while loading {Name}");
+                _logger.Error(e);
             }
         }
 
@@ -203,7 +276,7 @@ namespace Tavstal.TLibrary.Models.Plugin
                 if (field.GetValue(Config) != null)
                     continue;
                 
-                Logger.LogWarning($"The config field '{field.Name}' is missing in '{PluginName}' configuration.");
+                Logger.Warning($"The config field '{field.Name}' is missing in '{PluginName}' configuration.");
             }
             
             foreach (var field in Config.GetType().GetFields())
@@ -214,7 +287,7 @@ namespace Tavstal.TLibrary.Models.Plugin
                 if (field.GetValue(Config) != null)
                     continue;
                 
-                Logger.LogWarning($"The config field '{field.Name}' is missing in '{PluginName}' configuration.");
+                Logger.Warning($"The config field '{field.Name}' is missing in '{PluginName}' configuration.");
             }
             
             
@@ -249,7 +322,7 @@ namespace Tavstal.TLibrary.Models.Plugin
                                 || www.result == UnityWebRequest.Result.DataProcessingError
                                 || www.result == UnityWebRequest.Result.ProtocolError)
                             {
-                                Logger.LogError("Failed to download language packs.");
+                                Logger.Error("Failed to download language packs.");
                             }
                             else
                                 File.WriteAllText(path, www.downloadHandler.text);
@@ -318,7 +391,7 @@ namespace Tavstal.TLibrary.Models.Plugin
         [Obsolete("Use Localize instead", true)]
         protected new string Translate(string translationKey, params object[] placeholder)
         {
-            Logger.LogWarning($"OLD TRANSLATION METHOD WAS USED FOR '{translationKey}'");
+            Logger.Warning($"OLD TRANSLATION METHOD WAS USED FOR '{translationKey}'");
             throw new Exception("The 'Translate' method was used instead of 'Localize'.");
         }
 
@@ -348,8 +421,8 @@ namespace Tavstal.TLibrary.Models.Plugin
             }
             catch (Exception ex)
             {
-               Logger.LogException($"Failed to localize '{translationKey}' key:");
-               Logger.LogError(ex);
+               Logger.Exception($"Failed to localize '{translationKey}' key:");
+               Logger.Error(ex);
                return string.Empty;
             }
         }
