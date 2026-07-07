@@ -13,7 +13,6 @@ permissions:
 env:
   SLN_NAME: TLibrary.sln # Solution file name
   DLL_NAME: TLibrary.dll # DLL file name
-  LIBRARY_PATH: ""
   DLL_PATH: ./TLibrary/bin/Release/net48/TLibrary.dll # Path to the main DLL
   COMMIT_EXTRA_DESC: ""
 
@@ -63,26 +62,6 @@ jobs:
         } else {
             Write-Output "DLL not found at path: $env:DLL_PATH"
             exit 1
-        }
-        
-        if (Test-Path $env:LIBRARY_PATH) {
-            Write-Output "Library DLL found: $env:LIBRARY_PATH"
-            $libraryVersion = (Get-Item $env:LIBRARY_PATH).VersionInfo.ProductVersion
-
-            if ($libraryVersion) {
-                Write-Output "Extracted library version: $libraryVersion"
-                Write-Output "Setting LIBRARY_VERSION=$libraryVersion in GITHUB_ENV"
-        
-                $commitDesc = $env:COMMIT_EXTRA_DESC
-                Write-Output "Debug 1: $commitDesc"
-        
-                # Replace the placeholder safely using native PowerShell
-                $updatedCommitDesc = $commitDesc -replace "VERSION_PLACEHOLDER", $libraryVersion
-                Write-Output "Debug 2: $updatedCommitDesc"
-                Write-Output "Debug 3: $commitDesc"
-        
-                Add-Content -Path $env:GITHUB_ENV -Value "COMMIT_EXTRA_DESC=$updatedCommitDesc"
-            }
         }
       shell: powershell
         
