@@ -3,205 +3,91 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{05EAF096-08FA-4C72-AF53-C3B940F6BCFE}</ProjectGuid>
+    <ProjectGuid>{2AF059EA-2AB2-42B8-B605-2E7833F87D8D}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tavstal.TLibrary</RootNamespace>
-    <AssemblyName>TLibrary</AssemblyName>
     <TargetFramework>net48</TargetFramework>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    
+    <!-- Naming -->
+    <AssemblyName>TLibrary</AssemblyName>
+    <RootNamespace>Tavstal.TLibrary</RootNamespace>
+    <Product>TLibrary</Product>
+    <Company>Tavstal</Company>
+    <Copyright>Copyright © 2020-2026 Tavstal</Copyright>
+    <Description>A helper library for RocketMod 4 that makes plugin development easier and faster.</Description>
+
+    <!-- Version -->
+    <Version>1.2.2</Version>
+    <InformationalVersion>1.2.2</InformationalVersion>
+    <AssemblyVersion>1.2.2.0</AssemblyVersion>
+    <FileVersion>1.2.2.0</FileVersion>
+    
+    <!-- Config -->
+    <LangVersion>8.0</LangVersion> 
+    <Nullable>enable</Nullable>
     <FileAlignment>512</FileAlignment>
-    <Deterministic>false</Deterministic>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Deterministic>true</Deterministic>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <NoWarn>CS0169;CS0067;IDE0051;IDE0060;IDE0062;RS0016</NoWarn>
   </PropertyGroup>
+  
+  <!-- Libraries -->
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System">
-      <HintPath>..\Libraries\System.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Data">
-      <HintPath>..\Libraries\System.Data.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <HintPath>..\Libraries\System.Data.DataSetExtensions.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Net.Http">
-      <HintPath>..\Libraries\System.Net.Http.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Numerics">
-      <HintPath>..\Libraries\System.Numerics.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization">
-      <HintPath>..\Libraries\System.Runtime.Serialization.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Web">
-      <HintPath>..\Libraries\System.Web.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Xml">
-      <HintPath>..\Libraries\System.Xml.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Xml.Linq">
-      <HintPath>..\Libraries\System.Xml.Linq.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\Libraries\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\assets\libraries\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="com.rlabrecque.steamworks.net">
-      <HintPath>..\Libraries\com.rlabrecque.steamworks.net.dll</HintPath>
+      <HintPath>..\assets\libraries\com.rlabrecque.steamworks.net.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MySql.Data, Version=8.0.30.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\MySql.Data.dll</HintPath>
+    <Reference Include="I18N">
+      <HintPath>..\assets\libraries\RL-I18N.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="I18N.West">
+      <HintPath>..\assets\libraries\RL-I18N.West.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RL-I18N, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\RL-I18N.dll</HintPath>
+    <Reference Include="MySqlConnector">
+      <HintPath>..\..\TShop2\assets\libraries\MySqlConnector.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RL-I18N.West, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libraries\RL-I18N.West.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RL-RestSharp">
-      <HintPath>..\Libraries\RL-RestSharp.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\assets\libraries\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Rocket.API">
-      <HintPath>..\Libraries\Rocket.API.dll</HintPath>
+      <HintPath>..\assets\libraries\Rocket.API.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Rocket.Core">
-      <HintPath>..\Libraries\Rocket.Core.dll</HintPath>
+      <HintPath>..\assets\libraries\Rocket.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Rocket.Unturned">
-      <HintPath>..\Libraries\Rocket.Unturned.dll</HintPath>
+      <HintPath>..\assets\libraries\Rocket.Unturned.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="SDG.NetTransport">
-      <HintPath>..\Libraries\SDG.NetTransport.dll</HintPath>
+      <HintPath>..\assets\libraries\SDG.NetTransport.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\Libraries\UnityEngine.dll</HintPath>
+      <HintPath>..\assets\libraries\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\Libraries\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\assets\libraries\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>..\Libraries\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>..\assets\libraries\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestModule">
-      <HintPath>..\Libraries\UnityEngine.UnityWebRequestModule.dll</HintPath>
+      <HintPath>..\assets\libraries\UnityEngine.UnityWebRequestModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
-  <!-- Visual Studio
-  <ItemGroup>
-    <Compile Include="Compatibility\Interfaces\Economy\IBankCard.cs" />
-    <Compile Include="Compatibility\Interfaces\Economy\ITransaction.cs" />
-    <Compile Include="Compatibility\Interfaces\Economy\IEconomyCard.cs" />
-    <Compile Include="Compatibility\Interfaces\IPlayerComponent.cs" />
-    <Compile Include="Compatibility\Models\DatabaseSettingsBase.cs" />
-    <Compile Include="Compatibility\Models\Database\Attributes\SqlMemberAttribute.cs" />
-    <Compile Include="Compatibility\Models\Database\Attributes\SqlNameAttribute.cs" />
-    <Compile Include="Compatibility\Models\Database\Attributes\SqlIgnoreAttribute.cs" />
-    <Compile Include="Compatibility\Models\Database\SqlParameter.cs" />
-    <Compile Include="Compatibility\Models\Database\SqlColumn.cs" />
-    <Compile Include="Compatibility\Models\Discord\Embed.cs" />
-    <Compile Include="Compatibility\Models\Discord\EmbedAuthor.cs" />
-    <Compile Include="Compatibility\Models\Discord\EmbedField.cs" />
-    <Compile Include="Compatibility\Models\Discord\EmbedVideo.cs" />
-    <Compile Include="Compatibility\Models\Discord\EmbedThumbnail.cs" />
-    <Compile Include="Compatibility\Models\Discord\EmbedImage.cs" />
-    <Compile Include="Compatibility\Models\Discord\EmbedFooter.cs" />
-    <Compile Include="Compatibility\Models\Discord\JsonParameter.cs" />
-    <Compile Include="Compatibility\Models\Discord\WebhookSettings.cs" />
-    <Compile Include="Compatibility\Models\Economy\Transaction.cs" />
-    <Compile Include="Compatibility\Models\Economy\BankCard.cs" />
-    <Compile Include="Compatibility\Models\Discord\FileParameter.cs" />
-    <Compile Include="Compatibility\Models\FormatHelper\ConsoleFormat.cs" />
-    <Compile Include="Compatibility\Models\FormatHelper\TextFormat.cs" />
-    <Compile Include="Compatibility\Models\Commands\CommandBase.cs" />
-    <Compile Include="Compatibility\Models\Plugin\ConfigurationBase.cs" />
-    <Compile Include="Compatibility\Models\Plugin\PluginBase.cs" />
-    <Compile Include="Compatibility\Models\Commands\SubCommand.cs" />
-    <Compile Include="Compatibility\Models\Plugin\TLogger.cs" />
-    <Compile Include="Compatibility\Interfaces\ICommand.cs" />
-    <Compile Include="Compatibility\Interfaces\IDatabaseSettings.cs" />
-    <Compile Include="Compatibility\Interfaces\IDatabaseManager.cs" />
-    <Compile Include="Compatibility\Interfaces\IConfigurationBase.cs" />
-    <Compile Include="Compatibility\Models\SerializableVector3.cs" />
-    <Compile Include="Compatibility\Interfaces\IPlugin.cs" />
-    <Compile Include="Extensions\PluginExtensions.cs" />
-    <Compile Include="Extensions\Rocket\RocketPluginExtensions.cs" />
-    <Compile Include="Extensions\ReflectionExtensions.cs" />
-    <Compile Include="Extensions\Unturned\PlayerExtensions.cs" />
-    <Compile Include="Extensions\MySqlExtensions.cs" />
-    <Compile Include="Extensions\IntegerExtensions.cs" />
-    <Compile Include="Extensions\ArrayExtensions.cs" />
-    <Compile Include="Extensions\StringExtensions.cs" />
-    <Compile Include="Compatibility\Hooks\Hook.cs" />
-    <Compile Include="Compatibility\Enumerators\ETransaction.cs" />
-    <Compile Include="Compatibility\Enumerators\EPaymentMethod.cs" />
-    <Compile Include="Compatibility\Interfaces\HookInterfaces\IEconomyProvider.cs" />
-    <Compile Include="Compatibility\Interfaces\HookInterfaces\IPluginProvider.cs" />
-    <Compile Include="Helpers\General\DatabaseHelper.cs" />
-    <Compile Include="Helpers\General\FormatHelper.cs" />
-    <Compile Include="Helpers\Unturned\UEffectHelper.cs" />
-    <Compile Include="Helpers\General\LinqHelper.cs" />
-    <Compile Include="Helpers\General\LoggerHelper.cs" />
-    <Compile Include="Helpers\General\StringHelper.cs" />
-    <Compile Include="Helpers\Unturned\UAssetHelper.cs" />
-    <Compile Include="Helpers\Unturned\UPlayerHelper.cs" />
-    <Compile Include="Helpers\Unturned\UVehicleHelper.cs" />
-    <Compile Include="Helpers\Unturned\UStructureHelper.cs" />
-    <Compile Include="Helpers\Unturned\UBarricadeHelper.cs" />
-    <Compile Include="Helpers\Unturned\UChatHelper.cs" />
-    <Compile Include="Helpers\General\MathHelper.cs" />
-    <Compile Include="Managers\DatabaseManagerBase.cs" />
-    <Compile Include="Managers\HookManager.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\DiscordWebhook.cs" />
-  </ItemGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  -->
 </Project>
