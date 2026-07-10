@@ -1,17 +1,18 @@
-﻿using Newtonsoft.Json;
-
-namespace Tavstal.TLibrary.Models.Discord
+﻿namespace Tavstal.TLibrary.Models.Discord
 {
-    public class JsonParameter
+    /// <summary>
+    /// Holds a JSON string and its content type for use in multipart form data.
+    /// </summary>
+    public struct JsonParameter
     {
+        /// <summary>
+        /// The serialized JSON content.
+        /// </summary>
         public string Content { get; set; }
+        
+        /// <summary>
+        /// The MIME content type (e.g. "application/json").
+        /// </summary>
         public string ContentType { get; set; }
-        public JsonParameter(object content) : this(JsonConvert.SerializeObject(content), "application/json") { }
-        public JsonParameter(object content, string contenttype) : this(JsonConvert.SerializeObject(content), contenttype) { }
-        public JsonParameter(string content, string contenttype)
-        {
-            Content = content;
-            ContentType = contenttype;
-        }
     }
 }

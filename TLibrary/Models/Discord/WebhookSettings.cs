@@ -1,28 +1,34 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Tavstal.TLibrary.Models.Discord
 {
-    [Serializable]
+    /// <summary>
+    /// Stores the configuration for a Discord webhook.
+    /// </summary>
     public class WebhookSettings
     {
+        /// <summary>
+        /// The URL of the Discord webhook.
+        /// </summary>
         [JsonProperty("WebhookUrl")]
-        public string WebhookUrl { get; set; }
+        public string WebhookUrl { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// The name the webhook will display.
+        /// </summary>
         [JsonProperty("Name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
+        
+        /// <summary>
+        /// The avatar image URL for the webhook.
+        /// </summary>
         [JsonProperty("AvatarUrl")]
-        public string AvatarUrl { get; set; }
+        public string? AvatarUrl { get; set; }
+        
+        /// <summary>
+        /// The color used for Discord embeds (e.g. "#ff0000").
+        /// </summary>
         [JsonProperty("Color")]
-        public string Color { get; set; }
-
-        public WebhookSettings() { }
-
-        public WebhookSettings(string webhookUrl, string name = null, string avatarUrl = null, string color = null)
-        {
-            WebhookUrl = webhookUrl;
-            Name = name;
-            AvatarUrl = avatarUrl;
-            Color = color;
-        }
+        public string? Color { get; set; }
     }
 }

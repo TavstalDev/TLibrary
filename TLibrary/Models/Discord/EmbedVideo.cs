@@ -2,23 +2,33 @@
 
 namespace Tavstal.TLibrary.Models.Discord
 {
-    public class EmbedVideo
+    /// <summary>
+    /// Represents a video in a Discord embed.
+    /// </summary>
+    public struct EmbedVideo
     {
+        /// <summary>
+        /// The direct URL of the video.
+        /// </summary>
         [JsonProperty("url")]
         public string Url { get; set; }
+        
+        /// <summary>
+        /// A proxied version of the video URL provided by Discord.
+        /// </summary>
         [JsonProperty("proxy_url")]
         public string ProxyUrl { get; set; }
+        
+        /// <summary>
+        /// The height of the video in pixels.
+        /// </summary>
         [JsonProperty("height")]
         public int? Height { get; set; }
+        
+        /// <summary>
+        /// The width of the video in pixels.
+        /// </summary>
         [JsonProperty("width")]
         public int? Width { get; set; }
-
-        public EmbedVideo(string url, string proxyUrl, int? height, int? width)
-        {
-            Url = url;
-            ProxyUrl = proxyUrl;
-            Height = height;
-            Width = width;
-        }
     }
 }
