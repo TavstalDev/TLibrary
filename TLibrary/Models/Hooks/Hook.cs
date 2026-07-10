@@ -1,4 +1,5 @@
 ﻿using System;
+using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Models.Plugin;
 
 namespace Tavstal.TLibrary.Models.Hooks
@@ -11,22 +12,23 @@ namespace Tavstal.TLibrary.Models.Hooks
         /// <summary>
         /// The plugin instance that loads this hook, NOT THE PLUGIN THAT IS BEING HOOKED.
         /// </summary>
-        public IPlugin Plugin { get; private set; }
+        public IPlugin Plugin { get; }
+        
         /// <summary>
         /// Name of the plugin that should be hooked
         /// </summary>
-        public string Name { get; private set; }
+        public string Name { get; }
+        
         /// <summary>
         /// If the hook is essential, the plugin will not load if the hook fails to load.
         /// </summary>
         public bool IsEssential { get; private set; }
+        
         /// <summary>
         /// If the hook is loaded
         /// </summary>
         public bool IsLoaded { get; private set; }
-
-        protected Hook() { }
-
+        
         protected Hook(IPlugin loaderPluginInstance, string name, bool isEssential)
         {
             Plugin = loaderPluginInstance;
@@ -50,8 +52,7 @@ namespace Tavstal.TLibrary.Models.Hooks
             }
             catch (Exception ex)
             {
-                Plugin.GetLogger().Error($"Failed to load '{Name}' hook.");
-                Plugin.GetLogger().Exception(ex.ToString());
+                Plugin.GetLogger().Error($"Failed to load '{Name}' hook.", ex);
             }
         }
 
@@ -69,20 +70,19 @@ namespace Tavstal.TLibrary.Models.Hooks
             catch (Exception ex)
             {
                 IsLoaded = false;
-                Plugin.GetLogger().Error($"Failed to unload '{Name}' hook.");
-                Plugin.GetLogger().Exception(ex.ToString());
+                Plugin.GetLogger().Error($"Failed to unload '{Name}' hook.", ex);
             }
         }
 
         /// <summary>
         /// Abstract function that is called when the hook is loaded.
         /// </summary>
-        public abstract void OnLoad();
+        protected abstract void OnLoad();
 
         /// <summary>
         /// Abstract function that is called when the hook is unloaded.
         /// </summary>
-        public abstract void OnUnload();
+        protected abstract void OnUnload();
 
         /// <summary>
         /// Abstract function that is called to check if the hook can be loaded.

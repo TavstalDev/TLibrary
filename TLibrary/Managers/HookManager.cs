@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Models.Hooks;
 using Tavstal.TLibrary.Models.Plugin;
 
@@ -18,7 +19,7 @@ namespace Tavstal.TLibrary.Managers
         public IEnumerable<Hook> Hooks => _hooks.Values;
 
         public HookManager(IPlugin plugin) {
-            _logger = TLogger.CreateInstance("TLibrary", this.GetType(), plugin.GetLogger().IsDebugEnabled);
+            _logger = new TLogger(plugin.GetPluginName(), GetType(), plugin.GetLogLevel());
         }
 
         /// <summary>
@@ -29,20 +30,26 @@ namespace Tavstal.TLibrary.Managers
         {
             if (!typeof(Hook).IsAssignableFrom(type))
             {
-                _logger.Exception("'{0}' is not a hook.");
+                _logger.Debug($"'{type.Name}' is not a hook.");
                 return;
             }
 
             if (type.IsAbstract)
             {
-                _logger.Exception($"Cannot register {type.Name} because it is abstract.");
+                _logger.Debug($"'{type.Name}' is not a abstract class.");
                 return;
             }
 
             var hook = CreateInstance<Hook>(type);
+            if (hook == null)
+            {
+                _logger.Debug($"Failed to create '{type.Name}' hook.");
+                return;
+            }
+            
             if (_hooks.ContainsKey(hook.Name))
             {
-                _logger.Exception("Hook with '{0}' name already exists.");
+                _logger.Debug($"Hook with '{hook.Name}' name already exists.");
                 return;
             }
 
@@ -57,14 +64,20 @@ namespace Tavstal.TLibrary.Managers
         /// <param name="ignoreDuplicate"></param>
         public void LoadAll(Assembly pluginAssembly, bool ignoreDuplicate = false)
         {
-            foreach (Type t in pluginAssembly.GetTypes().ToList().FindAll(x => !x.IsAbstract && typeof(Hook).IsAssignableFrom(x)))
+            foreach (Type type in pluginAssembly.GetTypes().ToList().FindAll(x => !x.IsAbstract && typeof(Hook).IsAssignableFrom(x)))
             {
-                var hook = CreateInstance<Hook>(t);
+                var hook = CreateInstance<Hook>(type);
+                if (hook == null)
+                {
+                    _logger.Debug($"'{type.Name}' is not a hook.");
+                    continue;
+                }
+                
                 try
                 {
                     if (_hooks.ContainsKey(hook.Name))
                     {
-                        _logger.Exception($"Hook with '{hook.Name}' name already exists.");
+                        _logger.Debug($"Hook with '{hook.Name}' name already exists.");
                         continue;
                     }
 
@@ -80,8 +93,7 @@ namespace Tavstal.TLibrary.Managers
                 }
                 catch (Exception ex)
                 {
-                    _logger.Exception($"Failed to add the '{hook.Name}' hook to the library.");
-                    _logger.Error(ex);
+                    _logger.Error($"Failed to create '{type.Name}' hook.", ex);
                 }
             }
         }
@@ -92,22 +104,22 @@ namespace Tavstal.TLibrary.Managers
         /// <param name="type">The type of hooks to unload.</param>
         public void Unload(Type type)
         {
-            if (type != typeof(Hook))
+            if (!typeof(Hook).IsAssignableFrom(type))
             {
-                _logger.Exception($"'{type.Name}' is not a hook.");
+                _logger.Debug($"'{type.Name}' is not a hook.");
                 return;
             }
 
-            if (!_hooks.Any(x => x.Value.GetType() == type))
+            if (_hooks.All(x => x.Value.GetType() != type))
             {
-                _logger.Exception($"'{type.Name}' is not loaded.");
+                _logger.Debug($"'{type.Name}' is not loaded.");
                 return;
             }
 
             var hook = _hooks.Values.FirstOrDefault(x => x.GetType() == type);
             if (hook == null)
             {
-                _logger.Exception($"'{type.Name}' is not found.");
+               _logger.Debug($"'{type.Name}' hook is not found.");
                 return;
             }
 
@@ -162,14 +174,14 @@ namespace Tavstal.TLibrary.Managers
         /// </summary>
         /// <typeparam name="T">The type of hook to retrieve.</typeparam>
         /// <returns>The hook instance of the specified type if found; otherwise, null.</returns>
-        public T GetHook<T>()
+        public T? GetHook<T>() where T : Hook
         {
             foreach (var hook in _hooks)
             {
                 if (hook.Value.GetType() == typeof(T))
-                    return (T)(object)hook.Value;
+                    return (T)hook.Value;
             }
-            return default;
+            return null;
         }
 
         /// <summary>
@@ -178,7 +190,7 @@ namespace Tavstal.TLibrary.Managers
         /// <typeparam name="T">The type of instance to create.</typeparam>
         /// <param name="type">The type of the instance to create.</param>
         /// <returns>An instance of the specified type if creation is successful; otherwise, null.</returns>
-        private T CreateInstance<T>(Type type)
+        private T? CreateInstance<T>(Type type) where T : Hook
         {
             try
             {
@@ -186,9 +198,8 @@ namespace Tavstal.TLibrary.Managers
             }
             catch (Exception ex)
             {
-                _logger.Exception($"Failed to create instance for '{type.Name}' hook.");
-                _logger.Error(ex);
-                return default;
+                _logger.Error($"Failed to create '{type.Name}' hook.", ex);
+                return null;
             }
         }
     }
