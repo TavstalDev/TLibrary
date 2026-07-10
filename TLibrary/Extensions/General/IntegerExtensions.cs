@@ -1,7 +1,10 @@
 ﻿using Tavstal.TLibrary.Helpers.General;
 
-namespace Tavstal.TLibrary.Extensions
+namespace Tavstal.TLibrary.Extensions.General
 {
+    /// <summary>
+    /// Provides extension methods for numeric types like int, double, and float.
+    /// </summary>
     public static class IntegerExtensions
     {
         /// <summary>
@@ -11,10 +14,8 @@ namespace Tavstal.TLibrary.Extensions
         /// <param name="minValue">The minimum value to clamp to.</param>
         /// <param name="maxValue">The maximum value to clamp to.</param>
         /// <returns>The clamped integer value.</returns>
-        public static int Clamp(this int value, int minValue, int maxValue)
-        {
-            return MathHelper.Clamp(value, minValue, maxValue);
-        }
+        public static int Clamp(this int value, int minValue, int maxValue) =>
+            MathHelper.Clamp(value, minValue, maxValue);
 
         /// <summary>
         /// Clamps the specified double value between the given minimum and maximum values.
@@ -23,10 +24,8 @@ namespace Tavstal.TLibrary.Extensions
         /// <param name="minValue">The minimum value to clamp to.</param>
         /// <param name="maxValue">The maximum value to clamp to.</param>
         /// <returns>The clamped double value.</returns>
-        public static double Clamp(this double value, double minValue, double maxValue)
-        {
-            return MathHelper.Clamp(value, minValue, maxValue);
-        }
+        public static double Clamp(this double value, double minValue, double maxValue) =>
+            MathHelper.Clamp(value, minValue, maxValue);
 
         /// <summary>
         /// Clamps the specified float value between the given minimum and maximum values.
@@ -35,9 +34,7 @@ namespace Tavstal.TLibrary.Extensions
         /// <param name="minValue">The minimum value to clamp to.</param>
         /// <param name="maxValue">The maximum value to clamp to.</param>
         /// <returns>The clamped float value.</returns>
-        public static float Clamp(this float value, float minValue, float maxValue)
-        {
-            return MathHelper.Clamp(value, minValue, maxValue);
-        }
+        public static float Clamp(this float value, float minValue, float maxValue) =>
+            MathHelper.Clamp(value, minValue, maxValue);
     }
 }
