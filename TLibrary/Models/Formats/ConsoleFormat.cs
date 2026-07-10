@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Tavstal.TLibrary.Models.FormatHelper
+namespace Tavstal.TLibrary.Models.Formats
 {
     /// <summary>
     /// Format for console output.
@@ -15,9 +15,7 @@ namespace Tavstal.TLibrary.Models.FormatHelper
         /// Color of the format
         /// </summary>
         public ConsoleColor Color { get; set; }
-
-        public ConsoleFormat() { }
-
+        
         public ConsoleFormat(string key, ConsoleColor color)
         {
             Key = key;
