@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 using Tavstal.TLibrary.Helpers.General;
 using UnityEngine;
@@ -16,9 +17,27 @@ namespace Tavstal.TLibrary
     /// </remarks>
     public class MainThreadDispatcher : MonoBehaviour
     {
-        private readonly ConcurrentQueue<Action> _executionQueue = new ConcurrentQueue<Action>();
-        private static MainThreadDispatcher _instance;
+        private readonly ConcurrentQueue<Action> ExecutionQueue = new ConcurrentQueue<Action>();
+        private static MainThreadDispatcher _instance = null!;
+        private static int _mainThreadId;
 
+        /// <summary>
+        /// Saves the ID of the main thread when this object is created.
+        /// </summary>
+        private void Awake()
+        {
+            _mainThreadId = Thread.CurrentThread.ManagedThreadId;
+        }
+        
+        /// <summary>
+        /// Processes and executes all queued actions on the main thread.
+        /// </summary>
+        private void Update()
+        {
+            while (ExecutionQueue.TryDequeue(out var action))
+                action();
+        }
+        
         /// <summary>
         /// Gets the singleton instance of the <see cref="MainThreadDispatcher"/>. If the instance does not exist, it creates one.
         /// </summary>
@@ -38,17 +57,14 @@ namespace Tavstal.TLibrary
                 return _instance;
             }
         }
-
+        
         /// <summary>
-        /// Processes and executes all queued actions on the main thread.
+        /// Checks if the current code is running on the main thread.
         /// </summary>
-        private void Update()
-        {
-            while (_executionQueue.TryDequeue(out var action))
-            {
-                action();
-            }
-        }
+        /// <value>
+        /// <see langword="true"/> if the current thread is the main thread; otherwise, <see langword="false"/>.
+        /// </value>
+        public static bool IsMainThread => Thread.CurrentThread.ManagedThreadId == _mainThreadId;
 
         /// <summary>
         /// Enqueues an action to be executed on the main thread.
@@ -60,9 +76,17 @@ namespace Tavstal.TLibrary
         /// </remarks>
         public static void RunOnMainThread(Action action)
         {
-            if (Application.isPlaying)
+            if (!Application.isPlaying)
+                return;
+            if (IsMainThread)
             {
-                Instance._executionQueue.Enqueue(action);
+                action();
+                return;
+            }
+
+            lock (Instance.ExecutionQueue)
+            {
+                Instance.ExecutionQueue.Enqueue(action);
             }
         }
 
@@ -77,10 +101,23 @@ namespace Tavstal.TLibrary
         public static Task<bool> RunOnMainThreadAsync(Action action)
         {
             var tcs = new TaskCompletionSource<bool>();
-            
-            if (Application.isPlaying)
+
+            if (!Application.isPlaying)
             {
-                Instance._executionQueue.Enqueue(() =>
+                tcs.SetResult(false);
+                return tcs.Task;
+            }
+            
+            if (IsMainThread)
+            {
+                action();
+                tcs.SetResult(true);
+                return tcs.Task;
+            }
+
+            lock (Instance.ExecutionQueue)
+            {
+                Instance.ExecutionQueue.Enqueue(() =>
                 {
                     try
                     {
@@ -91,16 +128,13 @@ namespace Tavstal.TLibrary
                     }
                     catch (Exception ex)
                     {
-                        LoggerHelper.LogException("Error while running async action on main thread");
+                        LoggerHelper.LogError("Error while running async action on main thread");
+                        tcs.SetResult(false);
                         tcs.SetException(ex);
                     }
                 });
             }
-            else
-                tcs.SetResult(false);
-            
             return tcs.Task;
         }
     }
-
 }
