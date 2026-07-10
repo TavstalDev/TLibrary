@@ -8,14 +8,16 @@ using Tavstal.TLibrary.Models.Plugin;
 
 namespace Tavstal.TLibrary.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for plugins.
+    /// </summary>
     public static class PluginExtensions
     {
-
         /// <summary>
-        /// Checks whether the provided <paramref name="configuration"/> has a valid config file, and if not, creates and saves it.
+        /// Checks if the config file exists. If not, creates and saves it.
         /// </summary>
-        /// <param name="configuration">The configuration instance to be checked and potentially saved.</param>
-        /// <returns>True if the configuration file is valid; otherwise, false.</returns>
+        /// <param name="configuration">The config to check.</param>
+        /// <returns>True if the config file exists, false if a new one was created.</returns>
         public static bool CheckConfigFile(this ConfigurationBase configuration)
         {
             string fullPath = Path.Combine(configuration.FilePath, configuration.FileName);
@@ -28,12 +30,12 @@ namespace Tavstal.TLibrary.Extensions
         }
 
         /// <summary>
-        /// Reads and returns a configuration object of type <typeparamref name="T"/> from the provided <paramref name="configuration"/> instance.
+        /// Reads and returns a config object from a file.
         /// </summary>
-        /// <typeparam name="T">The type of the configuration object to read.</typeparam>
-        /// <param name="configuration">The configuration instance containing the configuration data.</param>
-        /// <returns>The configuration object of type <typeparamref name="T"/>.</returns>
-        public static T ReadConfig<T>(this ConfigurationBase configuration) where T : ConfigurationBase
+        /// <typeparam name="T">The type of the config to read.</typeparam>
+        /// <param name="configuration">The config to read from.</param>
+        /// <returns>The config object, or null if it failed.</returns>
+        public static T? ReadConfig<T>(this ConfigurationBase configuration) where T : ConfigurationBase
         {
             string fullPath = Path.Combine(configuration.FilePath, configuration.FileName);
             try
@@ -46,7 +48,7 @@ namespace Tavstal.TLibrary.Extensions
             }
             catch
             {
-                LoggerHelper.LogException("Failed to read the configuration file, it might be outdated.\nSaving current one and generating a new file...");
+                LoggerHelper.LogError("Failed to read the configuration file, it might be outdated.\nSaving current one and generating a new file...");
                 File.Move(fullPath, Path.Combine(configuration.FilePath, configuration.FileName.Insert(configuration.FileName.IndexOf(".json", StringComparison.Ordinal), $"_save_{DateTime.Now.ToString("s").Replace("-", "").Replace(":", "")}")));
                 configuration.SaveConfig();
                 return null;
@@ -54,9 +56,9 @@ namespace Tavstal.TLibrary.Extensions
         }
 
         /// <summary>
-        /// Saves the provided <paramref name="configuration"/> object by serializing it and writing to a file.
+        /// Saves the config object to its file.
         /// </summary>
-        /// <param name="configuration">The configuration object to be saved.</param>
+        /// <param name="configuration">The config to save.</param>
         public static void SaveConfig(this ConfigurationBase configuration)
         {
             string fullPath = Path.Combine(configuration.FilePath, configuration.FileName);
@@ -67,12 +69,12 @@ namespace Tavstal.TLibrary.Extensions
         }
 
         /// <summary>
-        /// Reads translations from the specified file located at the given <paramref name="filePath"/>.
+        /// Reads translations from a file.
         /// </summary>
-        /// <param name="filePath">The path where the translation file is located.</param>
+        /// <param name="filePath">The folder path of the translation file.</param>
         /// <param name="fileName">The name of the translation file.</param>
-        /// <returns>A dictionary containing translation key-value pairs.</returns>
-        public static Dictionary<string, string> ReadTranslation(string filePath, string fileName)
+        /// <returns>A dictionary with translation keys and values.</returns>
+        public static Dictionary<string, string>? ReadTranslation(string filePath, string fileName)
         {
             string fullPath = Path.Combine(filePath, fileName);
             string text = File.ReadAllText(fullPath);
@@ -84,10 +86,10 @@ namespace Tavstal.TLibrary.Extensions
         }
 
         /// <summary>
-        /// Saves the provided <paramref name="locale"/> translations to the specified file located at the given <paramref name="filePath"/>.
+        /// Saves translations to a file.
         /// </summary>
-        /// <param name="locale">The dictionary containing translation key-value pairs to be saved.</param>
-        /// <param name="filePath">The path where the translation file should be saved.</param>
+        /// <param name="locale">The dictionary with translation keys and values to save.</param>
+        /// <param name="filePath">The folder path to save the translation file in.</param>
         /// <param name="fileName">The name of the translation file.</param>
         public static void SaveTranslation(Dictionary<string, string> locale, string filePath, string fileName)
         {
@@ -100,29 +102,27 @@ namespace Tavstal.TLibrary.Extensions
         }
 
         /// <summary>
-        /// Retrieves the value of the configuration property with the specified <paramref name="name"/> from the given <paramref name="config"/>.
+        /// Gets the value of a config property by its name.
         /// </summary>
-        /// <typeparam name="T">The type of the value to retrieve.</typeparam>
-        /// <param name="config">The configuration object containing the property.</param>
-        /// <param name="name">The name of the property to retrieve.</param>
-        /// <returns>The value of the specified property.</returns>
+        /// <typeparam name="T">The type of the value to get.</typeparam>
+        /// <param name="config">The config to get the value from.</param>
+        /// <param name="name">The name of the property.</param>
+        /// <returns>The property value, or null if not found.</returns>
         public static T GetValue<T>(this IConfigurationBase config, string name)
         {
             try
             {
-                T value = default;
-
+                T value = default(T);
                 var token = JObject.FromObject(config).SelectToken(name.Replace(":", "."));
                 if (token != null)
                     value = token.Value<T>();
-
-                return value;
+                return value!;
             }
             catch (Exception ex)
             {
-                LoggerHelper.LogException($"Error in GetValue({name}), PluginExtensions:");
+                LoggerHelper.LogError($"Error in GetValue({name}), PluginExtensions:");
                 LoggerHelper.LogError(ex);
-                return default;
+                return default!;
             }
         }
     }
