@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Rocket.API;
 using Rocket.Unturned.Player;
-using Tavstal.TLibrary.Extensions;
+using Tavstal.TLibrary.Extensions.General;
 using Tavstal.TLibrary.Helpers.Unturned;
 using Tavstal.TLibrary.Models.Plugin;
 
@@ -25,23 +25,28 @@ namespace Tavstal.TLibrary.Models.Commands
         /// <br/>Values: Console, Player, Both
         /// </summary>
         public abstract AllowedCaller AllowedCaller { get; }
+        
         /// <summary>
         /// Name of the command
         /// </summary>
         public abstract string Name { get; }
+        
         /// <summary>
         /// Description of the command
         /// </summary>
         public abstract string Help { get; }
+        
         /// <summary>
         /// Example usage of the command
         /// <br/>Example: "help | action1 | action2"
         /// </summary>
         public abstract string Syntax { get; }
+        
         /// <summary>
         /// Other acceptabla names
         /// </summary>
         public abstract List<string> Aliases { get; }
+        
         /// <summary>
         /// Permissions that the command require
         /// </summary>
@@ -51,7 +56,7 @@ namespace Tavstal.TLibrary.Models.Commands
         /// Subcommands like /example help
         /// <br/>help can be modified with on ExecuteHelp
         /// </summary>
-        protected abstract List<SubCommand> SubCommands { get; }
+        protected abstract List<SubCommand>? SubCommands { get; }
 
         /// <summary>
         /// Called when the command is executed
@@ -69,12 +74,12 @@ namespace Tavstal.TLibrary.Models.Commands
         /// <param name="isError"></param>
         /// <param name="subcommand"></param>
         /// <param name="args"></param>
-        protected virtual Task ExecuteHelp(IRocketPlayer caller, bool isError, string subcommand, string[] args)
+        protected virtual Task ExecuteHelp(IRocketPlayer caller, bool isError, string? subcommand, string[] args)
         {
             string translation = isError ? "error_command_syntax" : "success_command_help";
             if (subcommand != null)
             {
-                SubCommand subCommand = GetSubCommandByName(subcommand);
+                SubCommand? subCommand = GetSubCommandByName(subcommand);
                 if (subCommand != null)
                 {
                     Plugin.SendCommandReply(caller, translation, Name, subCommand.Syntax);
@@ -132,7 +137,7 @@ namespace Tavstal.TLibrary.Models.Commands
 
                 if (args.Length > 0 && SubCommands.IsValidIndex(0))
                 {
-                    SubCommand subCommand = GetSubCommandByName(args[0]);
+                    SubCommand? subCommand = GetSubCommandByName(args[0]);
                     if (subCommand != null)
                     {
                         if (isPlayer && !subCommand.Permissions.Any(caller.HasPermission))
@@ -157,13 +162,15 @@ namespace Tavstal.TLibrary.Models.Commands
                 else
                 {
                     if (!(ExecutionRequested(caller, args).Result))
-                        await ExecuteHelp(caller, true, null, null);
+                        await ExecuteHelp(caller, true, null, new string[] { });
                 }
             });
         }
 
-        private SubCommand GetSubCommandByName(string arg)
+        private SubCommand? GetSubCommandByName(string arg)
         {
+            if (SubCommands == null)
+                return null;
             return SubCommands.Find(x => x.Name.ToLower() == arg.ToLower() || x.Aliases.Contains(arg.ToLower()));
         }
     }

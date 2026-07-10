@@ -5,32 +5,22 @@ using Rocket.API;
 
 namespace Tavstal.TLibrary.Models.Commands
 {
-    /// <summary>
-    /// Class used to help in creating subcommands
-    /// </summary>
-    // ReSharper disable once ClassNeverInstantiated.Global
+    /// <inheritdoc/>
     public class SubCommand : ICommand
     {
-        /// <summary>
-        /// Name of the subcommand
-        /// </summary>
+        /// <inheritdoc/>
         public string Name { get; private set; }
-        /// <summary>
-        /// Description of the subcommand
-        /// </summary>
+        
+        /// <inheritdoc/>
         public string Help { get; private set; }
-        /// <summary>
-        /// Example usage of the subcommand
-        /// <br/>Example: "give [itemId]&lt;amount>"
-        /// </summary>
+        
+        /// <inheritdoc/>
         public string Syntax { get; private set; }
-        /// <summary>
-        /// Other acceptabla names
-        /// </summary>
+        
+        /// <inheritdoc/>
         public List<string> Aliases { get; private set; }
-        /// <summary>
-        /// Permissions that the subcommand require
-        /// </summary>
+        
+        /// <inheritdoc/>
         public List<string> Permissions { get; private set; }
 
         /// <summary>
@@ -39,17 +29,22 @@ namespace Tavstal.TLibrary.Models.Commands
         public Func<IRocketPlayer, string[], Task> ActionToExecute { get; private set; }
 
         /// <summary>
-        /// Executes the <see cref="ActionToExecute"/> action
+        /// Executes the <see cref="ActionToExecute"/> action.
         /// </summary>
-        /// <param name="caller"></param>
-        /// <param name="args"></param>
-        public async Task Execute(IRocketPlayer caller, string[] args)
-        {
+        /// <param name="caller">The player who executed the command.</param>
+        /// <param name="args">The arguments passed to the command.</param>
+        public async Task Execute(IRocketPlayer caller, string[] args) =>
             await ActionToExecute(caller, args);
-        }
 
-        public SubCommand() { }
-
+        /// <summary>
+        /// Creates a new subcommand with the given properties.
+        /// </summary>
+        /// <param name="name">The name of the subcommand.</param>
+        /// <param name="help">The help text for the subcommand.</param>
+        /// <param name="syntax">The syntax description of the subcommand.</param>
+        /// <param name="aliases">Alternative names for the subcommand.</param>
+        /// <param name="permissions">The permissions required to use the subcommand.</param>
+        /// <param name="codeToExecute">The function to run when the subcommand is executed.</param>
         public SubCommand(string name, string help, string syntax, List<string> aliases, List<string> permissions, Func<IRocketPlayer, string[], Task> codeToExecute)
         {
             Name = name;
