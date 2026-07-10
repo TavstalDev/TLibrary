@@ -2,7 +2,6 @@
 {
     public interface IPlugin
     {
-        
         void OnLoad();
 
         void OnUnLoad();
@@ -10,6 +9,7 @@
         string GetPluginName();
 
         TLogger GetLogger();
+        ELogLevel GetLogLevel();
 
         void CheckPluginFiles();
 

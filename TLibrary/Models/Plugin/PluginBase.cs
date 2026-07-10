@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Rocket.Core.Plugins;
 using Tavstal.TLibrary.Extensions;
+using Tavstal.TLibrary.Extensions.General;
 using Tavstal.TLibrary.Managers;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -24,10 +24,30 @@ namespace Tavstal.TLibrary.Models.Plugin
     /// <typeparam name="PluginConfig"></typeparam>
     public abstract class PluginBase<PluginConfig> : RocketPlugin, IPlugin where PluginConfig : ConfigurationBase
     {
+        static PluginBase()
+        {
+            string libPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Libraries");
+            string[] dependencies = { "System.Buffers", "System.Memory", "System.Threading.Tasks.Extensions", "MySqlConnector", "RL-I18N", "RL-I18N.West" };
+
+            foreach (string lib in dependencies)
+            {
+                try
+                {
+                    string fullPath = Path.Combine(libPath, $"{lib}.dll");
+                    if (File.Exists(fullPath))
+                        Assembly.LoadFrom(fullPath);
+                }
+                catch
+                {
+                    // Suppress errors to ensure the loop keeps going
+                }
+            }
+        }
+        
         /// <summary>
         /// The root directory path for the plugin.
         /// </summary>
-        private string _rootDirectory;
+        private string _rootDirectory = string.Empty;
         /// <summary>
         /// Gets the root directory path for the plugin.
         /// </summary>
@@ -36,7 +56,7 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// <summary>
         /// The directory path specific to the plugin.
         /// </summary>
-        private string _pluginDirectory;
+        private string _pluginDirectory = string.Empty;
         /// <summary>
         /// Gets the directory path specific to the plugin.
         /// </summary>
@@ -45,7 +65,7 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// <summary>
         /// The name of the plugin.
         /// </summary>
-        private string _pluginName;
+        private string _pluginName = string.Empty;
         /// <summary>
         /// Gets or sets the name of the plugin. The name can only be set if it is currently null or empty.
         /// </summary>
@@ -59,36 +79,76 @@ namespace Tavstal.TLibrary.Models.Plugin
             } 
         }
 
-        
+
         /// <summary>
         /// Plugin Configuration
         /// </summary>
-        public PluginConfig Config { get; private set; }
+        public PluginConfig Config { get; private set; } = null!;
 
         /// <summary>
         /// Hook Manager used to work with plugin hooks
         /// </summary>
-        public static HookManager HookManager { get; set; }
+        public static HookManager HookManager { get; set; } = null!;
 
         /// <summary>
         /// Rich logger used to replace Rocket's logger
         /// </summary>
-        private static TLogger _logger { get; set; }
+        private static TLogger _logger { get; set; } = null!;
         /// <summary>
         /// Rich logger used to replace Rocket's logger
         /// </summary>
         public static TLogger Logger => _logger;
 
         private static DateTime _versioningDate = new DateTime(2000, 1, 1);
-        private static Version _libraryVersion;
-        private static Version _version;
+        private static Version? _libraryVersion;
+        private static Version? _version;
         private static DateTime _buildDate;
-        private static Version _displayVersion;
         
-        public static Version LibraryVersion => _libraryVersion;
-        public static Version Version => _displayVersion;
+        public static Version? LibraryVersion => _libraryVersion;
+        public static Version? Version => _version;
         public static DateTime BuildDate => _buildDate;
 
+        public sealed override void LoadPlugin()
+        {
+            if (!Name.IsNullOrEmpty())
+                _pluginName = this.Name;
+            _rootDirectory = System.IO.Directory.GetCurrentDirectory();
+            _pluginDirectory = Path.Combine(_rootDirectory, "Plugins", GetPluginName());
+            _logger = new TLogger(this, "", ELogLevel.INFO);
+            
+            // Get Library Version
+            try
+            {
+                object[] versionAttributes = Assembly.GetExecutingAssembly()
+                    .GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
+                if (versionAttributes.Length > 0)
+                {
+                    AssemblyFileVersionAttribute versionAttribute = (AssemblyFileVersionAttribute)versionAttributes[0];
+                    _libraryVersion = new Version(versionAttribute.Version);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Failed to get library version:", ex);
+            }
+            
+            // Get Plugin Build Version
+            try
+            {
+                _version = this.Assembly.GetName().Version;
+                _buildDate = _versioningDate.AddDays(_version.Build).AddSeconds(_version.Revision * 2);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Failed to get plugin build version:", ex);
+            }
+            
+            OnPreLoad();
+            base.LoadPlugin();
+        }
+
+        public virtual void OnPreLoad() {}
+        
         /// <summary>
         /// Used when the plugin loads
         /// </summary>
@@ -96,88 +156,12 @@ namespace Tavstal.TLibrary.Models.Plugin
         {
             try
             {
-                if (!this.Name.IsNullOrEmpty())
-                    _pluginName = this.Name;
-                _rootDirectory = System.IO.Directory.GetCurrentDirectory();
-                _pluginDirectory = Path.Combine(_rootDirectory, "Plugins", GetPluginName());
-                _logger = TLogger.CreateInstance(this, false);
-                
-                Assembly assembly = Assembly.GetExecutingAssembly();
-                object[] versionAttributes;
-
-                // Get Library Version
-                try
-                {
-                    versionAttributes = assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
-                    if (versionAttributes.Length > 0)
-                    {
-                        AssemblyFileVersionAttribute versionAttribute =
-                            (AssemblyFileVersionAttribute)versionAttributes[0];
-                        _logger.Debug("Loading library version: " + versionAttribute.Version);
-                        _libraryVersion = new Version(versionAttribute.Version);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.Exception("Failed to get library version:");
-                    _logger.Error(ex);
-                }
-
-                assembly = this.Assembly;
-
-                // Get Plugin Build Version
-                try
-                {
-                    _version = assembly.GetName().Version;
-                    _buildDate = _versioningDate.AddDays(_version.Build).AddSeconds(_version.Revision * 2);
-                }
-                catch (Exception ex)
-                {
-                    _logger.Exception("Failed to get plugin build version:");
-                    _logger.Error(ex);
-                }
-
-                // Get Plugin Display Version
-                try
-                {
-                    versionAttributes =
-                        assembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
-                    if (versionAttributes.Length > 0)
-                    {
-                        AssemblyInformationalVersionAttribute informationalVersionAttribute =
-                            (AssemblyInformationalVersionAttribute)versionAttributes[0];
-                        _logger.Debug("Loading plugin display version: " + informationalVersionAttribute.InformationalVersion);
-                        _displayVersion = new Version(informationalVersionAttribute.InformationalVersion);
-                    }
-                    else
-                    {
-                        _logger.Debug("No plugin display version found, using default version.");
-                        _displayVersion = new Version(1, 0, 0, 0);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.Exception("Failed to get plugin display version:");
-                    _logger.Error(ex);
-                }
-
-                try
-                {
-                    base.Load();
-                    CheckPluginFiles();
-                    OnLoad();
-
-                }
-                catch (Exception ex)
-                {
-                    _logger.Exception($"Failed to load {Name}");
-                    _logger.Error(ex);
-                }
+                CheckPluginFiles();
+                OnLoad();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.Exception($"Unexpected error while loading {Name}");
-                _logger.Error(e);
+                _logger.Error($"Unexpected error while loading {Name}", ex);
             }
         }
 
@@ -186,7 +170,6 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// </summary>
         protected override void Unload()
         {
-            base.Unload();
             OnUnLoad();
             Localization = new Dictionary<string, string>(); // Clearing because of /rocket reload caused error
         }
@@ -195,40 +178,30 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// Returns the logger
         /// </summary>
         /// <returns>Object of a <see cref="TLogger"/></returns>
-        public TLogger GetLogger()
-        {
-            return _logger;
-        }
-        
+        public TLogger GetLogger() => _logger;
+
+        public ELogLevel GetLogLevel() => Config.LogLevel;
+
         /// <summary>
         /// Returns the name of the plugin
         /// </summary>
         /// <returns>A <see cref="string"></see> containing the name of the plugin.</returns>
-        public string GetPluginName()
-        {
-            return _pluginName;
-        }
+        public string GetPluginName() => _pluginName;
 
         /// <summary>
         /// Called after the plugins Load() function was called
         /// </summary>
-        public virtual void OnLoad()
-        {
-
-        }
+        public virtual void OnLoad() { }
 
         /// <summary>
         /// Called after the plugins Unload() function was called
         /// </summary>
-        public virtual void OnUnLoad() 
-        {
-            
-        }
+        public virtual void OnUnLoad() { }
 
         /// <summary>
         /// Used to check the plugin files.
         /// <br/>Deleting rocket generated files
-        /// <br/>And generating and loading the json configurations and translations
+        /// <br/>And generating and loading the JSON configurations and translations
         /// </summary>
         public virtual void CheckPluginFiles()
         {
@@ -252,12 +225,12 @@ namespace Tavstal.TLibrary.Models.Plugin
             Config = ConfigurationBase.Create<PluginConfig>("Configuration.json", _pluginDirectory);
             
             if (Config.CheckConfigFile())
-                Config = Config.ReadConfig<PluginConfig>();
+                Config = Config.ReadConfig<PluginConfig>()!;
             else
             {
                 CultureInfo ci = CultureInfo.InstalledUICulture;
                 string langISO = ci.TwoLetterISOLanguageName.ToLower();
-                if (langISO != "en" && LanguagePacks != null)
+                if (langISO != "en")
                 {
                     if (LanguagePacks.ContainsKey(ci.TwoLetterISOLanguageName))
                     {
@@ -290,12 +263,9 @@ namespace Tavstal.TLibrary.Models.Plugin
                 Logger.Warning($"The config field '{field.Name}' is missing in '{PluginName}' configuration.");
             }
             
-            
-            _logger.SetDebugMode(Config.DebugMode);
+            TLogger.SetLogLevel(GetPluginName(), Config.LogLevel);
 
-            Dictionary<string, string> localLocalization = CommonLocalization ?? new Dictionary<string, string>();
-            if (DefaultLocalization == null)
-                DefaultLocalization = new Dictionary<string, string>();
+            Dictionary<string, string> localLocalization = CommonLocalization;
 
             foreach (var l in DefaultLocalization)
                 localLocalization[l.Key] = l.Value;
@@ -306,29 +276,29 @@ namespace Tavstal.TLibrary.Models.Plugin
                 PluginExtensions.SaveTranslation(localLocalization, translationsDirectory, "locale.en.json");
             }
 
-            if (LanguagePacks != null)
-                if (Config.DownloadLocalePacks && LanguagePacks.Count > 0)
-                    foreach (var pack in LanguagePacks)
+            if (Config.DownloadLocalePacks && LanguagePacks.Count > 0)
+                foreach (var pack in LanguagePacks)
+                {
+                    string path = Path.Combine(translationsDirectory, $"locale.{pack.Key}.json");
+                    if (File.Exists(path))
+                        continue;
+
+                    UnityWebRequest www = UnityWebRequest.Get(pack.Value);
+                    www.SendWebRequest();
+                    InvokeAction(3, () =>
                     {
-                        string path = Path.Combine(translationsDirectory, $"locale.{pack.Key}.json");
-                        if (File.Exists(path))
-                            continue;
-
-                        UnityWebRequest www = UnityWebRequest.Get(pack.Value);
-                        www.SendWebRequest();
-                        InvokeAction(3, () =>
+                        if (www.result == UnityWebRequest.Result.ConnectionError
+                            || www.result == UnityWebRequest.Result.DataProcessingError
+                            || www.result == UnityWebRequest.Result.ProtocolError)
                         {
-                            if (www.result == UnityWebRequest.Result.ConnectionError
-                                || www.result == UnityWebRequest.Result.DataProcessingError
-                                || www.result == UnityWebRequest.Result.ProtocolError)
-                            {
-                                Logger.Error("Failed to download language packs.");
-                            }
-                            else
-                                File.WriteAllText(path, www.downloadHandler.text);
-                        });
+                            Logger.Error("Failed to download language packs.");
+                        }
+                        else
+                            File.WriteAllText(path, www.downloadHandler.text);
+                    });
 
-                    }
+                }
+                
             
             string locale = Config.Locale;
             if (File.Exists(Path.Combine(translationsDirectory, $"locale.{locale}.json")))
@@ -338,7 +308,7 @@ namespace Tavstal.TLibrary.Models.Plugin
                 {
                     if (localLocale.Count > 0)
                     {
-                        if ((DefaultLocalization.Count + CommonLocalization.Count) - localLocale.Count != 0)
+                        if (DefaultLocalization.Count + CommonLocalization.Count - localLocale.Count != 0)
                         {
                             foreach (var l in localLocale)
                             {
@@ -396,7 +366,7 @@ namespace Tavstal.TLibrary.Models.Plugin
         }
 
         /// <summary>
-        /// Custom method used to translate stuff with multi language support
+        /// Custom method used to translate stuff with multi-language support
         /// </summary>
         /// <param name="AddPrefix"></param>
         /// <param name="translationKey"></param>
@@ -414,21 +384,19 @@ namespace Tavstal.TLibrary.Models.Plugin
                 {
                     if (Localization.TryGetValue("prefix", out string prefixLocalization))
                         return prefixLocalization + string.Format(localization, args);
-                    return string.Format(localization, args);
                 }
 
                 return string.Format(localization, args);
             }
             catch (Exception ex)
             {
-               Logger.Exception($"Failed to localize '{translationKey}' key:");
-               Logger.Error(ex);
+               Logger.Error($"Failed to localize '{translationKey}' key:", ex);
                return string.Empty;
             }
         }
 
         /// <summary>
-        /// Custom method used to translate stuff with multi language support
+        /// Custom method used to translate stuff with multi-language support
         /// </summary>
         /// <param name="translationKey"></param>
         /// <param name="args"></param>
@@ -460,14 +428,15 @@ namespace Tavstal.TLibrary.Models.Plugin
             { "error_arg_not_number", "&cYou must provide a valid number as argument for '{0}'." },
             { "success_command_help", "&aUsage: /{0} {1}" },
         };
-        
+
         /// <summary>
         /// Default translations in the native language.
         /// </summary>
-        public virtual Dictionary<string, string> DefaultLocalization { get; set; }
+        public virtual Dictionary<string, string> DefaultLocalization { get; set; } = new Dictionary<string, string>();
+        
         /// <summary>
         /// Officialy supported language packs.
         /// </summary>
-        public virtual Dictionary<string, string> LanguagePacks { get; set; }
+        public virtual Dictionary<string, string> LanguagePacks { get; set; } = new Dictionary<string, string>();
     }
 }
