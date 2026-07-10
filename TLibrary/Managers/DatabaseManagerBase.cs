@@ -1,6 +1,6 @@
-﻿using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using MySqlConnector;
 using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Models.Database;
 using Tavstal.TLibrary.Models.Plugin;
@@ -14,13 +14,14 @@ namespace Tavstal.TLibrary.Managers
     {
         // ReSharper disable once InconsistentNaming
         public IPlugin _plugin { get; }
-        public IConfigurationBase _configuration { get; }
+        public DatabaseSettingsBase _configuration { get; }
 
-        protected DatabaseManagerBase(IPlugin plugin, IConfigurationBase configuration)
+        protected DatabaseManagerBase(IPlugin plugin, DatabaseSettingsBase configuration)
         {
             _plugin = plugin;
             _configuration = configuration;
-            var _ = new I18N.West.CP1250();
+            // Forces Mono's compiler/linker to include the CP1250 codepage
+            _ = new I18N.West.CP1250();
             // ReSharper disable once VirtualMemberCallInConstructor
             CheckSchema();
             Task.Run(async () => await CheckSchemaAsync());
@@ -30,22 +31,30 @@ namespace Tavstal.TLibrary.Managers
         /// Creates a MySqlConnection object for connecting to the database.
         /// </summary>
         /// <returns>A MySqlConnection object.</returns>
-        public MySqlConnection CreateConnection()
+        public MySqlConnection? CreateConnection()
         {
-            MySqlConnection mySqlConnection = null;
+            var builder = new MySqlConnectionStringBuilder
+            {
+                Server = _configuration.Host,
+                Database = _configuration.DatabaseName,
+                UserID = _configuration.UserName,
+                Password = _configuration.UserPassword,
+                Port = (uint)_configuration.Port,
+                DefaultCommandTimeout = (uint)_configuration.TimeOut,
+                CharacterSet = "utf8",
+                Pooling = true, 
+                MinimumPoolSize = 5,
+                MaximumPoolSize = 10,
+            };
+            
+            MySqlConnection? mySqlConnection = null;
             try
             {
-                mySqlConnection = new MySqlConnection(string.Format("SERVER={0};DATABASE={1};UID={2};PASSWORD={3};PORT={4};DEFAULT COMMAND TIMEOUT={5};CharSet=utf8;",
-                _configuration.GetValue<string>("Database:Host"),
-                _configuration.GetValue<string>("Database:DatabaseName"),
-                _configuration.GetValue<string>("Database:UserName"),
-                _configuration.GetValue<string>("Database:UserPassword"),
-                _configuration.GetValue<int>("Database:Port"),
-                _configuration.GetValue<int>("Database:TimeOut")));
+                mySqlConnection = new MySqlConnection(builder.ConnectionString);
             }
             catch (Exception ex)
             {
-                _plugin.GetLogger().Exception(ex.ToString());
+                _plugin.GetLogger().Error("Failed to create MySqlConnection.", ex);
             }
             return mySqlConnection;
         }
@@ -53,19 +62,11 @@ namespace Tavstal.TLibrary.Managers
         /// <summary>
         /// Checks the database schema and performs necessary updates if required.
         /// </summary>
-        public virtual void CheckSchema()
-        {
-            
-        }
+        public virtual void CheckSchema() { }
 
         /// <summary>
         /// Checks the database schema and performs necessary updates if required.
         /// </summary>
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public virtual async Task CheckSchemaAsync()
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-        {
-            
-        }
+        public virtual Task CheckSchemaAsync() => Task.CompletedTask;
     }
 }
