@@ -5,13 +5,16 @@ using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Tavstal.TLibrary.Extensions;
+using Tavstal.TLibrary.Extensions.General;
 using Tavstal.TLibrary.Extensions.Unturned;
 using Tavstal.TLibrary.Helpers.General;
 using UnityEngine;
 
 namespace Tavstal.TLibrary.Helpers.Unturned
 {
+    /// <summary>
+    /// Provides helper methods for managing Unturned players, their inventories, and other player-related actions.
+    /// </summary>
     public static class UPlayerHelper
     {
         /// <summary>
@@ -83,7 +86,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
                         ItemJar itemJar = items[b];
                         if (itemJar.item.amount > 0 || findEmpty)
                         {
-                            ItemAsset itemAsset = UAssetHelper.FindItemAsset(itemJar.item.id);
+                            ItemAsset? itemAsset = UAssetHelper.FindItemAsset(itemJar.item.id);
                             if (itemAsset != null && itemAsset.type == type)
                             {
                                 search.Add(new InventorySearch(item.page, itemJar));
@@ -157,9 +160,6 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="player">The player whose barricades will be destroyed.</param>
         public static void DestroyPlayerBarricades(UnturnedPlayer player)
         {
-            if (player == null)
-                return;
-
             if (player.CSteamID == CSteamID.Nil)
                 return;
 
@@ -245,8 +245,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
                 if (item == null)
                     continue;
 
-                ItemAsset asset = Assets.find(EAssetType.ITEM, item.id) as ItemAsset;
-
+                ItemAsset? asset = Assets.find(EAssetType.ITEM, item.id) as ItemAsset;
                 items.Add(asset?.type == EItemType.MAGAZINE
                     ? new Item(item.id, item.amount, item.quality, item.state)
                     : new Item(item.id, 1, item.quality, item.state));

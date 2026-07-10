@@ -1,6 +1,7 @@
 ﻿using System;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
+using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Helpers.General;
 using Tavstal.TLibrary.Models.Plugin;
 using UnityEngine;
@@ -8,11 +9,19 @@ using UnityEngine;
 namespace Tavstal.TLibrary.Helpers.Unturned
 {
     /// <summary>
-    /// Unturned chat helper
+    /// Provides helper methods for sending chat messages in Unturned.
     /// </summary>
     public static class UChatHelper
     {
-        public static void ServerSendChatMessage(string text, string icon = null, SteamPlayer fromPlayer = null,  SteamPlayer toPlayer = null, EChatMode mode = EChatMode.GLOBAL)
+        /// <summary>
+        /// Sends a chat message from the server, optionally with an icon, sender, and target player.
+        /// </summary>
+        /// <param name="text">The message text to send.</param>
+        /// <param name="icon">The URL of an icon image to show next to the message (optional).</param>
+        /// <param name="fromPlayer">The player who appears as the sender (optional).</param>
+        /// <param name="toPlayer">The specific player to send the message to (optional).</param>
+        /// <param name="mode">The chat mode (global, local, etc.). Defaults to global.</param>
+        public static void ServerSendChatMessage(string text, string? icon = null, SteamPlayer? fromPlayer = null,  SteamPlayer? toPlayer = null, EChatMode mode = EChatMode.GLOBAL)
         {
             // Main thread execution error fix
             MainThreadDispatcher.RunOnMainThread(() =>
@@ -23,17 +32,17 @@ namespace Tavstal.TLibrary.Helpers.Unturned
                 }
                 catch (Exception ex)
                 {
-                    LoggerHelper.LogException("The serverSendMessage function must be called from unity's game main thread.");
+                    LoggerHelper.LogError("The serverSendMessage function must be called from unity's game main thread.");
                     LoggerHelper.LogError(ex);
                 }
             });
         }
 
         /// <summary>
-        /// Send plain text chat message to a specific player
+        /// Sends a plain text chat message to a specific player without formatting.
         /// </summary>
-        /// <param name="toPlayer"></param>
-        /// <param name="text"></param>
+        /// <param name="toPlayer">The player to receive the message.</param>
+        /// <param name="text">The message text.</param>
         public static void SendPlainChatMessage(SteamPlayer toPlayer, string text)
         {
             string icon = "";
@@ -41,12 +50,12 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         }
 
         /// <summary>
-        /// Send chat message as command reply to a specific player
+        /// Sends a formatted command reply message to a specific player.
         /// </summary>
-        /// <param name="plugin"></param>
-        /// <param name="toPlayer"></param>
-        /// <param name="translation"></param>
-        /// <param name="args"></param>
+        /// <param name="plugin">The plugin sending the message.</param>
+        /// <param name="toPlayer">The target player (SteamPlayer or UnturnedPlayer).</param>
+        /// <param name="translation">The translation key to localize.</param>
+        /// <param name="args">Optional format arguments for the translation.</param>
         public static void SendCommandReply(this IPlugin plugin, object toPlayer, string translation, params object[] args)
         {
             string icon = "";
@@ -65,12 +74,12 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         }
 
         /// <summary>
-        /// Send chat message as command reply to a specific player
+        /// Sends a plain (unlocalized) command reply message to a specific player.
         /// </summary>
-        /// <param name="plugin"></param>
-        /// <param name="toPlayer"></param>
-        /// <param name="translation"></param>
-        /// <param name="args"></param>
+        /// <param name="plugin">The plugin sending the message.</param>
+        /// <param name="toPlayer">The target player (SteamPlayer or UnturnedPlayer).</param>
+        /// <param name="translation">The raw text or format string.</param>
+        /// <param name="args">Optional format arguments.</param>
         public static void SendPlainCommandReply(this IPlugin plugin, object toPlayer, string translation, params object[] args)
         {
             string icon = "";
@@ -83,12 +92,12 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         }
 
         /// <summary>
-        /// Send chat message to a specific player
+        /// Sends a formatted and localized chat message to a specific player.
         /// </summary>
-        /// <param name="plugin"></param>
-        /// <param name="toPlayer"></param>
-        /// <param name="translation"></param>
-        /// <param name="args"></param>
+        /// <param name="plugin">The plugin sending the message.</param>
+        /// <param name="toPlayer">The target player.</param>
+        /// <param name="translation">The translation key to localize.</param>
+        /// <param name="args">Optional format arguments for the translation.</param>
         public static void SendChatMessage(this IPlugin plugin, SteamPlayer toPlayer, string translation, params object[] args)
         {
             string icon = "";
@@ -97,11 +106,11 @@ namespace Tavstal.TLibrary.Helpers.Unturned
 
 
         /// <summary>
-        /// Send chat message to all players
+        /// Sends a formatted and localized chat message to all players.
         /// </summary>
-        /// <param name="plugin"></param>
-        /// <param name="translation"></param>
-        /// <param name="args"></param>
+        /// <param name="plugin">The plugin sending the message.</param>
+        /// <param name="translation">The translation key to localize.</param>
+        /// <param name="args">Optional format arguments for the translation.</param>
         public static void SendChatMessage(this IPlugin plugin, string translation, params object[] args)
         {
             string icon = "";

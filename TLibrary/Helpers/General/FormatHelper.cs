@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Tavstal.TLibrary.Models.FormatHelper;
+using Tavstal.TLibrary.Models.Formats;
 
 namespace Tavstal.TLibrary.Helpers.General
 {
@@ -9,7 +9,10 @@ namespace Tavstal.TLibrary.Helpers.General
     /// </summary>
     public static class FormatHelper
     {
-        public readonly static List<TextFormat> DefaultFormats = new List<TextFormat>()
+        /// <summary>
+        /// The default list of text color and decoration formats used for rich text.
+        /// </summary>
+        public static readonly List<TextFormat> DefaultFormats = new List<TextFormat>()
         {
             new TextFormat("&0", "<color=#000000>", "</color>", false),
             new TextFormat("&1", "<color=#0000AA>", "</color>", false),
@@ -31,31 +34,35 @@ namespace Tavstal.TLibrary.Helpers.General
             new TextFormat("&o", "<i>", "</i>", true),
         };
 
-        public readonly static List<ConsoleFormat> ConsoleFormats = new List<ConsoleFormat>
+        /// <summary>
+        /// The default list of console color formats.
+        /// </summary>
+        public static readonly Dictionary<string, string> ConsoleFormats = new Dictionary<string, string>
         {
-            new ConsoleFormat("&0", ConsoleColor.Black),
-            new ConsoleFormat("&1", ConsoleColor.DarkBlue),
-            new ConsoleFormat("&2", ConsoleColor.DarkGreen),
-            new ConsoleFormat("&3", ConsoleColor.DarkCyan),
-            new ConsoleFormat("&4", ConsoleColor.DarkRed),
-            new ConsoleFormat("&5", ConsoleColor.DarkMagenta),
-            new ConsoleFormat("&6", ConsoleColor.DarkYellow),
-            new ConsoleFormat("&7", ConsoleColor.Gray),
-            new ConsoleFormat("&8", ConsoleColor.DarkGray),
-            new ConsoleFormat("&9", ConsoleColor.Blue),
-            new ConsoleFormat("&a", ConsoleColor.Green),
-            new ConsoleFormat("&b", ConsoleColor.Cyan),
-            new ConsoleFormat("&c", ConsoleColor.Red),
-            new ConsoleFormat("&d", ConsoleColor.Magenta),
-            new ConsoleFormat("&e", ConsoleColor.Yellow),
-            new ConsoleFormat("&f", ConsoleColor.White),
+            {"&0", "\x1b[40m"},
+            {"&1", "\x1b[44m"},
+            {"&2", "\x1b[42m"},
+            {"&3", "\x1b[46m"},
+            {"&4", "\x1b[41m"},
+            {"&5", "\x1b[45m"},
+            {"&6", "\x1b[43m"},
+            {"&7", "\x1b[47m"},
+            {"&8", "\x1b[100m"},
+            {"&9", "\x1b[104m"},
+            {"&a", "\x1b[102m"},
+            {"&b", "\x1b[106m"},
+            {"&c", "\x1b[101m"},
+            {"&d", "\x1b[105m"},
+            {"&e", "\x1b[103m"},
+            {"&f", "\x1b[107m"},
+            {"&r", "\x1b[0m"},
         };
 
         /// <summary>
-        /// Formats the text with the default formats.
+        /// Formats the text using the default color and decoration codes.
         /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
+        /// <param name="text">The text with format codes (e.g. "&amp;cHello").</param>
+        /// <returns>The formatted rich text string.</returns>
         public static string FormatTextV2(string text)
         {
             string formated = string.Empty;
@@ -173,104 +180,25 @@ namespace Tavstal.TLibrary.Helpers.General
 
             return formated;
         }
-
-        /// <summary>
-        /// Sends the formated text to the console.
-        /// </summary>
-        /// <param name="text"></param>
-        public static void SendFormatedConsole(string text)
+        
+        public static string FormatTextConsole(string text)
         {
-            ConsoleColor oldColor = Console.ForegroundColor;
-            char lastChar = ' ';
-            bool isHex = false;
-            string hexString = string.Empty;
-            for (int i = 0; i < text.Length; i++)
-            {
-                char s = text[i];
-                // Should be formatted
-                if (lastChar == '&' && s != ' ')
-                {
-                    string key = new string(new[] { lastChar, s });
-                    // &r means reset, resets the format if it has active formats already
-                    if (key == "&r")
-                        Console.ForegroundColor = ConsoleColor.White;
-                    else if (s == '#') // Hex found, tries to format to hex color
-                    {
-                        isHex = true;
-                        s = '&'; // sets current char to & because it will be later on set to lastChar
-                    }
-                    else if (isHex && hexString.Length != 6)
-                    {
-                        hexString += s;
-
-                        if (hexString.Length == 6)
-                        {
-                            if (!int.TryParse(hexString, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out int _))
-                            {
-                                isHex = false;
-                                hexString = string.Empty;
-                            }
-                        }
-                        s = '&'; // sets current char to & because it will be later on set to lastChar
-                    }
-                    else
-                    {
-                        ConsoleFormat newFormat = null;
-                        if (!isHex)
-                            newFormat = ConsoleFormats.Find(x => x.Key == key);
-
-                        if (newFormat != null)
-                        {
-                            Console.ForegroundColor = newFormat.Color; //formated += newFormat.StartTag;
-
-                            // If the currentFormat is hex then it ads the current char because normaly the current char should be the part of the key.
-                            // For example: I would like to TEXT to be white, so I combine &#FFFFFF + TEXT. But If I remove this function this will happen:
-                            // &#FFFFFFTEXT -> EXT
-                            if (isHex)
-                            {
-                                isHex = false;
-                                hexString = string.Empty;
-                                //formated += s;
-                                Console.Write(s);
-                            }
-                        }
-                    }
-                    lastChar = s;
-                }
-                else if (isHex) // Empty char found while trying to build a hex string
-                {
-                    isHex = false;
-                    hexString = string.Empty;
-                }
-                else // Ads the character to the formatted string
-                {
-                    lastChar = s;
-                    if (s != '&')
-                        Console.Write(s); //formated += s;
-                }
-
-                // If it gets to the end of the string, it will close the formatting
-                if (i == text.Length - 1)
-                {
-                    Console.ForegroundColor = oldColor;
-                    Console.CursorLeft = 0;
-                    Console.CursorTop += 1;
-                }
-            }
+            foreach (var format in ConsoleFormats)
+                text = text.Replace(format.Key, format.Value);
+            return text + "\x1b[0m";
         }
 
         /// <summary>
-        /// Clear formaters from the text. Used by the console.
+        /// Removes all format codes from the text, leaving only plain text.
         /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
+        /// <param name="text">The text with format codes.</param>
+        /// <returns>The plain text without format codes.</returns>
         public static string ClearFormaters(string text)
         {
             string formated = string.Empty;
             char lastChar = ' ';
-            for (int i = 0; i < text.Length; i++)
+            foreach (var s in text)
             {
-                char s = text[i];
                 if (lastChar == '&' && s != ' ')
                 {
                     lastChar = s;

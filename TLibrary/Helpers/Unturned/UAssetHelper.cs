@@ -1,10 +1,13 @@
 ﻿using SDG.Unturned;
 using System;
 using System.Collections.Generic;
-using Tavstal.TLibrary.Extensions;
+using Tavstal.TLibrary.Extensions.General;
 
 namespace Tavstal.TLibrary.Helpers.Unturned
 {
+    /// <summary>
+    /// Provides helper methods to find and get Unturned assets like items, vehicles, and effects.
+    /// </summary>
     public static class UAssetHelper
     {
         /// <summary>
@@ -29,16 +32,18 @@ namespace Tavstal.TLibrary.Helpers.Unturned
             Assets.find(values);
             values = values.FindAll(x => x.assetCategory == EAssetType.VEHICLE);
             
-            foreach (Asset a in values) {
-                if (a is VehicleAsset va) {
-                    vehicles.Add(va);
-                }
-
-                if (a is VehicleRedirectorAsset vra) {
-                    vehicles.Add(vra.TargetVehicle.Find());
+            foreach (Asset asset in values)
+            {
+                switch (asset)
+                {
+                    case VehicleAsset va:
+                        vehicles.Add(va);
+                        break;
+                    case VehicleRedirectorAsset vra:
+                        vehicles.Add(vra.TargetVehicle.Find());
+                        break;
                 }
             }
-            
             return vehicles;
         }
 
@@ -47,16 +52,16 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static ItemAsset FindItemAsset(string name)
+        public static ItemAsset? FindItemAsset(string name)
         {
-            ItemAsset asset = null;
-            foreach (ItemAsset a in GetItemAssets())
+            ItemAsset? asset = null;
+            foreach (ItemAsset itemAsset in GetItemAssets())
             {
-                if (a.itemName != null && a.itemName.Length > 0)
+                if (!string.IsNullOrEmpty(itemAsset.itemName))
                 {
-                    if (a.itemName.ContainsIgnoreCase(name))
+                    if (itemAsset.itemName.ContainsIgnoreCase(name))
                     {
-                        asset = a;
+                        asset = itemAsset;
                         break;
                     }
                 }
@@ -70,16 +75,16 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static VehicleAsset FindVehicleAsset(string name)
+        public static VehicleAsset? FindVehicleAsset(string name)
         {
-            VehicleAsset asset = null;
-            foreach (VehicleAsset a in GetVehicleAssets())
+            VehicleAsset? asset = null;
+            foreach (VehicleAsset vehicleAsset in GetVehicleAssets())
             {
-                if (a.vehicleName != null && a.vehicleName.Length > 0)
+                if (!string.IsNullOrEmpty(vehicleAsset.vehicleName))
                 {
-                    if (a.vehicleName.ContainsIgnoreCase(name))
+                    if (vehicleAsset.vehicleName.ContainsIgnoreCase(name))
                     {
-                        asset = a;
+                        asset = vehicleAsset;
                         break;
                     }
                 }
@@ -93,27 +98,28 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// </summary>
         /// <param name="id">The ID of the item asset to find.</param>
         /// <returns>An ItemAsset object representing the item asset with the specified ID, or null if not found.</returns>
-        public static ItemAsset FindItemAsset(ushort id) => (ItemAsset)Assets.find(EAssetType.ITEM, id);
+        public static ItemAsset? FindItemAsset(ushort id) => (ItemAsset)Assets.find(EAssetType.ITEM, id);
 
         /// <summary>
         /// Finds and retrieves a VehicleAsset object with the specified ID.
         /// </summary>
         /// <param name="id">The ID of the vehicle asset to find.</param>
         /// <returns>A VehicleAsset object representing the vehicle asset with the specified ID, or null if not found.</returns>
-        public static VehicleAsset FindVehicleAsset(ushort id) {
+        public static VehicleAsset? FindVehicleAsset(ushort id) {
             Asset asset = Assets.FindBaseVehicleAssetByGuidOrLegacyId(Guid.Empty, id) ?? Assets.FindVehicleAssetByGuidOrLegacyId(Guid.Empty, id);
-            if (asset == null)
-                return null;
-            
-            if (asset is VehicleAsset va) {
-                return va;
+            switch (asset)
+            {
+                case null:
+                    return null;
+                case VehicleAsset vehicleAsset:
+                    return vehicleAsset;
+                case VehicleRedirectorAsset vehicleRedirectorAsset:
+                    return vehicleRedirectorAsset.TargetVehicle.Find();
+                default:
+                    return null;
             }
-
-            if (asset is VehicleRedirectorAsset vra) {
-                return vra.TargetVehicle.Find();
-            }
-
-            return null;
         }
+        
+        public static EffectAsset? FindEffectAsset(ushort id) => (EffectAsset)Assets.find(EAssetType.EFFECT, id);
     }
 }

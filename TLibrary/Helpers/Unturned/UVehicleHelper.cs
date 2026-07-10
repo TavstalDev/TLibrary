@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace Tavstal.TLibrary.Helpers.Unturned
 {
+    /// <summary>
+    /// Provides helper methods for finding and managing Unturned vehicles.
+    /// </summary>
     public static class UVehicleHelper
     {
         /// <summary>
@@ -20,7 +23,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
             try
             {
                 if (VehicleManager.vehicles == null) return result;
-                RaycastHit[] rayResult = new RaycastHit[] { };
+                RaycastHit[] rayResult = { };
                 Physics.SphereCastNonAlloc(center, sqrRadius, Vector3.forward, rayResult, RayMasks.VEHICLE);
                 foreach (RaycastHit ray in rayResult)
                 {

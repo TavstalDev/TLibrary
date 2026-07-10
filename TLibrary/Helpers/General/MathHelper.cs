@@ -4,63 +4,57 @@ using UnityEngine;
 
 namespace Tavstal.TLibrary.Helpers.General
 {
+    /// <summary>
+    /// Provides helper methods for math operations.
+    /// </summary>
     public static class MathHelper
     {
-        private static System.Random _random;
+        private static System.Random? _random;
         private static readonly object SyncObj = new object();
 
         /// <summary>
-        /// Calculates the center point of an array of Vector3 points.
+        /// Finds the center point of an array of Vector3 points.
         /// </summary>
         /// <param name="vectors">An array of Vector3 points.</param>
-        /// <returns>The center point of the provided Vector3 points.</returns>
+        /// <returns>The center point of the given points.</returns>
         public static Vector3 GetCenterOfVectors(Vector3[] vectors)
         {
             Vector3 sum = Vector3.zero;
-            if (vectors == null || vectors.Length == 0)
-            {
+            if (vectors.Length == 0)
                 return sum;
-            }
 
             foreach (Vector3 vec in vectors)
-            {
                 sum += vec;
-            }
             return sum / vectors.Length;
         }
 
         /// <summary>
-        /// Calculates the center point of a List of Vector3 points.
+        /// Finds the center point of a list of Vector3 points.
         /// </summary>
-        /// <param name="vectors">A List of Vector3 points.</param>
-        /// <returns>The center point of the provided Vector3 points.</returns>
+        /// <param name="vectors">A list of Vector3 points.</param>
+        /// <returns>The center point of the given points.</returns>
         public static Vector3 GetCenterOfVectors(List<Vector3> vectors)
         {
             Vector3 sum = Vector3.zero;
-            if (vectors == null || vectors.Count == 0)
-            {
+            if (vectors.Count == 0)
                 return sum;
-            }
 
             foreach (Vector3 vec in vectors)
-            {
                 sum += vec;
-            }
             return sum / vectors.Count;
         }
 
         /// <summary>
-        /// Returns a random integer between the specified minimum and maximum values (inclusive).
+        /// Returns a random whole number between the given minimum and maximum values (both included).
         /// </summary>
-        /// <param name="min">The minimum value of the random range.</param>
-        /// <param name="max">The maximum value of the random range.</param>
-        /// <returns>A random integer between the specified minimum and maximum values.</returns>
+        /// <param name="min">The smallest possible number.</param>
+        /// <param name="max">The biggest possible number.</param>
+        /// <returns>A random whole number between min and max.</returns>
         public static int Next(int min, int max)
         {
             lock (SyncObj)
             {
-                if (_random == null)
-                    _random = new System.Random(); // Or exception...
+                _random ??= new System.Random();
                 return _random.Next(min, max);
             }
         }
@@ -74,8 +68,7 @@ namespace Tavstal.TLibrary.Helpers.General
         {
             lock (SyncObj)
             {
-                if (_random == null)
-                    _random = new System.Random(); // Or exception...
+                _random ??= new System.Random();
                 return _random.Next(0, max);
             }
         }
@@ -100,8 +93,7 @@ namespace Tavstal.TLibrary.Helpers.General
         {
             lock (SyncObj)
             {
-                if (_random == null)
-                    _random = new System.Random();
+                _random ??= new System.Random();
                 return (uint)(_random.Next(1 << 30)) << 2 | (uint)(_random.Next(1 << 2));
             }
         }
@@ -128,8 +120,7 @@ namespace Tavstal.TLibrary.Helpers.General
         {
             lock (SyncObj)
             {
-                if (_random == null)
-                    _random = new System.Random(); // Or exception...
+                _random ??= new System.Random();
                 return (_random.NextDouble() * Math.Abs(max - min)) + min;
             }
         }
@@ -143,8 +134,7 @@ namespace Tavstal.TLibrary.Helpers.General
         {
             lock (SyncObj)
             {
-                if (_random == null)
-                    _random = new System.Random(); // Or exception...
+                _random ??= new System.Random();
                 return (_random.NextDouble() * Math.Abs(max));
             }
         }
@@ -171,8 +161,7 @@ namespace Tavstal.TLibrary.Helpers.General
         {
             lock (SyncObj)
             {
-                if (_random == null)
-                    _random = new System.Random(); // Or exception...
+                _random ??= new System.Random();
                 return ((float)_random.NextDouble() * Math.Abs(max - min)) + min;
             }
         }
@@ -186,8 +175,7 @@ namespace Tavstal.TLibrary.Helpers.General
         {
             lock (SyncObj)
             {
-                if (_random == null)
-                    _random = new System.Random(); // Or exception...
+                _random ??= new System.Random();
                 return ((float)_random.NextDouble() * Math.Abs(max));
             }
         }
@@ -209,40 +197,32 @@ namespace Tavstal.TLibrary.Helpers.General
         /// </summary>
         /// <param name="metadata">The byte array representing the metadata.</param>
         /// <returns>The converted <see cref="int"/>.</returns>
-        public static int ConvertByteToInt32(byte[] metadata)
-        {
-            return BitConverter.ToInt32(metadata, 0);
-        }
+        public static int ConvertByteToInt32(byte[] metadata) =>
+            BitConverter.ToInt32(metadata, 0);
 
         /// <summary>
         /// Converts a byte array representing metadata to an unsigned integer.
         /// </summary>
         /// <param name="metadata">The byte array representing the metadata.</param>
         /// <returns>The converted <see cref="uint"/>.</returns>
-        public static uint ConvertByteToUInt32(byte[] metadata)
-        {
-            return BitConverter.ToUInt32(metadata, 0);
-        }
-
+        public static uint ConvertByteToUInt32(byte[] metadata) =>
+            BitConverter.ToUInt32(metadata, 0);
+        
         /// <summary>
         /// Converts an integer to a byte array representing metadata.
         /// </summary>
         /// <param name="value"></param>
         /// <returns>The byte array representing the converted <see cref="int"/>.</returns>
-        public static byte[] ConvertInt32ToMetadata(uint value)
-        {
-            return BitConverter.GetBytes(value);
-        }
+        public static byte[] ConvertInt32ToMetadata(uint value) =>
+            BitConverter.GetBytes(value);
 
         /// <summary>
         /// Converts an unsigned integer to a byte array representing metadata.
         /// </summary>
         /// <param name="value"></param>
         /// <returns>The byte array representing the converted <see cref="uint"/>.</returns>
-        public static byte[] ConvertUInt32ToMetadata(uint value)
-        {
-            return BitConverter.GetBytes(value);
-        }
+        public static byte[] ConvertUInt32ToMetadata(uint value) =>
+            BitConverter.GetBytes(value);
 
         /// <summary>
         /// Generates a random frequency as an unsigned integer.
@@ -255,7 +235,6 @@ namespace Tavstal.TLibrary.Helpers.General
                 inUseFrequencies.Add(freq);
             else
                 freq = GenerateFrequency(ref inUseFrequencies);
-
             return freq;
         }
 
@@ -263,9 +242,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// Generates a random frequency as an unsigned integer.
         /// </summary>
         /// <returns>A randomly generated frequency.</returns>
-        public static uint GenerateFrequency()
-        {
-            return Convert.ToUInt32(MathHelper.Next(300000, 900000));
-        }
+        public static uint GenerateFrequency() =>
+            Convert.ToUInt32(Next(300000, 900000));
     }
 }

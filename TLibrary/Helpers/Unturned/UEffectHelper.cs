@@ -1,4 +1,5 @@
-﻿using Rocket.Unturned.Player;
+﻿using System.Collections.Generic;
+using Rocket.Unturned.Player;
 using SDG.NetTransport;
 using SDG.Unturned;
 using Tavstal.TLibrary.Helpers.General;
@@ -6,6 +7,9 @@ using Tavstal.TLibrary.Models.Plugin;
 
 namespace Tavstal.TLibrary.Helpers.Unturned
 {
+    /// <summary>
+    /// Provides helper methods to send and manage Unturned UI effects for players.
+    /// </summary>
     public static class UEffectHelper
     {
         /// <summary>
@@ -361,7 +365,6 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="value">The text to send.</param>
         public static void SendUIEffectRichText(ushort effectId, ITransportConnection connection, bool reliable, string uiName, string value) 
             => SendUIEffectText(effectId, connection, reliable, uiName, FormatHelper.FormatTextV2(value));
-        
 
         /// <summary>
         /// Sends a UI effect with four arguments to the specified transport connection.
@@ -374,10 +377,8 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="arg1">The second argument for the effect.</param>
         /// <param name="arg2">The third argument for the effect.</param>
         /// <param name="arg3">The fourth argument for the effect.</param>
-        public static void SendUIEffect(ushort id, short key, ITransportConnection transportConnection, bool reliable, string arg0, string arg1, string arg2, string arg3)
-        {
-            MainThreadDispatcher.RunOnMainThread(() => EffectManager.sendUIEffect(id, key, transportConnection, reliable, arg0, arg1, arg2, arg3));
-        }
+        public static void SendUIEffect(ushort id, short key, ITransportConnection transportConnection, bool reliable, string arg0, string arg1, string arg2, string arg3) =>
+            SendUIEffect(id, key, transportConnection, reliable, new List<string> { arg0, arg1, arg2, arg3 });
         
         /// <summary>
         /// Sends a UI effect with three arguments to the specified transport connection.
@@ -389,10 +390,8 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="arg0">The first argument for the effect.</param>
         /// <param name="arg1">The second argument for the effect.</param>
         /// <param name="arg2">The third argument for the effect.</param>
-        public static void SendUIEffect(ushort id, short key, ITransportConnection transportConnection, bool reliable, string arg0, string arg1, string arg2)
-        {
-            MainThreadDispatcher.RunOnMainThread(() => EffectManager.sendUIEffect(id, key, transportConnection, reliable, arg0, arg1, arg2));
-        }
+        public static void SendUIEffect(ushort id, short key, ITransportConnection transportConnection, bool reliable, string arg0, string arg1, string arg2) =>
+            SendUIEffect(id, key, transportConnection, reliable, new List<string> { arg0, arg1, arg2 });
         
         /// <summary>
         /// Sends a UI effect with two arguments to the specified transport connection.
@@ -403,10 +402,8 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="reliable">Determines whether the transmission should be reliable.</param>
         /// <param name="arg0">The first argument for the effect.</param>
         /// <param name="arg1">The second argument for the effect.</param>
-        public static void SendUIEffect(ushort id, short key, ITransportConnection transportConnection, bool reliable, string arg0, string arg1)
-        {
-            MainThreadDispatcher.RunOnMainThread(() => EffectManager.sendUIEffect(id, key, transportConnection, reliable, arg0, arg1));
-        }
+        public static void SendUIEffect(ushort id, short key, ITransportConnection transportConnection, bool reliable, string arg0, string arg1)=>
+            SendUIEffect(id, key, transportConnection, reliable, new List<string> { arg0, arg1 });
         
         /// <summary>
         /// Sends a UI effect with one argument to the specified transport connection.
@@ -416,10 +413,8 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="transportConnection">The transport connection to send the effect to.</param>
         /// <param name="reliable">Determines whether the transmission should be reliable.</param>
         /// <param name="arg0">The first argument for the effect.</param>
-        public static void SendUIEffect(ushort id, short key, ITransportConnection transportConnection, bool reliable, string arg0)
-        {
-            MainThreadDispatcher.RunOnMainThread(() => EffectManager.sendUIEffect(id, key, transportConnection, reliable, arg0));
-        }
+        public static void SendUIEffect(ushort id, short key, ITransportConnection transportConnection, bool reliable, string arg0) =>
+            SendUIEffect(id, key, transportConnection, reliable, new List<string> { arg0 });
         
         /// <summary>
         /// Sends a UI effect with no arguments to the specified transport connection.
@@ -428,10 +423,8 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="key">The key associated with the effect.</param>
         /// <param name="transportConnection">The transport connection to send the effect to.</param>
         /// <param name="reliable">Determines whether the transmission should be reliable.</param>
-        public static void SendUIEffect(ushort id, short key, ITransportConnection transportConnection, bool reliable)
-        {
-            MainThreadDispatcher.RunOnMainThread(() => EffectManager.sendUIEffect(id, key, transportConnection, reliable));
-        }
+        public static void SendUIEffect(ushort id, short key, ITransportConnection transportConnection, bool reliable) =>
+            SendUIEffect(id, key, transportConnection, reliable, new List<string>());
         
         /// <summary>
         /// Sends UI text to the specified transport connection.
@@ -441,10 +434,8 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="reliable">Determines whether the transmission should be reliable.</param>
         /// <param name="childNameOrPath">The name or path of the UI element to update with the text.</param>
         /// <param name="text">The text to send.</param>
-        public static void SendUIEffectText(short key, ITransportConnection transportConnection, bool reliable, string childNameOrPath, string text)
-        {
+        public static void SendUIEffectText(short key, ITransportConnection transportConnection, bool reliable, string childNameOrPath, string text) =>
             MainThreadDispatcher.RunOnMainThread(() => EffectManager.sendUIEffectText(key, transportConnection, reliable, childNameOrPath, text));
-        }
 
         /// <summary>
         /// Sends UI text to the specified transport connection.
@@ -466,10 +457,8 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="reliable">Determines whether the transmission should be reliable.</param>
         /// <param name="childNameOrPath">The name or path of the UI element to update with the image URL.</param>
         /// <param name="url">The image URL to send.</param>
-        public static void SendUIEffectImageURL(short key, ITransportConnection transportConnection, bool reliable, string childNameOrPath, string url)
-        {
+        public static void SendUIEffectImageURL(short key, ITransportConnection transportConnection, bool reliable, string childNameOrPath, string url) =>
             MainThreadDispatcher.RunOnMainThread(() => EffectManager.sendUIEffectImageURL(key, transportConnection, reliable, childNameOrPath, url));
-        }
 
         /// <summary>
         /// Sends a UI image URL to the specified transport connection.
@@ -491,10 +480,8 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="reliable">Determines whether the transmission should be reliable.</param>
         /// <param name="childNameOrPath">The name or path of the UI element to update visibility for.</param>
         /// <param name="visibility">The visibility state to set.</param>
-        public static void SendUIEffectVisibility(short key, ITransportConnection transportConnection, bool reliable, string childNameOrPath, bool visibility)
-        {
+        public static void SendUIEffectVisibility(short key, ITransportConnection transportConnection, bool reliable, string childNameOrPath, bool visibility) =>
             MainThreadDispatcher.RunOnMainThread(() => EffectManager.sendUIEffectVisibility(key, transportConnection, reliable, childNameOrPath, visibility));
-        }
 
         /// <summary>
         /// Sets the visibility of a UI element for the specified transport connection.
@@ -505,24 +492,76 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="childNameOrPath">The name or path of the UI element to update visibility for.</param>
         /// <param name="visibility">The visibility state to set.</param>
         public static void SendUIEffectVisibility(ushort key, ITransportConnection transportConnection, bool reliable,
-            string childNameOrPath, bool visibility) => SendUIEffectVisibility((short)key, transportConnection, reliable, childNameOrPath, visibility);
+            string childNameOrPath, bool visibility) => 
+            SendUIEffectVisibility((short)key, transportConnection, reliable, childNameOrPath, visibility);
 
         /// <summary>
         /// Clears a specific effect by its ID for the specified transport connection.
         /// </summary>
         /// <param name="key">The ID of the effect to clear.</param>
         /// <param name="transportConnection">The transport connection to clear the effect for.</param>
-        public static void AskEffectClearByID(ushort key, ITransportConnection transportConnection)
-        {
+        public static void AskEffectClearByID(ushort key, ITransportConnection transportConnection) =>
             MainThreadDispatcher.RunOnMainThread(() => EffectManager.askEffectClearByID(key, transportConnection));
-        }
 
         /// <summary>
         /// Clears all effects for all transport connections.
         /// </summary>
-        public static void AskEffectClearAll()
-        {
+        public static void AskEffectClearAll() =>
             MainThreadDispatcher.RunOnMainThread(EffectManager.askEffectClearAll);
+        
+        
+        /// <summary>
+        /// Sends a UI effect to a specific player connection.
+        /// </summary>
+        /// <param name="id">The ID of the effect asset to send.</param>
+        /// <param name="key">The key of the effect.</param>
+        /// <param name="transportConnection">The connection of the player to send the effect to.</param>
+        /// <param name="reliable">If <see langword="true"/>, the effect is sent reliably.</param>
+        /// <param name="args">The list of arguments to pass with the effect.</param>
+        private static void SendUIEffect(ushort id, short key, ITransportConnection transportConnection, bool reliable, List<string> args)
+        {
+            var effectAsset = UAssetHelper.FindEffectAsset(id);
+            if (effectAsset == null)
+            {
+                LoggerHelper.LogWarning($"Failed to get effect asset by '{id}' id.");
+                return;
+            }
+
+            System.Action? action;
+            switch (args.Count)
+            {
+                case 0:
+                {
+                    action = () =>
+                        EffectManager.SendUIEffect(effectAsset, key, transportConnection, reliable);
+                    break;
+                }
+                case 1:
+                {
+                    action = () =>
+                        EffectManager.SendUIEffect(effectAsset, key, transportConnection, reliable, args[0]);   
+                    break;
+                }
+                case 2:
+                {
+                    action = () =>
+                        EffectManager.SendUIEffect(effectAsset, key, transportConnection, reliable, args[0],  args[1]);   
+                    break;
+                }
+                case 3:
+                {
+                    action = () =>
+                        EffectManager.SendUIEffect(effectAsset, key, transportConnection, reliable, args[0],  args[1],  args[2]);   
+                    break;
+                }
+                default:
+                {
+                    action = () =>
+                        EffectManager.SendUIEffect(effectAsset, key, transportConnection, reliable, args[0],  args[1],  args[2], args[3]);   
+                    break;
+                }
+            }
+            MainThreadDispatcher.RunOnMainThread(action);
         }
     }
 }

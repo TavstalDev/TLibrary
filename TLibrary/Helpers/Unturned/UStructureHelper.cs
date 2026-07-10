@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Tavstal.TLibrary.Helpers.Unturned
 {
+    /// <summary>
+    /// Provides helper methods for finding and managing Unturned structures.
+    /// </summary>
     public static class UStructureHelper
     {
         /// <summary>
