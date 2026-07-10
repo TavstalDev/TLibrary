@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
-using MySql.Data.MySqlClient;
-using Tavstal.TLibrary.Models.Plugin;
+using MySqlConnector;
 
 namespace Tavstal.TLibrary.Models.Database
 {
     /// <summary>
-    /// Base interface for all database managers.
+    /// Defines the basic structure for a database manager.
+    /// Every database manager should implement this interface.
     /// </summary>
     public interface IDatabaseManager
     {
@@ -13,16 +13,22 @@ namespace Tavstal.TLibrary.Models.Database
         /// The configuration of the plugin.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        IConfigurationBase _configuration { get; }
+        DatabaseSettingsBase _configuration { get; }
 
         /// <summary>
         /// Creates a connection to the database.
         /// </summary>
-        /// <returns></returns>
-        MySqlConnection CreateConnection();
+        /// <returns>A new MySQL connection, or null if it fails.</returns>
+        MySqlConnection? CreateConnection();
 
+        /// <summary>
+        /// Checks the database schema and creates missing tables or columns.
+        /// </summary>
         void CheckSchema();
         
+        /// <summary>
+        /// Checks the database schema and creates missing tables or columns.
+        /// </summary>
         Task CheckSchemaAsync();
     }
 }
