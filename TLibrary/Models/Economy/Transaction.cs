@@ -6,51 +6,52 @@ using Tavstal.TLibrary.Models.Plugin;
 
 namespace Tavstal.TLibrary.Models.Economy
 {
-    /// <summary>
-    /// Transaction
-    /// </summary>
-    [Serializable]
+    /// <inheritdoc/>
     public class Transaction : ITransaction
     {
+        /// <inheritdoc/>
         [SqlMember(columnType: "varchar(36)", isPrimaryKey: true)]
         public string Id { get; set; }
-        /// <summary>
-        /// Type of the transaction to check the transaction was sent or recieved by the payee
-        /// <br/>For values check <see cref="ETransaction"/>
-        /// </summary>
+        
+        /// <inheritdoc/>
         [SqlMember(columnType: "tinyint(1)")]
         public ETransaction Type { get; set; }
-        /// <summary>
-        /// Type of the payment method, used to check the type of the money
-        /// </summary>
+        
+        /// <inheritdoc/>
         [SqlMember(columnType: "tinyint(1)")]
         public EPaymentMethod PaymentMethod { get; set; }
-        /// <summary>
-        /// Name of the store, can be used as displayName if the transaction was made between a player and a plugin, like TShop
-        /// </summary>
+        
+        /// <inheritdoc/>
         [SqlMember(isNullable: true, columnType: "varchar(64)")]
         public string StoreName { get; set; }
-        /// <summary>
-        /// SteamId of the payer, the player who sends the money
-        /// </summary>
+        
+        /// <inheritdoc/>
         [SqlMember(isUnsigned: true)]
         public ulong PayerId { get; set; }
-        /// <summary>
-        /// SteamId of the payer, the player who recieves the money
-        /// </summary>
+        
+        /// <inheritdoc/>
         [SqlMember(isUnsigned: true)]
         public ulong PayeeId { get; set; }
-        /// <summary>
-        /// Amout of the transaction
-        /// </summary>
+        
+        /// <inheritdoc/>
         [SqlMember(columnType: "decimal(18,2)")]
         public decimal Amount { get; set; }
-        /// <summary>
-        /// Date when the transaction was created
-        /// </summary>
+        
+        /// <inheritdoc/>
         [SqlMember]
         public DateTime Date { get; set; }
 
+        /// <summary>
+        /// Creates a new transaction with the given ID and details.
+        /// </summary>
+        /// <param name="id">The unique identifier of the transaction.</param>
+        /// <param name="type">The type of the transaction.</param>
+        /// <param name="method">The payment method used.</param>
+        /// <param name="storename">The name of the store involved.</param>
+        /// <param name="payer">The ID of the payer.</param>
+        /// <param name="payee">The ID of the payee.</param>
+        /// <param name="amount">The amount of the transaction.</param>
+        /// <param name="date">The date of the transaction.</param>
         public Transaction(string id, ETransaction type, EPaymentMethod method, string storename, ulong payer, ulong payee, decimal amount, DateTime date) 
         {
             Id = id;
@@ -63,6 +64,16 @@ namespace Tavstal.TLibrary.Models.Economy
             Date = date; 
         }
         
+        /// <summary>
+        /// Creates a new transaction with an auto-generated GUID and the given details.
+        /// </summary>
+        /// <param name="type">The type of the transaction.</param>
+        /// <param name="method">The payment method used.</param>
+        /// <param name="storename">The name of the store involved.</param>
+        /// <param name="payer">The ID of the payer.</param>
+        /// <param name="payee">The ID of the payee.</param>
+        /// <param name="amount">The amount of the transaction.</param>
+        /// <param name="date">The date of the transaction.</param>
         public Transaction(ETransaction type, EPaymentMethod method, string storename, ulong payer, ulong payee, decimal amount, DateTime date) 
         {
             Id = Guid.NewGuid().ToString();
@@ -75,8 +86,14 @@ namespace Tavstal.TLibrary.Models.Economy
             Date = date; 
         }
 
-        public Transaction() { }
-
+        /// <summary>
+        /// Creates a new transaction with default values and an auto-generated ID.
+        /// </summary>
+        public Transaction()
+        {
+            Id = Guid.NewGuid().ToString();
+            StoreName = string.Empty;
+        }
 
         /// <summary>
         /// Gets the transaction operator character based on the transaction type and amount.
@@ -85,7 +102,7 @@ namespace Tavstal.TLibrary.Models.Economy
         public char GetTransactionOperator()
         {
             if (Amount == 0)
-                return new char();
+                return '\0';
 
             switch (Type)
             {
@@ -102,7 +119,7 @@ namespace Tavstal.TLibrary.Models.Economy
                 case ETransaction.PAYMENT:
                     return Amount > 0 ? '+' : '-';
                 default:
-                    return new char();
+                    return '\0';
             }
         }
 
@@ -115,7 +132,7 @@ namespace Tavstal.TLibrary.Models.Economy
         public static char GetTransactionOperator(ETransaction type, decimal amount)
         {
             if (amount == 0)
-                return new char();
+                return '\0';
 
             switch (type)
             {
@@ -132,15 +149,15 @@ namespace Tavstal.TLibrary.Models.Economy
                 case ETransaction.PAYMENT:
                     return amount > 0 ? '+' : '-';
                 default:
-                    return new char();
+                    return '\0';
             }
         }
 
         /// <summary>
         /// Gets the transaction name based on the transaction type.
         /// </summary>
-        /// <param name="plugin"></param>
-        /// <param name="player"></param>
+        /// <param name="plugin">The plugin instance used for localization.</param>
+        /// <param name="player">The player involved in the transaction.</param>
         /// <returns>The transaction name as <see cref="string"/></returns>
         public string GetTransactionName(IPlugin plugin, UnturnedPlayer player)
         {
@@ -149,37 +166,32 @@ namespace Tavstal.TLibrary.Models.Economy
             {
                 case ETransaction.DEPOSIT:
                 case ETransaction.WITHDRAW:
-                    {
-                       name = player.CharacterName;
-                       break;
-                    }
+                {
+                    name = player.CharacterName;
+                    break;
+                }
                 case ETransaction.REFUND:
                 case ETransaction.SALE:
                 case ETransaction.PURCHASE:
-                    {
-                        name = StoreName;
-                        break;
-                    }
+                {
+                    name = StoreName;
+                    break;
+                }
                 case ETransaction.PAYMENT:
+                {
+                    if (player.CSteamID.m_SteamID == PayeeId)
                     {
-                        if (player.CSteamID.m_SteamID == PayeeId)
-                        {
-                            UnturnedPlayer otherPlayer = UnturnedPlayer.FromCSteamID((CSteamID)PayerId);
-                            if (otherPlayer != null)
-                                name = otherPlayer.CharacterName;
-                            else
-                                name = PayerId.ToString();
-                        }
-                        else
-                        {
-                            UnturnedPlayer otherPlayer = UnturnedPlayer.FromCSteamID((CSteamID)PayeeId);
-                            if (otherPlayer != null)
-                                name = otherPlayer.CharacterName;
-                            else
-                                name = PayeeId.ToString();
-                        }
-                        break;
+                        UnturnedPlayer otherPlayer = UnturnedPlayer.FromCSteamID((CSteamID)PayerId);
+                        name = otherPlayer != null ? otherPlayer.CharacterName : PayerId.ToString();
                     }
+                    else
+                    {
+                        UnturnedPlayer otherPlayer = UnturnedPlayer.FromCSteamID((CSteamID)PayeeId);
+                        name = otherPlayer != null ? otherPlayer.CharacterName : PayeeId.ToString();
+                    }
+
+                    break;
+                }
             }
             return name;
         }
