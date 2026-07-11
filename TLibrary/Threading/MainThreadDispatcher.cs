@@ -6,7 +6,7 @@ using Tavstal.TLibrary.Helpers.General;
 using UnityEngine;
 using Action = System.Action;
 
-namespace Tavstal.TLibrary
+namespace Tavstal.TLibrary.Threading
 {
     /// <summary>
     /// A singleton class that dispatches actions to be executed on the main thread in Unity.
@@ -18,6 +18,7 @@ namespace Tavstal.TLibrary
     public class MainThreadDispatcher : MonoBehaviour
     {
         private readonly ConcurrentQueue<Action> ExecutionQueue = new ConcurrentQueue<Action>();
+        private static readonly object _lock = new object();
         private static MainThreadDispatcher _instance = null!;
         private static int _mainThreadId;
 
@@ -50,9 +51,12 @@ namespace Tavstal.TLibrary
             {
                 if (_instance == null)
                 {
-                    var obj = new GameObject("MainThreadDispatcher");
-                    _instance = obj.AddComponent<MainThreadDispatcher>();
-                    DontDestroyOnLoad(obj);
+                    lock (_lock)
+                    {
+                        var obj = new GameObject("MainThreadDispatcher");
+                        _instance = obj.AddComponent<MainThreadDispatcher>();
+                        DontDestroyOnLoad(obj);
+                    }
                 }
                 return _instance;
             }
@@ -84,10 +88,7 @@ namespace Tavstal.TLibrary
                 return;
             }
 
-            lock (Instance.ExecutionQueue)
-            {
-                Instance.ExecutionQueue.Enqueue(action);
-            }
+            Instance.ExecutionQueue.Enqueue(action);
         }
 
         /// <summary>
@@ -115,25 +116,22 @@ namespace Tavstal.TLibrary
                 return tcs.Task;
             }
 
-            lock (Instance.ExecutionQueue)
+            Instance.ExecutionQueue.Enqueue(() =>
             {
-                Instance.ExecutionQueue.Enqueue(() =>
+                try
                 {
-                    try
-                    {
-                        // Execute the provided action
-                        action();
-                        // Signal success
-                        tcs.SetResult(true);
-                    }
-                    catch (Exception ex)
-                    {
-                        LoggerHelper.LogError("Error while running async action on main thread");
-                        tcs.SetResult(false);
-                        tcs.SetException(ex);
-                    }
-                });
-            }
+                    // Execute the provided action
+                    action();
+                    // Signal success
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    LoggerHelper.LogError("Error while running async action on main thread");
+                    tcs.SetResult(false);
+                    tcs.SetException(ex);
+                }
+            });
             return tcs.Task;
         }
     }
