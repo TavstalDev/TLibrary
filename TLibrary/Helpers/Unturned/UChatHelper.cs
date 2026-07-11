@@ -25,7 +25,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         public static void ServerSendChatMessage(string text, string? icon = null, SteamPlayer? fromPlayer = null,  SteamPlayer? toPlayer = null, EChatMode mode = EChatMode.GLOBAL)
         {
             // Main thread execution error fix
-            MainThreadDispatcher.RunOnMainThread(() =>
+            MainThreadDispatcher.Run(() =>
             {
                 try
                 {

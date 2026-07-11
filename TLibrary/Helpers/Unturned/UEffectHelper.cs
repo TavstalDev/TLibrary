@@ -38,7 +38,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="maxPage">The maximum page number.</param>
         public static void UpdatePagination<T>(short effectId, UnturnedPlayer player, string uiName, int arrayIndex, int page, int maxPage) where T : IPlayerComponent
         {
-            MainThreadDispatcher.RunOnMainThread(() =>
+            MainThreadDispatcher.Run(() =>
             {
                 T comp = player.GetComponent<T>();
                 EffectManager.sendUIEffectVisibility(effectId, player.SteamPlayer().transportConnection, true,
@@ -436,7 +436,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="childNameOrPath">The name or path of the UI element to update with the text.</param>
         /// <param name="text">The text to send.</param>
         public static void SendUIEffectText(short key, ITransportConnection transportConnection, bool reliable, string childNameOrPath, string text) =>
-            MainThreadDispatcher.RunOnMainThread(() => EffectManager.sendUIEffectText(key, transportConnection, reliable, childNameOrPath, text));
+            MainThreadDispatcher.Run(() => EffectManager.sendUIEffectText(key, transportConnection, reliable, childNameOrPath, text));
 
         /// <summary>
         /// Sends UI text to the specified transport connection.
@@ -459,7 +459,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="childNameOrPath">The name or path of the UI element to update with the image URL.</param>
         /// <param name="url">The image URL to send.</param>
         public static void SendUIEffectImageURL(short key, ITransportConnection transportConnection, bool reliable, string childNameOrPath, string url) =>
-            MainThreadDispatcher.RunOnMainThread(() => EffectManager.sendUIEffectImageURL(key, transportConnection, reliable, childNameOrPath, url));
+            MainThreadDispatcher.Run(() => EffectManager.sendUIEffectImageURL(key, transportConnection, reliable, childNameOrPath, url));
 
         /// <summary>
         /// Sends a UI image URL to the specified transport connection.
@@ -482,7 +482,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="childNameOrPath">The name or path of the UI element to update visibility for.</param>
         /// <param name="visibility">The visibility state to set.</param>
         public static void SendUIEffectVisibility(short key, ITransportConnection transportConnection, bool reliable, string childNameOrPath, bool visibility) =>
-            MainThreadDispatcher.RunOnMainThread(() => EffectManager.sendUIEffectVisibility(key, transportConnection, reliable, childNameOrPath, visibility));
+            MainThreadDispatcher.Run(() => EffectManager.sendUIEffectVisibility(key, transportConnection, reliable, childNameOrPath, visibility));
 
         /// <summary>
         /// Sets the visibility of a UI element for the specified transport connection.
@@ -502,13 +502,13 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="key">The ID of the effect to clear.</param>
         /// <param name="transportConnection">The transport connection to clear the effect for.</param>
         public static void AskEffectClearByID(ushort key, ITransportConnection transportConnection) =>
-            MainThreadDispatcher.RunOnMainThread(() => EffectManager.askEffectClearByID(key, transportConnection));
+            MainThreadDispatcher.Run(() => EffectManager.askEffectClearByID(key, transportConnection));
 
         /// <summary>
         /// Clears all effects for all transport connections.
         /// </summary>
         public static void AskEffectClearAll() =>
-            MainThreadDispatcher.RunOnMainThread(EffectManager.askEffectClearAll);
+            MainThreadDispatcher.Run(EffectManager.askEffectClearAll);
         
         
         /// <summary>
@@ -562,7 +562,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
                     break;
                 }
             }
-            MainThreadDispatcher.RunOnMainThread(action);
+            MainThreadDispatcher.Run(action);
         }
     }
 }
