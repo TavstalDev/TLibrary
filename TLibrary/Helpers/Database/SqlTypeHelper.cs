@@ -178,5 +178,26 @@ namespace Tavstal.TLibrary.Helpers.Database
         /// <returns>A string with single quotes restored.</returns>
         public static string ConvertSqlToIllegalChars(string value) =>
             value.Replace("U+0027", "'");
+
+        /// <summary>
+        /// Prepares a value for database insertion by converting unsupported types.
+        /// </summary>
+        /// <param name="value">The value to prepare. Can be <see langword="null"/>.</param>
+        /// <returns>
+        /// <see cref="DBNull.Value"/> if <paramref name="value"/> is <see langword="null"/>;
+        /// <c>1</c> if <paramref name="value"/> is <c>true</c>;
+        /// <c>0</c> if <paramref name="value"/> is <c>false</c>;
+        /// otherwise, the original <paramref name="value"/>.
+        /// </returns>
+        public static object FixValue(object? value = null)
+        {
+            if (value == null)
+                return DBNull.Value;
+
+            if (value is bool boolValue)
+                return boolValue ? 1 : 0;
+            
+            return value;
+        }
     }
 }
