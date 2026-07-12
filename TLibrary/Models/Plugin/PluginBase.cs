@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Rocket.Core.Plugins;
 using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Extensions.General;
+using Tavstal.TLibrary.Helpers;
 using Tavstal.TLibrary.Managers;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -21,29 +23,8 @@ namespace Tavstal.TLibrary.Models.Plugin
     /// <summary>
     /// Abstract Plugin Base Class
     /// </summary>
-    /// <typeparam name="PluginConfig"></typeparam>
     public abstract class PluginBase<PluginConfig> : RocketPlugin, IPlugin where PluginConfig : ConfigurationBase
     {
-        static PluginBase()
-        {
-            string libPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Libraries");
-            string[] dependencies = { "System.Buffers", "System.Memory", "System.Threading.Tasks.Extensions", "MySqlConnector", "RL-I18N", "RL-I18N.West" };
-
-            foreach (string lib in dependencies)
-            {
-                try
-                {
-                    string fullPath = Path.Combine(libPath, $"{lib}.dll");
-                    if (File.Exists(fullPath))
-                        Assembly.LoadFrom(fullPath);
-                }
-                catch
-                {
-                    // Suppress errors to ensure the loop keeps going
-                }
-            }
-        }
-        
         /// <summary>
         /// The root directory path for the plugin.
         /// </summary>
@@ -98,8 +79,7 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// Rich logger used to replace Rocket's logger
         /// </summary>
         public static TLogger Logger => _logger;
-
-        private static DateTime _versioningDate = new DateTime(2000, 1, 1);
+        
         private static Version? _libraryVersion;
         private static Version? _version;
         private static DateTime _buildDate;
@@ -119,13 +99,7 @@ namespace Tavstal.TLibrary.Models.Plugin
             // Get Library Version
             try
             {
-                object[] versionAttributes = Assembly.GetExecutingAssembly()
-                    .GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
-                if (versionAttributes.Length > 0)
-                {
-                    AssemblyFileVersionAttribute versionAttribute = (AssemblyFileVersionAttribute)versionAttributes[0];
-                    _libraryVersion = new Version(versionAttribute.Version);
-                }
+                _libraryVersion  = VersionHelper.GetVersion(Assembly.GetExecutingAssembly());
             }
             catch (Exception ex)
             {
@@ -135,8 +109,12 @@ namespace Tavstal.TLibrary.Models.Plugin
             // Get Plugin Build Version
             try
             {
-                _version = this.Assembly.GetName().Version;
-                _buildDate = _versioningDate.AddDays(_version.Build).AddSeconds(_version.Revision * 2);
+                _version = VersionHelper.GetVersion(this.Assembly);
+                var buildDateAttribute = this.Assembly
+                    .GetCustomAttributes<AssemblyMetadataAttribute>()
+                    .FirstOrDefault(x => x.Key == "BuildDate");
+                if (buildDateAttribute != null)
+                    _buildDate = DateTime.Parse(buildDateAttribute.Value);;
             }
             catch (Exception ex)
             {
