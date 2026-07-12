@@ -18,9 +18,9 @@
 
     <!-- Version -->
     <Version>1.2.2</Version>
-    <InformationalVersion>1.2.2</InformationalVersion>
     <AssemblyVersion>1.2.2.0</AssemblyVersion>
     <FileVersion>1.2.2.0</FileVersion>
+    <BuildDate>$([System.DateTime]::UtcNow.ToString("yyyy-MM-dd HH:mm:ss"))</BuildDate>
     
     <!-- Config -->
     <LangVersion>8.0</LangVersion> 
@@ -30,64 +30,83 @@
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <NoWarn>CS0169;CS0067;IDE0051;IDE0060;IDE0062;RS0016</NoWarn>
   </PropertyGroup>
-  
+
+  <!-- Custom Metadata -->
+  <ItemGroup>
+    <AssemblyMetadata Include="BuildDate" Value="$(BuildDate)" />
+  </ItemGroup>
+
   <!-- Libraries -->
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\assets\libraries\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
     <Reference Include="com.rlabrecque.steamworks.net">
       <HintPath>..\assets\libraries\com.rlabrecque.steamworks.net.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
     <Reference Include="I18N">
       <HintPath>..\assets\libraries\RL-I18N.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
     <Reference Include="I18N.West">
       <HintPath>..\assets\libraries\RL-I18N.West.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
     <Reference Include="MySqlConnector">
       <HintPath>..\..\TShop2\assets\libraries\MySqlConnector.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\assets\libraries\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
     <Reference Include="Rocket.API">
       <HintPath>..\assets\libraries\Rocket.API.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
     <Reference Include="Rocket.Core">
       <HintPath>..\assets\libraries\Rocket.Core.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
     <Reference Include="Rocket.Unturned">
       <HintPath>..\assets\libraries\Rocket.Unturned.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
     <Reference Include="SDG.NetTransport">
       <HintPath>..\assets\libraries\SDG.NetTransport.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\assets\libraries\UnityEngine.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\assets\libraries\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\assets\libraries\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestModule">
       <HintPath>..\assets\libraries\UnityEngine.UnityWebRequestModule.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
   </ItemGroup>
 </Project>
