@@ -63,7 +63,7 @@ namespace Tavstal.TLibrary.Models.Database
                 
             try
             {
-                using var command = new MySqlCommand();
+                await using var command = new MySqlCommand();
                 command.Connection = connection;
                 if (transaction != null) command.Transaction = transaction;
                 
@@ -93,7 +93,7 @@ namespace Tavstal.TLibrary.Models.Database
             
             try
             {
-                using var command = new MySqlCommand();
+                await using var command = new MySqlCommand();
                 command.Connection = connection;
                 if (transaction != null) command.Transaction = transaction;
                 
@@ -110,7 +110,7 @@ namespace Tavstal.TLibrary.Models.Database
                     columnValues.Add(paramName);
                     
                     var value = fieldInfo.GetValue(entity);
-                    command.Parameters.AddWithValue(paramName, value ?? DBNull.Value);
+                    command.Parameters.AddWithValue(paramName, SqlTypeHelper.FixValue(value));
                 }
                 
                 string columns =  string.Join(", ", columnList);
@@ -119,7 +119,7 @@ namespace Tavstal.TLibrary.Models.Database
                                       $"SELECT * FROM `{_tableName}` WHERE id = LAST_INSERT_ID();";
 
                 T? result = null;
-                using var reader = await command.ExecuteReaderAsync();
+                await using var reader = await command.ExecuteReaderAsync();
                 if (await reader.ReadAsync())
                     result = reader.ConvertToObject<T>();
                 return result;
@@ -147,7 +147,7 @@ namespace Tavstal.TLibrary.Models.Database
             
             try
             {
-                using var command = new MySqlCommand();
+                await using var command = new MySqlCommand();
                 command.Connection = connection;
                 if (transaction != null) command.Transaction = transaction;
                 
@@ -166,7 +166,7 @@ namespace Tavstal.TLibrary.Models.Database
                     columnValues.Add($"`{column}` = {paramName}");
                     
                     var value = fieldInfo.GetValue(entity);
-                    command.Parameters.AddWithValue(paramName, value ?? DBNull.Value);
+                    command.Parameters.AddWithValue(paramName, SqlTypeHelper.FixValue(value));
                 }
                 
                 string values =  string.Join(", ", columnValues);
@@ -200,7 +200,7 @@ namespace Tavstal.TLibrary.Models.Database
             
             try
             {
-                using var command = new MySqlCommand();
+                await using var command = new MySqlCommand();
                 command.Connection = connection;
                 if (transaction != null) command.Transaction = transaction;
                 
@@ -226,12 +226,12 @@ namespace Tavstal.TLibrary.Models.Database
                     {
                         string paramName = $"@q{qParamIndex++}";
                         queryList.Add($"`{column}` {queryParameter.Operator} {paramName}");
-                        command.Parameters.AddWithValue(paramName, queryParameter.Value ?? DBNull.Value);
+                        command.Parameters.AddWithValue(paramName, SqlTypeHelper.FixValue(queryParameter.Value));
                     }
                 }
                 
                 string values =  string.Join(", ", columnValues);
-                string queryValues = string.Join(", ", queryList);
+                string queryValues = string.Join(" AND ", queryList);
                 command.CommandText = $"UPDATE `{_tableName}` SET {values} WHERE {queryValues};";
                 
                 return await command.ExecuteNonQueryAsync() > 0;
@@ -259,7 +259,7 @@ namespace Tavstal.TLibrary.Models.Database
             
             try
             {
-                using var command = new MySqlCommand();
+                await using var command = new MySqlCommand();
                 command.Connection = connection;
                 if (transaction != null) command.Transaction = transaction;
                 
@@ -294,7 +294,7 @@ namespace Tavstal.TLibrary.Models.Database
             
             try
             {
-                using var command = new MySqlCommand();
+                await using var command = new MySqlCommand();
                 command.Connection = connection;
                 if (transaction != null) command.Transaction = transaction;
                 
@@ -310,11 +310,11 @@ namespace Tavstal.TLibrary.Models.Database
                     {
                         string paramName = $"@q{qParamIndex++}";
                         queryList.Add($"`{column}` {queryParameter.Operator} {paramName}");
-                        command.Parameters.AddWithValue(paramName, queryParameter.Value ?? DBNull.Value);
+                        command.Parameters.AddWithValue(paramName, SqlTypeHelper.FixValue(queryParameter.Value));
                     }
                 }
                 
-                string queryValues = string.Join(", ", queryList);
+                string queryValues = string.Join(" AND ", queryList);
                 command.CommandText = $"DELETE FROM `{_tableName}` WHERE {queryValues};";
                 
                 return await command.ExecuteNonQueryAsync() > 0;
@@ -342,14 +342,14 @@ namespace Tavstal.TLibrary.Models.Database
             
             try
             {
-                using var command = new MySqlCommand();
+                await using var command = new MySqlCommand();
                 command.Connection = connection;
                 if (transaction != null) command.Transaction = transaction;
                 
                 command.Parameters.AddWithValue("@Id", id);
                 command.CommandText = $"SELECT * FROM `{_tableName}` WHERE `{_idColumnName}` = @Id;";
-                
-                using var reader = await command.ExecuteReaderAsync();
+
+                await using var reader = await command.ExecuteReaderAsync();
                 T? result = null;
                 if (await reader.ReadAsync())
                     result = reader.ConvertToObject<T>();
@@ -382,7 +382,7 @@ namespace Tavstal.TLibrary.Models.Database
             
             try
             {
-                using var command = new MySqlCommand();
+                await using var command = new MySqlCommand();
                 command.Connection = connection;
                 if (transaction != null) command.Transaction = transaction;
                 
@@ -398,15 +398,15 @@ namespace Tavstal.TLibrary.Models.Database
                     {
                         string paramName = $"@q{qParamIndex++}";
                         queryList.Add($"`{column}` {queryParameter.Operator} {paramName}");
-                        command.Parameters.AddWithValue(paramName, queryParameter.Value ?? DBNull.Value);
+                        command.Parameters.AddWithValue(paramName, SqlTypeHelper.FixValue(queryParameter.Value));
                     }
                 }
                 
-                string queryValues = string.Join(", ", queryList);
+                string queryValues = string.Join(" AND ", queryList);
                 
                 command.CommandText = $"SELECT * FROM `{_tableName}` WHERE {queryValues} LIMIT {limit};";
-                
-                using var reader = await command.ExecuteReaderAsync();
+
+                await using var reader = await command.ExecuteReaderAsync();
                 List<T>? result = null;
                 while (await reader.ReadAsync())
                 {
