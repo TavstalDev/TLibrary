@@ -43,11 +43,11 @@ namespace Tavstal.TLibrary.Helpers.Database
                 if (sqlMember.ShouldAutoIncrement)
                     autoincrementString = $" AUTO_INCREMENT";
 
-                if (!sqlMember.IsNullable)
-                    nullableString = $" NOT NULL";
-
                 if (sqlMember.IsUnsigned)
-                    nullableString = $" UNSIGNED";
+                    nullableString += $" UNSIGNED";
+                
+                if (!sqlMember.IsNullable)
+                    nullableString += $" NOT NULL";
 
                 if (sqlMember.IsPrimaryKey)
                     keyParamList.Add($"PRIMARY KEY({propName})");
