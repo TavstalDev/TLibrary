@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Rocket.API;
@@ -167,11 +168,7 @@ namespace Tavstal.TLibrary.Models.Commands
             });
         }
 
-        private SubCommand? GetSubCommandByName(string arg)
-        {
-            if (SubCommands == null)
-                return null;
-            return SubCommands.Find(x => x.Name.ToLower() == arg.ToLower() || x.Aliases.Contains(arg.ToLower()));
-        }
+        private SubCommand? GetSubCommandByName(string arg) =>
+            SubCommands?.Find(x => string.Equals(x.Name, arg, StringComparison.CurrentCultureIgnoreCase) || x.Aliases.Contains(arg.ToLower()));
     }
 }
