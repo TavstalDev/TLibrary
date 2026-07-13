@@ -10,7 +10,7 @@ namespace Tavstal.TLibrary.Models.Logging
     /// Logger helper used to log messages to console and log file.
     /// </summary>
     // ReSharper disable once InconsistentNaming
-    public class TLogger
+    public class TLogger : IDisposable
     {
         /// <summary>
         /// Name of the plugin that uses the logger.
@@ -57,12 +57,10 @@ namespace Tavstal.TLibrary.Models.Logging
             _logLevel = logLevel;
             OnLogLevelChanged += HandleLogLevelChanged;
         }
-
-        private void HandleLogLevelChanged(string pluginName, ELogLevel newLevel)
+        
+        public void Dispose()
         {
-            if (pluginName != _pluginName || newLevel == _logLevel)
-                return;
-            _logLevel = newLevel;
+            OnLogLevelChanged -= HandleLogLevelChanged;
         }
         
         public void LogRich(ELogLevel logLevel, string message, Exception? exception = null, bool includePrefixes = true)
@@ -134,6 +132,13 @@ namespace Tavstal.TLibrary.Models.Logging
             {
                 Rocket.Core.Logging.Logger.Log("[LOG-FAILED]: " + text, color);
             }
+        }
+        
+        private void HandleLogLevelChanged(string pluginName, ELogLevel newLevel)
+        {
+            if (pluginName != _pluginName || newLevel == _logLevel)
+                return;
+            _logLevel = newLevel;
         }
 
         private string GetLogLevelPrefix(ELogLevel logLevel)
