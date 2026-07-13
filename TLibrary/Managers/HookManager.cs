@@ -37,7 +37,7 @@ namespace Tavstal.TLibrary.Managers
 
             if (type.IsAbstract)
             {
-                _logger.Debug($"'{type.Name}' is not a abstract class.");
+                _logger.Debug($"'{type.Name}' is an abstract class.");
                 return;
             }
 
@@ -79,11 +79,6 @@ namespace Tavstal.TLibrary.Managers
                     if (_hooks.ContainsKey(hook.Name))
                     {
                         _logger.Debug($"Hook with '{hook.Name}' name already exists.");
-                        continue;
-                    }
-
-                    if (_hooks.ContainsKey(hook.Name))
-                    {
                         if (!ignoreDuplicate)
                             throw new Exception($"Hook with '{hook.Name}' name already exists.");
                         continue;
