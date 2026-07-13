@@ -1,4 +1,6 @@
-﻿namespace Tavstal.TLibrary.Models.Plugin
+﻿using Tavstal.TLibrary.Models.Logging;
+
+namespace Tavstal.TLibrary.Models.Plugin
 {
     public interface IPlugin
     {

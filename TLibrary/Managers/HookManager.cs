@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Models.Hooks;
+using Tavstal.TLibrary.Models.Logging;
 using Tavstal.TLibrary.Models.Plugin;
 
 namespace Tavstal.TLibrary.Managers

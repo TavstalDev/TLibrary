@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,6 +10,8 @@ using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Extensions.General;
 using Tavstal.TLibrary.Helpers;
 using Tavstal.TLibrary.Managers;
+using Tavstal.TLibrary.Models.Config;
+using Tavstal.TLibrary.Models.Logging;
 using UnityEngine;
 using UnityEngine.Networking;
 // ReSharper disable UnusedMember.Global
@@ -23,7 +24,7 @@ namespace Tavstal.TLibrary.Models.Plugin
     /// <summary>
     /// Abstract Plugin Base Class
     /// </summary>
-    public abstract class PluginBase<PluginConfig> : RocketPlugin, IPlugin where PluginConfig : ConfigurationBase
+    public abstract class PluginBase<PluginConfig> : RocketPlugin, IPlugin where PluginConfig : class, IConfiguration
     {
         /// <summary>
         /// The root directory path for the plugin.
@@ -64,7 +65,7 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// <summary>
         /// Plugin Configuration
         /// </summary>
-        public PluginConfig Config { get; private set; } = null!;
+        public PluginConfig Config { get; private set; } = default!;
 
         /// <summary>
         /// Hook Manager used to work with plugin hooks
@@ -91,7 +92,7 @@ namespace Tavstal.TLibrary.Models.Plugin
         public sealed override void LoadPlugin()
         {
             if (!Name.IsNullOrEmpty())
-                _pluginName = this.Name;
+                _pluginName = Name;
             _rootDirectory = System.IO.Directory.GetCurrentDirectory();
             _pluginDirectory = Path.Combine(_rootDirectory, "Plugins", GetPluginName());
             _logger = new TLogger(this, "", ELogLevel.INFO);
@@ -109,12 +110,12 @@ namespace Tavstal.TLibrary.Models.Plugin
             // Get Plugin Build Version
             try
             {
-                _version = VersionHelper.GetVersion(this.Assembly);
-                var buildDateAttribute = this.Assembly
+                _version = VersionHelper.GetVersion(Assembly);
+                var buildDateAttribute = Assembly
                     .GetCustomAttributes<AssemblyMetadataAttribute>()
                     .FirstOrDefault(x => x.Key == "BuildDate");
                 if (buildDateAttribute != null)
-                    _buildDate = DateTime.Parse(buildDateAttribute.Value);;
+                    _buildDate = DateTime.Parse(buildDateAttribute.Value);
             }
             catch (Exception ex)
             {
@@ -158,7 +159,7 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// <returns>Object of a <see cref="TLogger"/></returns>
         public TLogger GetLogger() => _logger;
 
-        public ELogLevel GetLogLevel() => Config.LogLevel;
+        public ELogLevel GetLogLevel() => Config.GetLogLevel();
 
         /// <summary>
         /// Returns the name of the plugin
@@ -200,22 +201,67 @@ namespace Tavstal.TLibrary.Models.Plugin
                 System.IO.Directory.CreateDirectory(translationsDirectory);
 
             // Handle Configuration
-            Config = ConfigurationBase.Create<PluginConfig>("Configuration.json", _pluginDirectory);
-            
-            if (Config.CheckConfigFile())
-                Config = Config.ReadConfig<PluginConfig>()!;
+            if (typeof(JsonConfiguration).IsAssignableFrom(typeof(PluginConfig)))
+            {
+                var localConfig = JsonConfiguration.Create<PluginConfig>("Configuration.json", _pluginDirectory);
+                if (localConfig == null)
+                {
+                    Logger.Error($"Failed to create json configuration base.");
+                    UnloadPlugin();
+                    return;
+                }
+                localConfig.LoadDefaults();
+
+                if (localConfig.Verify())
+                {
+                    var localPluginConfig = localConfig.ReadConfig<PluginConfig>();
+                    if (localPluginConfig == null)
+                    {
+                        Logger.Error($"Failed to read configuration, it might be outdated. Please check the configuration file and try again.");
+                        UnloadPlugin();
+                        return;
+                    }
+                    Config = localPluginConfig;
+                }
+                else
+                {
+                    Config = localConfig;
+                    Config.Save();
+                }
+            }
+            else if (typeof(YamlConfiguration).IsAssignableFrom(typeof(PluginConfig)))
+            {
+                var localConfig = YamlConfiguration.Create<PluginConfig>("configuration.yml", _pluginDirectory);
+                if (localConfig == null)
+                {
+                    Logger.Error($"Failed to create yaml configuration base.");
+                    UnloadPlugin();
+                    return;
+                }
+                localConfig.LoadDefaults();
+
+                if (localConfig.Verify())
+                {
+                    var localPluginConfig = localConfig.ReadConfig<PluginConfig>();
+                    if (localPluginConfig == null)
+                    {
+                        Logger.Error($"Failed to read configuration, it might be outdated. Please check the configuration file and try again.");
+                        UnloadPlugin();
+                        return;
+                    }
+                    Config = localPluginConfig;
+                }
+                else
+                {
+                    Config = localConfig;
+                    Config.Save();
+                }
+            }
             else
             {
-                CultureInfo ci = CultureInfo.InstalledUICulture;
-                string langISO = ci.TwoLetterISOLanguageName.ToLower();
-                if (langISO != "en")
-                {
-                    if (LanguagePacks.ContainsKey(ci.TwoLetterISOLanguageName))
-                    {
-                        Config.Locale = langISO;
-                        Config.SaveConfig();
-                    }
-                }
+                Logger.Error($"The configuration type '{typeof(PluginConfig).Name}' is not supported. Please use either 'JsonConfiguration' or 'YamlConfiguration'.");
+                UnloadPlugin();
+                return;
             }
             
             // Log missing fields
@@ -241,7 +287,7 @@ namespace Tavstal.TLibrary.Models.Plugin
                 Logger.Warning($"The config field '{field.Name}' is missing in '{PluginName}' configuration.");
             }
             
-            TLogger.SetLogLevel(GetPluginName(), Config.LogLevel);
+            TLogger.SetLogLevel(GetPluginName(), Config.GetLogLevel());
 
             Dictionary<string, string> localLocalization = CommonLocalization;
 
@@ -254,7 +300,7 @@ namespace Tavstal.TLibrary.Models.Plugin
                 PluginExtensions.SaveTranslation(localLocalization, translationsDirectory, "locale.en.json");
             }
 
-            if (Config.DownloadLocalePacks && LanguagePacks.Count > 0)
+            if (Config.GetDownloadLocalePacks() && LanguagePacks.Count > 0)
                 foreach (var pack in LanguagePacks)
                 {
                     string path = Path.Combine(translationsDirectory, $"locale.{pack.Key}.json");
@@ -278,7 +324,7 @@ namespace Tavstal.TLibrary.Models.Plugin
                 }
                 
             
-            string locale = Config.Locale;
+            string locale = Config.GetLocale();
             if (File.Exists(Path.Combine(translationsDirectory, $"locale.{locale}.json")))
             {
                 var localLocale = PluginExtensions.ReadTranslation(translationsDirectory, $"locale.{locale}.json");

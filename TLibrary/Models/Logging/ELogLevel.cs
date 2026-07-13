@@ -1,4 +1,4 @@
-namespace Tavstal.TLibrary.Models.Plugin
+namespace Tavstal.TLibrary.Models.Logging
 {
     /// <summary>
     /// Defines the severity levels for log messages.

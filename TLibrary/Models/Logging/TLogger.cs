@@ -2,8 +2,9 @@
 using System.IO;
 using Tavstal.TLibrary.Extensions.General;
 using Tavstal.TLibrary.Helpers.General;
+using Tavstal.TLibrary.Models.Plugin;
 
-namespace Tavstal.TLibrary.Models.Plugin
+namespace Tavstal.TLibrary.Models.Logging
 {
     /// <summary>
     /// Logger helper used to log messages to console and log file.
