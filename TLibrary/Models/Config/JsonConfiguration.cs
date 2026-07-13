@@ -7,7 +7,8 @@ using Tavstal.TLibrary.Models.Logging;
 namespace Tavstal.TLibrary.Models.Config
 {
     /// <summary>
-    /// Abstract class for all configurations.
+    /// Represents an abstract base class for JSON-based configuration files, providing serialization,
+    /// deserialization, and file management capabilities.
     /// </summary>
     public abstract class JsonConfiguration : IConfiguration
     {
