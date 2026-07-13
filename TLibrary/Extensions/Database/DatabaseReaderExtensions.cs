@@ -39,6 +39,12 @@ namespace Tavstal.TLibrary.Extensions.Database
                     int ordinal = reader.GetOrdinal(propName);
                     var value = reader.GetValue(ordinal);
 
+                    if (value == DBNull.Value)
+                    {
+                        prop.SetValue(obj, null);
+                        continue;
+                    }
+
                     if (prop.PropertyType.IsEnum)
                         prop.SetValue(obj, Enum.ToObject(prop.PropertyType, value));
                     else
