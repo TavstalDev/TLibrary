@@ -2,8 +2,16 @@ using System;
 
 namespace Tavstal.TLibrary.Extensions.General
 {
+    /// <summary>
+    /// Provides extension methods for converting <see cref="ConsoleColor"/> values to ANSI escape codes.
+    /// </summary>
     public static class ConsoleColorExtensions
     {
+        /// <summary>
+        /// Converts a <see cref="ConsoleColor"/> to its corresponding ANSI foreground escape code.
+        /// </summary>
+        /// <param name="color">The console color to convert.</param>
+        /// <returns>The ANSI escape sequence string for the foreground color.</returns>
         public static string ToAnsiForeground(this ConsoleColor color)
         {
             return color switch
@@ -28,6 +36,11 @@ namespace Tavstal.TLibrary.Extensions.General
             };
         }
 
+        /// <summary>
+        /// Converts a <see cref="ConsoleColor"/> to its corresponding ANSI background escape code.
+        /// </summary>
+        /// <param name="color">The console color to convert.</param>
+        /// <returns>The ANSI escape sequence string for the background color.</returns>
         public static string ToAnsiBackground(this ConsoleColor color)
         {
             // Background codes are just foreground codes + 10

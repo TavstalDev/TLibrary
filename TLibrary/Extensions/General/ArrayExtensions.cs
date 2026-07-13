@@ -4,6 +4,9 @@ using Tavstal.TLibrary.Helpers.General;
 
 namespace Tavstal.TLibrary.Extensions.General
 {
+    /// <summary>
+    /// Provides extension methods for arrays, lists, and dictionaries.
+    /// </summary>
     public static class ArrayExtensions
     {
         /// <summary>
