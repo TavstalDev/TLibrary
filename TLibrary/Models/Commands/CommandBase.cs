@@ -162,7 +162,7 @@ namespace Tavstal.TLibrary.Models.Commands
                 }
                 else
                 {
-                    if (!(ExecutionRequested(caller, args).Result))
+                    if (!await ExecutionRequested(caller, args))
                         await ExecuteHelp(caller, true, null, new string[] { });
                 }
             });
