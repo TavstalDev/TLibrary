@@ -34,10 +34,7 @@ namespace Tavstal.TLibrary.Helpers.General
             for (int i = 0; i < length; i++)
             {
                 var c = includeNums ? Chars.ElementAt(MathHelper.Next(Chars.Length - 1)) : CharsNoNums.ElementAt(MathHelper.Next(CharsNoNums.Length - 1));
-                if (key.Contains(c))
-                    i--;
-                else
-                    key += c;
+                key += c;
             }
 
             return key;
@@ -54,10 +51,7 @@ namespace Tavstal.TLibrary.Helpers.General
             for (int i = 0; i < length; i++)
             {
                 char c = Chars.ToLower().ElementAt(MathHelper.Next(Chars.Length - 1));
-                if (key.Contains(c))
-                    i--;
-                else
-                    key += c;
+                key += c;
             }
 
             return key;
@@ -74,10 +68,7 @@ namespace Tavstal.TLibrary.Helpers.General
             for (int i = 0; i < length; i++)
             {
                 char c = Chars.ToUpper().ElementAt(MathHelper.Next(Chars.Length - 1));
-                if (key.Contains(c))
-                    i--;
-                else
-                    key += c;
+                key += c;
             }
 
             return key;
@@ -96,10 +87,7 @@ namespace Tavstal.TLibrary.Helpers.General
             for (int i = 0; i < length; i++)
             {
                 char c = charSet.ToUpper().ElementAt(MathHelper.Next(charSet.Length - 1));
-                if (key.Contains(c))
-                    i--;
-                else
-                    key += c;
+                key += c;
             }
 
             return key;
@@ -179,7 +167,7 @@ namespace Tavstal.TLibrary.Helpers.General
         {
             string suffix = string.Empty;
             if (isAnalogue)
-                suffix = time.Hour > 12 ? "PM" : "AM";
+                suffix = time.Hour >= 12 ? "PM" : "AM";
 
             var newHourString = time.Hour > 12 ? MakeClockInt(time.Hour - 12) : MakeClockInt(time.Hour);
 
@@ -208,7 +196,7 @@ namespace Tavstal.TLibrary.Helpers.General
         {
             string suffix = string.Empty;
             if (isAnalogue)
-                suffix = time.Hours > 12 ? "PM" : "AM";
+                suffix = time.Hours >= 12 ? "PM" : "AM";
 
             var newHourString = time.Hours > 12 ? MakeClockInt(time.Hours - 12) : MakeClockInt(time.Hours);
 
