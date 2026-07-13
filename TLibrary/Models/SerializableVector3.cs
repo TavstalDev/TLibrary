@@ -61,18 +61,11 @@ namespace Tavstal.TLibrary.Models
             Z = float.Parse(parts[2]);
         }
 
-        /// <summary>
-        /// Checks if this vector equals another object.
-        /// </summary>
-        /// <param name="obj">The object to compare with.</param>
-        /// <returns><see langword="true"/> if the values are approximately equal.</returns>
-        public override bool Equals(object? obj)
-        {
-            if (obj is SerializableVector3 other && Mathf.Approximately(X, other.X) && Mathf.Approximately(Y, other.Y) && Mathf.Approximately(Z, other.Z))
-                return true;
-
-            return obj is Vector3 other3 && Mathf.Approximately(X, other3.x) && Mathf.Approximately(Y, other3.y) && Mathf.Approximately(Z, other3.z);
-        }
+        protected bool Equals(Vector3 other) =>
+            X.Equals(other.x) && Y.Equals(other.y) && Z.Equals(other.z);
+        
+        protected bool Equals(SerializableVector3 other) =>
+            X.Equals(other.X) && Y.Equals(other.Y) && Z.Equals(other.Z);
 
         /// <summary>
         /// Converts this serializable vector to a Unity <see cref="Vector3"/>.
@@ -84,29 +77,13 @@ namespace Tavstal.TLibrary.Models
         /// Returns the vector as a string in "X;Y;Z" format.
         /// </summary>
         /// <returns>A string like "1.5;2.0;3.2".</returns>
-        public override string ToString()
-        {
-            return $"{X};{Y};{Z}";
-        }
-
-        /// <summary>
-        /// Returns the hash code for this vector.
-        /// </summary>
-        /// <returns>An integer hash code.</returns>
-        public override int GetHashCode()
-        {
-            // ReSharper disable once BaseObjectGetHashCodeCallInGetHashCode
-            return base.GetHashCode();
-        }
+        public override string ToString() => $"{X};{Y};{Z}";
         
         /// <summary>
         /// Converts a Unity <see cref="Vector3"/> to its string representation.
         /// </summary>
         /// <param name="v">The Unity vector to serialize.</param>
         /// <returns>A string in "X;Y;Z" format.</returns>
-        public static string Serialize(Vector3 v)
-        {
-            return $"{v.x};{v.y};{v.z}";
-        }
+        public static string Serialize(Vector3 v) => $"{v.x};{v.y};{v.z}";
     }
 }
