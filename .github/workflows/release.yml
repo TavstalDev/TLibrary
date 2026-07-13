@@ -115,9 +115,9 @@ jobs:
     # Step 9: Copy the original ZIP and insert the built DLL
     - name: Modify ZIP with Built DLL
       run: |
-        $zipFilePath = "./Libraries.zip"
+        $zipFilePath = "./assets./libraries.zip"
         $dllPath = "${{ env.DLL_PATH }}"
-        $outputZipFilePath = "./TLibrary/bin/Release/net48/NewLibraries.zip"
+        $outputZipFilePath = "./TLibrary/bin/Release/net48/libraries.zip"
 
         # Extract original ZIP contents (if needed)
         Write-Output "Extracting ZIP file: $zipFilePath"
@@ -146,4 +146,4 @@ jobs:
           ${{ env.COMMITS }}
         files: |
           ${{ env.DLL_PATH }}
-          ./TLibrary/bin/Release/net48/NewLibraries.zip
+          ./TLibrary/bin/Release/net48/libraries.zip
