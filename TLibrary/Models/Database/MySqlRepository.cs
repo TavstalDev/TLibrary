@@ -11,6 +11,11 @@ using Tavstal.TLibrary.Models.Database.Attributes;
 
 namespace Tavstal.TLibrary.Models.Database
 {
+    /// <summary>
+    /// Provides a generic MySQL repository for performing CRUD operations on entities of type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="ID">The type of the primary key identifier.</typeparam>
+    /// <typeparam name="T">The entity type to operate on, which must be a reference type.</typeparam>
     public class MySqlRepository<ID, T> where T : class
     {
         protected readonly string _tableName;
@@ -19,6 +24,12 @@ namespace Tavstal.TLibrary.Models.Database
         protected readonly IDatabaseManager _databaseManager;
         protected readonly Dictionary<PropertyInfo, string> _columnMappings = new Dictionary<PropertyInfo, string>();
         
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MySqlRepository{ID, T}"/> class.
+        /// </summary>
+        /// <param name="databaseManager">The database manager used to create connections.</param>
+        /// <param name="prefix">The prefix to prepend to the table name.</param>
+        /// <exception cref="Exception">Thrown when the entity type <typeparamref name="T"/> has no primary column declared.</exception>
         public MySqlRepository(IDatabaseManager databaseManager, string prefix)
         {
             _databaseManager = databaseManager;
@@ -51,6 +62,11 @@ namespace Tavstal.TLibrary.Models.Database
                 throw new Exception($"{_classType.Name} has no primary column declared.");
         }
         
+        /// <summary>
+        /// Ensures the database table exists, creating it if necessary.
+        /// </summary>
+        /// <param name="connection">An optional existing database connection to reuse.</param>
+        /// <param name="transaction">An optional transaction to execute within.</param>
         public async Task CheckSchemaAsync(MySqlConnection? connection = null, MySqlTransaction? transaction = null)
         {
             bool isLocalConnection = connection == null;
@@ -81,6 +97,13 @@ namespace Tavstal.TLibrary.Models.Database
             }
         }
 
+        /// <summary>
+        /// Inserts a new entity into the database table.
+        /// </summary>
+        /// <param name="entity">The entity to insert.</param>
+        /// <param name="connection">An optional existing database connection to reuse.</param>
+        /// <param name="transaction">An optional transaction to execute within.</param>
+        /// <returns>The inserted entity with its generated primary key, or <see langword="null"/> if the operation failed.</returns>
         public async Task<T?> AddAsync(T entity, MySqlConnection? connection = null, MySqlTransaction? transaction = null)
         {
             bool isLocalConnection = connection == null;
@@ -135,6 +158,14 @@ namespace Tavstal.TLibrary.Models.Database
             }
         }
 
+        /// <summary>
+        /// Updates an existing entity in the database by its primary key.
+        /// </summary>
+        /// <param name="id">The primary key of the entity to update.</param>
+        /// <param name="entity">The entity containing the updated values.</param>
+        /// <param name="connection">An optional existing database connection to reuse.</param>
+        /// <param name="transaction">An optional transaction to execute within.</param>
+        /// <returns><see langword="true"/> if the update was successful; otherwise, <see langword="false"/>.</returns>
         public async Task<bool> UpdateAsync(ID id, T entity, MySqlConnection? connection = null, MySqlTransaction? transaction = null)
         {
             bool isLocalConnection = connection == null;
@@ -185,9 +216,23 @@ namespace Tavstal.TLibrary.Models.Database
             }
         }
 
+        /// <summary>
+        /// Updates entities matching the query parameters with the specified column values.
+        /// </summary>
+        /// <param name="updateParameters">The columns and values to update.</param>
+        /// <param name="queryParameters">The conditions to match for the update.</param>
+        /// <returns><see langword="true"/> if at least one row was updated; otherwise, <see langword="false"/>.</returns>
         public async Task<bool> UpdateAsync(List<UpdateParameter> updateParameters, params QueryParameter[] queryParameters) =>
             await UpdateAsync( null, null, updateParameters, queryParameters);
-        
+
+        /// <summary>
+        /// Updates entities matching the query parameters with the specified column values.
+        /// </summary>
+        /// <param name="connection">An optional existing database connection to reuse.</param>
+        /// <param name="transaction">An optional transaction to execute within.</param>
+        /// <param name="updateParameters">The columns and values to update.</param>
+        /// <param name="queryParameters">The conditions to match for the update.</param>
+        /// <returns><see langword="true"/> if at least one row was updated; otherwise, <see langword="false"/>.</returns>
         public async Task<bool> UpdateAsync(MySqlConnection? connection, MySqlTransaction? transaction, List<UpdateParameter> updateParameters, params QueryParameter[] queryParameters)
         {
             bool isLocalConnection = connection == null;
@@ -247,6 +292,13 @@ namespace Tavstal.TLibrary.Models.Database
             }
         }
 
+        /// <summary>
+        /// Deletes an entity from the database by its primary key.
+        /// </summary>
+        /// <param name="id">The primary key of the entity to delete.</param>
+        /// <param name="connection">An optional existing database connection to reuse.</param>
+        /// <param name="transaction">An optional transaction to execute within.</param>
+        /// <returns><see langword="true"/> if the deletion was successful; otherwise, <see langword="false"/>.</returns>
         public async Task<bool> DeleteAsync(ID id, MySqlConnection? connection = null, MySqlTransaction? transaction = null)
         {
             bool isLocalConnection = connection == null;
@@ -279,9 +331,21 @@ namespace Tavstal.TLibrary.Models.Database
             }
         }
         
+        /// <summary>
+        /// Deletes entities matching the specified query parameters.
+        /// </summary>
+        /// <param name="queryParameters">The conditions to match for the deletion.</param>
+        /// <returns><see langword="true"/> if at least one row was deleted; otherwise, <see langword="false"/>.</returns>
         public async Task<bool> DeleteAsync(params QueryParameter[] queryParameters) =>
             await DeleteAsync(null, null, queryParameters);
-        
+
+        /// <summary>
+        /// Deletes entities matching the specified query parameters.
+        /// </summary>
+        /// <param name="connection">An optional existing database connection to reuse.</param>
+        /// <param name="transaction">An optional transaction to execute within.</param>
+        /// <param name="queryParameters">The conditions to match for the deletion.</param>
+        /// <returns><see langword="true"/> if at least one row was deleted; otherwise, <see langword="false"/>.</returns>
         public async Task<bool> DeleteAsync(MySqlConnection? connection, MySqlTransaction? transaction, params QueryParameter[] queryParameters)
         {
             bool isLocalConnection = connection == null;
@@ -330,6 +394,13 @@ namespace Tavstal.TLibrary.Models.Database
             }
         }
 
+        /// <summary>
+        /// Retrieves an entity from the database by its primary key.
+        /// </summary>
+        /// <param name="id">The primary key of the entity to retrieve.</param>
+        /// <param name="connection">An optional existing database connection to reuse.</param>
+        /// <param name="transaction">An optional transaction to execute within.</param>
+        /// <returns>The matching entity, or <see langword="null"/> if not found or the operation failed.</returns>
         public async Task<T?> GetAsync(ID id, MySqlConnection? connection = null, MySqlTransaction? transaction = null)
         {
             bool isLocalConnection = connection == null;
@@ -366,10 +437,24 @@ namespace Tavstal.TLibrary.Models.Database
             }
         }
 
+        /// <summary>
+        /// Retrieves entities matching the specified query parameters.
+        /// </summary>
+        /// <param name="limit">The maximum number of rows to return.</param>
+        /// <param name="queryParameters">The conditions to match for the query.</param>
+        /// <returns>A list of matching entities, or <see langword="null"/> if none found or the operation failed.</returns>
         public async Task<List<T>?> GetAsync(int limit = 1000, params QueryParameter[] queryParameters) =>
             await GetAsync(null, null, limit, queryParameters);
-        
-        
+
+
+        /// <summary>
+        /// Retrieves entities matching the specified query parameters.
+        /// </summary>
+        /// <param name="connection">An optional existing database connection to reuse.</param>
+        /// <param name="transaction">An optional transaction to execute within.</param>
+        /// <param name="limit">The maximum number of rows to return.</param>
+        /// <param name="queryParameters">The conditions to match for the query.</param>
+        /// <returns>A list of matching entities, or <see langword="null"/> if none found or the operation failed.</returns>
         public async Task<List<T>?> GetAsync(MySqlConnection? connection, MySqlTransaction? transaction, int limit = 1000, params QueryParameter[] queryParameters)
         {
             bool isLocalConnection = connection == null;

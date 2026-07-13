@@ -65,7 +65,7 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// <summary>
         /// Plugin Configuration
         /// </summary>
-        public PluginConfig Config { get; private set; } = default!;
+        public PluginConfig Config { get; private set; } = null!;
 
         /// <summary>
         /// Hook Manager used to work with plugin hooks
