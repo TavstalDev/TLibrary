@@ -59,7 +59,7 @@
       <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
     <Reference Include="MySqlConnector">
-      <HintPath>..\..\TShop2\assets\libraries\MySqlConnector.dll</HintPath>
+      <HintPath>..\assets\libraries\MySqlConnector.dll</HintPath>
       <Private>False</Private>
       <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
