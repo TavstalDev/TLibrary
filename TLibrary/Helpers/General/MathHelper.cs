@@ -213,7 +213,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// </summary>
         /// <param name="value"></param>
         /// <returns>The byte array representing the converted <see cref="int"/>.</returns>
-        public static byte[] ConvertInt32ToMetadata(uint value) =>
+        public static byte[] ConvertInt32ToMetadata(int value) =>
             BitConverter.GetBytes(value);
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace Tavstal.TLibrary.Helpers.General
         /// </summary>
         /// <param name="value"></param>
         /// <returns>The byte array representing the converted <see cref="uint"/>.</returns>
-        public static byte[] ConvertUInt32ToMetadata(uint value) =>
+        public static byte[] ConvertUint32ToMetadata(uint value) =>
             BitConverter.GetBytes(value);
 
         /// <summary>
