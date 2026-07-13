@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Tavstal.TLibrary.Helpers;
 using Tavstal.TLibrary.Helpers.General;
-using Tavstal.TLibrary.Models.Discord;
 
-namespace Tavstal.TLibrary.Services
+namespace Tavstal.TLibrary.Models.Discord
 {
     /// <summary>
     /// Discord webhook class used to send messages and images to discord servers
@@ -202,7 +201,7 @@ namespace Tavstal.TLibrary.Services
             if (responseStream == null)
                 return null;
             
-            StreamReader responseReader = new StreamReader(responseStream);
+            using StreamReader responseReader = new StreamReader(responseStream);
             string fullResponse =  await responseReader.ReadToEndAsync();
             webResponse.Close();
 
