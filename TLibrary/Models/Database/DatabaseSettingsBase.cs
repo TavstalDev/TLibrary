@@ -29,5 +29,7 @@ namespace Tavstal.TLibrary.Models.Database
         /// <inheritdoc/>
         [JsonProperty(Order = 5), YamlMember(Order = 5, Description = "Database connection timeout in seconds, default is 120.")]
         public int TimeOut { get; set; } = 120;
+
+        protected DatabaseSettingsBase() { }
     }
 }

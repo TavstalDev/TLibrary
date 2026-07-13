@@ -91,14 +91,18 @@ namespace Tavstal.TLibrary.Models.Config
             {
                 string text = File.ReadAllText(fullPath);
                 var deserializer = new DeserializerBuilder()
-                    .WithNamingConvention(HyphenatedNamingConvention.Instance) 
+                    .WithNamingConvention(HyphenatedNamingConvention.Instance)
+                    .IgnoreUnmatchedProperties()
                     .Build();
                 return deserializer.Deserialize<T>(text);
             }
-            catch
+            catch (Exception ex)
             {
-                LoggerHelper.LogError("Failed to read the configuration file, it might be outdated.\nSaving current one and generating a new file...");
-                File.Move(fullPath, Path.Combine(FilePath, FileName.Insert(FileName.IndexOf(".json", StringComparison.Ordinal), $"_save_{DateTime.Now.ToString("s").Replace("-", "").Replace(":", "")}")));
+                LoggerHelper.LogError("Failed to read the configuration file.");
+                LoggerHelper.LogError($"YAML ERROR: {ex.Message}");
+                if (ex.InnerException != null) 
+                    LoggerHelper.LogError($"Inner Exception: {ex.InnerException.Message}");
+                File.Move(fullPath, Path.Combine(FilePath, FileName.Insert(FileName.IndexOf(".yml", StringComparison.Ordinal), $"_save_{DateTime.Now.ToString("s").Replace("-", "").Replace(":", "")}")));
                 Save();
                 return null;
             }
