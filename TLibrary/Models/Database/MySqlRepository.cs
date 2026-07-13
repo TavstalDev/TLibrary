@@ -139,7 +139,7 @@ namespace Tavstal.TLibrary.Models.Database
                 string columns =  string.Join(", ", columnList);
                 string values =  string.Join(", ", columnValues);
                 command.CommandText = $"INSERT INTO `{_tableName}` ({columns}) VALUES ({values});" +
-                                      $"SELECT * FROM `{_tableName}` WHERE id = LAST_INSERT_ID();";
+                                      $"SELECT * FROM `{_tableName}` WHERE `{_idColumnName}` = LAST_INSERT_ID();";
 
                 T? result = null;
                 await using var reader = await command.ExecuteReaderAsync();
@@ -251,7 +251,6 @@ namespace Tavstal.TLibrary.Models.Database
                 
                 List<string> columnValues = new  List<string>();
                 List<string> queryList = new  List<string>();
-                int vParamIndex = 0;
                 int qParamIndex = 0;
                 foreach (var column in _columnMappings.Values)
                 {
@@ -261,8 +260,7 @@ namespace Tavstal.TLibrary.Models.Database
                     UpdateParameter? updateParameter = updateParameters.Find(x => x.ColumnName == column);
                     if (updateParameter != null)
                     {
-                        string paramName = $"@v{vParamIndex++}";
-                        columnValues.Add($"`{column}` = {paramName}");
+                        columnValues.Add($"`{column}` = {updateParameter.Value!.ParameterName}");
                         command.Parameters.Add(updateParameter.Value!);
                     }
                     
