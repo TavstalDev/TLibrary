@@ -144,12 +144,20 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="player">The player to teleport.</param>
         /// <param name="location">The destination location for the teleportation.</param>
         /// <param name="radious">The maximum distance from the destination location where the player can teleport. (Default is 3.0f)</param>
-        public static void ForceTeleport(Player player, Vector3 location, float radious = 3f)
+        /// <param name="maxAttempts">The maximum number of attempts to teleport the player. (Default is 5)</param>
+        public static void ForceTeleport(Player player, Vector3 location, float radious = 3f, int maxAttempts = 5)
         {
+            int remainingAttempts = maxAttempts;
             while (true)
             {
-                if (!player.teleportToLocation(location + UnityEngine.Random.insideUnitSphere * radious, player.transform.rotation.y)) 
+                if (!player.teleportToLocation(location + UnityEngine.Random.insideUnitSphere * radious,
+                        player.transform.rotation.y))
+                {
+                    remainingAttempts--;
+                    if (remainingAttempts <= 0)
+                        break;
                     continue;
+                }
                 break;
             }
         }

@@ -18,7 +18,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         public static List<Interactable2SalvageBarricade> GetBarricadesInRadius(Vector3 center, float sqrRadius)
         {
             List<Interactable2SalvageBarricade> result = new List<Interactable2SalvageBarricade>();
-            RaycastHit[] rayResult = new RaycastHit[] { };
+            RaycastHit[] rayResult = { };
             Physics.SphereCastNonAlloc(center, sqrRadius, Vector3.forward, rayResult, RayMasks.BARRICADE);
             foreach (RaycastHit ray in rayResult)
             {
@@ -35,9 +35,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// </summary>
         /// <param name="salvageBarricade">The Interactable2SalvageBarricade to retrieve the BarricadeDrop component from.</param>
         /// <returns>The <see cref="BarricadeDrop"></see> component attached to the Interactable2SalvageBarricade.</returns>
-        public static BarricadeDrop GetBarricadeDrop(this Interactable2SalvageBarricade salvageBarricade)
-        {
-            return BarricadeManager.FindBarricadeByRootTransform(salvageBarricade.transform);
-        }
+        public static BarricadeDrop GetBarricadeDrop(this Interactable2SalvageBarricade salvageBarricade) =>
+            BarricadeManager.FindBarricadeByRootTransform(salvageBarricade.transform);
     }
 }

@@ -18,7 +18,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         public static List<Interactable2SalvageStructure> GetStructuresInRadius(Vector3 center, float sqrRadius)
         {
             List<Interactable2SalvageStructure> result = new List<Interactable2SalvageStructure>();
-            RaycastHit[] rayResult = new RaycastHit[] { };
+            RaycastHit[] rayResult = { };
             Physics.SphereCastNonAlloc(center, sqrRadius, Vector3.forward, rayResult, RayMasks.BARRICADE);
             foreach (RaycastHit ray in rayResult)
             {
@@ -35,9 +35,7 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// </summary>
         /// <param name="salvageStructure">The Interactable2SalvageStructure for which to retrieve the StructureDrop.</param>
         /// <returns>The <see cref="StructureDrop"></see> associated with the given Interactable2SalvageStructure.</returns>
-        public static StructureDrop GetStructureDrop(this Interactable2SalvageStructure salvageStructure)
-        {
-            return StructureManager.FindStructureByRootTransform(salvageStructure.transform);
-        }
+        public static StructureDrop GetStructureDrop(this Interactable2SalvageStructure salvageStructure) =>
+            StructureManager.FindStructureByRootTransform(salvageStructure.transform);
     }
 }
