@@ -14,6 +14,8 @@ using Tavstal.TLibrary.Models.Config;
 using Tavstal.TLibrary.Models.Logging;
 using UnityEngine;
 using UnityEngine.Networking;
+using YamlDotNet.Serialization;
+
 // ReSharper disable UnusedMember.Global
 // ReSharper disable StaticMemberInGenericType
 // ReSharper disable MemberCanBePrivate.Global
@@ -267,7 +269,7 @@ namespace Tavstal.TLibrary.Models.Plugin
             // Log missing fields
             foreach (var field in Config.GetType().GetProperties())
             {
-                if (field.GetCustomAttribute<JsonIgnoreAttribute>() != null)
+                if (field.GetCustomAttribute<JsonIgnoreAttribute>() != null || field.GetCustomAttribute<YamlIgnoreAttribute>() != null)
                     continue;
                 
                 if (field.GetValue(Config) != null)
@@ -278,7 +280,7 @@ namespace Tavstal.TLibrary.Models.Plugin
             
             foreach (var field in Config.GetType().GetFields())
             {
-                if (field.GetCustomAttribute<JsonIgnoreAttribute>() != null)
+                if (field.GetCustomAttribute<JsonIgnoreAttribute>() != null || field.GetCustomAttribute<YamlIgnoreAttribute>() != null)
                     continue;
                 
                 if (field.GetValue(Config) != null)
