@@ -7,7 +7,7 @@ namespace Tavstal.TLibrary.Threading
     /// <summary>
     /// Provides fire-and-forget task execution with automatic exception handling.
     /// </summary>
-    public static class SafeTask
+    public static class BackgroundThreadDispatcher
     {
         /// <summary>
         /// Runs an action on a background thread, logging any exceptions.
@@ -50,43 +50,20 @@ namespace Tavstal.TLibrary.Threading
         }
 
         /// <summary>
-        /// Runs a task on a background thread, logging any exceptions.
-        /// </summary>
-        /// <param name="task">The task to execute.</param>
-        /// <param name="context">Optional context string for logging.</param>
-        public static void Run(Task task, string context = "unknown")
-        {
-            Task.Run(async () =>
-            {
-                try
-                {
-                    await task;
-                }
-                catch (Exception ex)
-                {
-                    LoggerHelper.LogError($"Unexpected error happened while executing async task in '{context}' context: {ex}");
-                }
-            });
-        }
-
-        /// <summary>
         /// Runs a task on a background thread and awaits its completion, logging any exceptions.
         /// </summary>
-        /// <param name="task">The task to execute.</param>
+        /// <param name="taskFactory">The task to execute.</param>
         /// <param name="context">Optional context string for logging.</param>
-        public static async Task RunAsync(Task task, string context = "unknown")
+        public static async Task RunAsync(Func<Task> taskFactory, string context = "unknown")
         {
-            await Task.Run(async () =>
+            try
             {
-                try
-                {
-                    await task;
-                }
-                catch (Exception ex)
-                {
-                    LoggerHelper.LogError($"Unexpected error happened while executing async task in '{context}' context: {ex}");
-                }
-            });
+                await Task.Run(taskFactory);
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogError($"Unexpected error happened while executing async task in '{context}' context: {ex}");
+            }
         }
     }
 }
