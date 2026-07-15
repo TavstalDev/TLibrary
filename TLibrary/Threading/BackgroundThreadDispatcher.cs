@@ -48,6 +48,23 @@ namespace Tavstal.TLibrary.Threading
                 }
             });
         }
+        
+        /// <summary>
+        /// Runs an async task on a background thread without awaiting its completion, logging any exceptions.
+        /// </summary>
+        /// <param name="taskFactory">The async task to execute.</param>
+        /// <param name="context">Optional context string for logging.</param>
+        public static void Run(Func<Task> taskFactory, string context = "unknown")
+        {
+            try
+            {
+                Task.Run(taskFactory);
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogError($"Unexpected error happened while executing async task in '{context}' context: {ex}");
+            }
+        }
 
         /// <summary>
         /// Runs a task on a background thread and awaits its completion, logging any exceptions.
