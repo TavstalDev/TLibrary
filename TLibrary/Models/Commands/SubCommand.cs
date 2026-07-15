@@ -2,57 +2,113 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Rocket.API;
+using Tavstal.TLibrary.Models.Plugin;
 
 namespace Tavstal.TLibrary.Models.Commands
 {
     /// <inheritdoc/>
-    public class SubCommand : ICommand
+    public class SubCommand : ISubcommand
     {
         /// <inheritdoc/>
-        public string Name { get; private set; }
-        
-        /// <inheritdoc/>
-        public string Help { get; private set; }
-        
-        /// <inheritdoc/>
-        public string Syntax { get; private set; }
-        
-        /// <inheritdoc/>
-        public List<string> Aliases { get; private set; }
-        
-        /// <inheritdoc/>
-        public List<string> Permissions { get; private set; }
+        public AllowedCaller AllowedCaller { get; }
 
-        /// <summary>
-        /// The action that stores what the subcommand should do
-        /// </summary>
-        public Func<IRocketPlayer, string[], Task> ActionToExecute { get; private set; }
+        /// <inheritdoc/>
+        public string Name { get; }
+        
+        /// <inheritdoc/>
+        public string Help { get; }
+        
+        /// <inheritdoc/>
+        public string Syntax { get; }
+        
+        /// <inheritdoc/>
+        public List<string> Aliases { get; }
+        
+        /// <inheritdoc/>
+        public List<string> Permissions { get; }
 
-        /// <summary>
-        /// Executes the <see cref="ActionToExecute"/> action.
-        /// </summary>
-        /// <param name="caller">The player who executed the command.</param>
-        /// <param name="args">The arguments passed to the command.</param>
-        public async Task Execute(IRocketPlayer caller, string[] args) =>
-            await ActionToExecute(caller, args);
+        /// <inheritdoc/>
+        public IPlugin Plugin { get; }
 
-        /// <summary>
-        /// Creates a new subcommand with the given properties.
-        /// </summary>
-        /// <param name="name">The name of the subcommand.</param>
-        /// <param name="help">The help text for the subcommand.</param>
-        /// <param name="syntax">The syntax description of the subcommand.</param>
-        /// <param name="aliases">Alternative names for the subcommand.</param>
-        /// <param name="permissions">The permissions required to use the subcommand.</param>
-        /// <param name="codeToExecute">The function to run when the subcommand is executed.</param>
-        public SubCommand(string name, string help, string syntax, List<string> aliases, List<string> permissions, Func<IRocketPlayer, string[], Task> codeToExecute)
+        /// <inheritdoc/>
+        public bool UseBackgroundThread { get; }
+
+        /// <inheritdoc/>
+        public List<ISubcommand>? SubCommands { get; }
+        
+        /// <inheritdoc/>
+        public Func<IRocketPlayer, string[], Action>? Action { get; }
+        
+        /// <inheritdoc/>
+        public Func<IRocketPlayer, string[], Task>? Task { get; }
+
+        public SubCommand(string name, string help, string syntax, List<string> aliases, List<string> permissions,
+            IPlugin plugin, AllowedCaller allowedCaller, Func<IRocketPlayer, string[], Action> action)
         {
+            AllowedCaller = allowedCaller;
             Name = name;
             Help = help;
             Syntax = syntax;
             Aliases = aliases;
             Permissions = permissions;
-            ActionToExecute = codeToExecute;
+            Plugin = plugin;
+            UseBackgroundThread = false;
+            SubCommands = null;
+            Action = action;
+            Task = null;
+        }
+        
+        public SubCommand(string name, string help, string syntax, List<string> aliases, List<string> permissions,
+            IPlugin plugin, AllowedCaller allowedCaller, List<ISubcommand>? subCommands, Func<IRocketPlayer, string[], Action> action)
+        {
+            AllowedCaller = allowedCaller;
+            Name = name;
+            Help = help;
+            Syntax = syntax;
+            Aliases = aliases;
+            Permissions = permissions;
+            Plugin = plugin;
+            UseBackgroundThread = false;
+            SubCommands = subCommands;
+            Action = action;
+            Task = null;
+        }
+        
+        public SubCommand(string name, string help, string syntax, List<string> aliases, List<string> permissions,
+            IPlugin plugin, AllowedCaller allowedCaller, Func<IRocketPlayer, string[], Task>? task)
+        {
+            AllowedCaller = allowedCaller;
+            Name = name;
+            Help = help;
+            Syntax = syntax;
+            Aliases = aliases;
+            Permissions = permissions;
+            Plugin = plugin;
+            UseBackgroundThread = true;
+            SubCommands = null;
+            Action = null;
+            Task = task;
+        }
+        
+        public SubCommand(string name, string help, string syntax, List<string> aliases, List<string> permissions,
+            IPlugin plugin, AllowedCaller allowedCaller, List<ISubcommand>? subCommands, Func<IRocketPlayer, string[], Task>? task)
+        {
+            AllowedCaller = allowedCaller;
+            Name = name;
+            Help = help;
+            Syntax = syntax;
+            Aliases = aliases;
+            Permissions = permissions;
+            Plugin = plugin;
+            UseBackgroundThread = true;
+            SubCommands = subCommands;
+            Action = null;
+            Task = task;
+        }
+
+        void IRocketCommand.Execute(IRocketPlayer caller, string[] command)
+        {
+            throw new InvalidOperationException("Subcommands should not be executed directly. They should be executed through their parent command.");
         }
     }
 }
