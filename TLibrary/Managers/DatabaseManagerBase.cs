@@ -4,6 +4,7 @@ using MySqlConnector;
 using Tavstal.TLibrary.Extensions;
 using Tavstal.TLibrary.Models.Database;
 using Tavstal.TLibrary.Models.Plugin;
+using Tavstal.TLibrary.Threading;
 
 namespace Tavstal.TLibrary.Managers
 {
@@ -23,8 +24,7 @@ namespace Tavstal.TLibrary.Managers
             // Forces Mono's compiler/linker to include the CP1250 codepage
             _ = new I18N.West.CP1250();
             // ReSharper disable once VirtualMemberCallInConstructor
-            CheckSchema();
-            Task.Run(async () => await CheckSchemaAsync());
+            BackgroundThreadDispatcher.Run(async () => await CheckSchemaAsync());
         }
 
         /// <summary>
@@ -58,11 +58,6 @@ namespace Tavstal.TLibrary.Managers
             }
             return mySqlConnection;
         }
-
-        /// <summary>
-        /// Checks the database schema and performs necessary updates if required.
-        /// </summary>
-        public virtual void CheckSchema() { }
 
         /// <summary>
         /// Checks the database schema and performs necessary updates if required.
