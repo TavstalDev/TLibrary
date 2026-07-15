@@ -442,17 +442,17 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// </summary>
         private Dictionary<string, string> CommonLocalization => new Dictionary<string, string>
         {
-            { "error_command_caller_not_console", "&cThis command must be executed by the console." },
-            { "error_command_caller_not_player", "&cThis command must be executed by a player." },
-            { "error_command_no_permission", "&cYou do not have enough permission to execute this command." },
-            { "error_command_syntax", "&cWrong syntax! Usage: /{0} {1}" },
-            { "error_subcommand_not_found", "&cThe '/{0}' command does not have '{1}' subcommand." },
-            { "error_arg_not_integer", "&cYou must provide a valid integer as argument for '{0}'." },
-            { "error_arg_not_byte", "&cYou must provide a valid byte as argument for '{0}'. (Value is between 0-255)" },
-            { "error_arg_not_decimal", "&cYou must provide a valid decimal as argument for '{0}'." },
-            { "error_arg_not_string", "&cYou must provide a valid string as argument for '{0}'." },
-            { "error_arg_not_number", "&cYou must provide a valid number as argument for '{0}'." },
-            { "success_command_help", "&aUsage: /{0} {1}" },
+            { "commands_common_error_player_caller", "&cThis command must be executed by the console." },
+            { "commands_common_error_console_caller", "&cThis command must be executed by a player." },
+            { "commands_common_error_permission", "&cYou do not have enough permission to execute this command." },
+            { "commands_common_error_syntax", "&cWrong syntax! Usage: /{0} {1}" },
+            { "commands_common_error_invalid_subcommand", "&cThe '/{0}' command does not have '{1}' subcommand." },
+            { "commands_common_error_parse_int", "&cYou must provide a valid integer as argument for '{0}'." },
+            { "commands_common_error_parse_byte", "&cYou must provide a valid byte as argument for '{0}'. (Value is between 0-255)" },
+            { "commands_common_error_parse_decimal", "&cYou must provide a valid decimal as argument for '{0}'." },
+            { "commands_common_error_parse_string", "&cYou must provide a valid string as argument for '{0}'." },
+            { "commands_common_error_parse_number", "&cYou must provide a valid number as argument for '{0}'." },
+            { "commands_common_usage", "&aUsage: /{0} {1}" },
         };
 
         /// <summary>
