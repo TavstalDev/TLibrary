@@ -157,6 +157,61 @@ namespace Tavstal.TLibrary.Models.Database
                 if (isLocalConnection) await connection.CloseAsync();
             }
         }
+        
+        /// <summary>
+        /// Inserts multiple entities into the database table in a single batch operation.
+        /// </summary>
+        /// <param name="entities">The list of entities to insert.</param>
+        /// <param name="connection">An optional existing database connection to reuse.</param>
+        /// <param name="transaction">An optional transaction to execute within.</param>
+        /// <returns><see langword="true"/> if at least one row was inserted; otherwise, <see langword="false"/>.</returns>
+        public async Task<bool> AddRangeAsync(List<T> entities, MySqlConnection? connection = null, MySqlTransaction? transaction = null)
+        {
+            bool isLocalConnection = connection == null;
+            connection ??= _databaseManager.CreateConnection();
+            if (connection == null)
+                return false;
+            bool connectionState = await connection.OpenSafeAsync();
+            if (!connectionState)
+                return false;
+            
+            try
+            {
+                await using var command = new MySqlCommand();
+                command.Connection = connection;
+                if (transaction != null) command.Transaction = transaction;
+                
+                var columnNames = _columnMappings.Values.Select(c => $"`{c}`").ToList();
+                var valueGroups = new List<string>();
+                int paramIndex = 0;
+                
+                foreach (var entity in entities)
+                {
+                    var currentParams = new List<string>();
+                    foreach (var columnMap in _columnMappings)
+                    {
+                        string paramName = $"@p{paramIndex++}";
+                        currentParams.Add(paramName);
+                
+                        var value = columnMap.Key.GetValue(entity);
+                        command.Parameters.AddWithValue(paramName, SqlTypeHelper.FixValue(value));
+                    }
+                    valueGroups.Add($"({string.Join(", ", currentParams)})");
+                }
+                
+                command.CommandText = $"INSERT INTO `{_tableName}` ({string.Join(", ", columnNames)}) VALUES {string.Join(", ", valueGroups)};";
+                return await command.ExecuteNonQueryAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                HandleException(nameof(AddAsync), ex);
+                return false;
+            }
+            finally
+            {
+                if (isLocalConnection) await connection.CloseAsync();
+            }
+        }
 
         /// <summary>
         /// Updates an existing entity in the database by its primary key.
@@ -378,6 +433,54 @@ namespace Tavstal.TLibrary.Models.Database
                 
                 string queryValues = string.Join(" AND ", queryList);
                 command.CommandText = $"DELETE FROM `{_tableName}` WHERE {queryValues};";
+                
+                return await command.ExecuteNonQueryAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                HandleException(nameof(DeleteAsync), ex);
+                return false;
+            }
+            finally
+            {
+                if (isLocalConnection) await connection.CloseAsync();
+            }
+        }
+        
+        /// <summary>
+        /// Deletes multiple rows from the database table where the specified column matches any of the given values.
+        /// </summary>
+        /// <param name="columnName">The column name to filter by.</param>
+        /// <param name="values">The list of values to match against the column.</param>
+        /// <param name="connection">An optional existing database connection to reuse.</param>
+        /// <param name="transaction">An optional transaction to execute within.</param>
+        /// <returns><see langword="true"/> if at least one row was deleted; otherwise, <see langword="false"/>.</returns>
+        public async Task<bool> DeleteRangeAsync(string columnName, List<object> values, MySqlConnection? connection = null, MySqlTransaction? transaction = null)
+        {
+            bool isLocalConnection = connection == null;
+            connection ??= _databaseManager.CreateConnection();
+            if (connection == null)
+                return false;
+            bool connectionState = await connection.OpenSafeAsync();
+            if (!connectionState)
+                return false;
+            
+            try
+            {
+                await using var command = new MySqlCommand();
+                command.Connection = connection;
+                if (transaction != null) command.Transaction = transaction;
+                
+                var paramNames = new List<string>();
+                for (int i = 0; i < values.Count; i++)
+                {
+                    string paramName = $"@p{i}";
+                    command.Parameters.AddWithValue(paramName, SqlTypeHelper.FixValue(values[i]));
+                    paramNames.Add(paramName);
+                }
+                
+                string inClause = string.Join(", ", paramNames);
+                command.CommandText = $"DELETE FROM `{_tableName}` WHERE `{columnName}` IN ({inClause});";
                 
                 return await command.ExecuteNonQueryAsync() > 0;
             }
