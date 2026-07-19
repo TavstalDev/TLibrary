@@ -17,6 +17,11 @@ namespace Tavstal.TLibrary.Managers
         public IPlugin _plugin { get; }
         public DatabaseSettingsBase _configuration { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseManagerBase"/> class.
+        /// </summary>
+        /// <param name="plugin">The plugin that owns this database manager.</param>
+        /// <param name="configuration">The database connection settings.</param>
         protected DatabaseManagerBase(IPlugin plugin, DatabaseSettingsBase configuration)
         {
             _plugin = plugin;
