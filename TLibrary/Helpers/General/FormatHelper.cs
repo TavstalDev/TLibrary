@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Tavstal.TLibrary.Models.Formats;
+using Tavstal.TLibrary.Models;
 
 namespace Tavstal.TLibrary.Helpers.General
 {
@@ -38,23 +38,23 @@ namespace Tavstal.TLibrary.Helpers.General
         /// </summary>
         public static readonly Dictionary<string, string> ConsoleFormats = new Dictionary<string, string>
         {
-            {"&0", "\x1b[40m"},
-            {"&1", "\x1b[44m"},
-            {"&2", "\x1b[42m"},
-            {"&3", "\x1b[46m"},
-            {"&4", "\x1b[41m"},
-            {"&5", "\x1b[45m"},
-            {"&6", "\x1b[43m"},
-            {"&7", "\x1b[47m"},
-            {"&8", "\x1b[100m"},
-            {"&9", "\x1b[104m"},
-            {"&a", "\x1b[102m"},
-            {"&b", "\x1b[106m"},
-            {"&c", "\x1b[101m"},
-            {"&d", "\x1b[105m"},
-            {"&e", "\x1b[103m"},
-            {"&f", "\x1b[107m"},
-            {"&r", "\x1b[0m"},
+            {"&0", "\x1b[30m"},   // Black
+            {"&1", "\x1b[34m"},   // Dark Blue
+            {"&2", "\x1b[32m"},   // Dark Green
+            {"&3", "\x1b[36m"},   // Dark Cyan
+            {"&4", "\x1b[31m"},   // Dark Red
+            {"&5", "\x1b[35m"},   // Dark Magenta
+            {"&6", "\x1b[33m"},   // Gold/Orange (Dark Yellow)
+            {"&7", "\x1b[37m"},   // Gray
+            {"&8", "\x1b[90m"},   // Dark Gray (Bright Black)
+            {"&9", "\x1b[94m"},   // Blue
+            {"&a", "\x1b[92m"},   // Green
+            {"&b", "\x1b[96m"},   // Cyan
+            {"&c", "\x1b[91m"},   // Red
+            {"&d", "\x1b[95m"},   // Magenta
+            {"&e", "\x1b[93m"},   // Yellow
+            {"&f", "\x1b[97m"},   // White
+            {"&r", "\x1b[0m"},    // Reset
         };
 
         /// <summary>
