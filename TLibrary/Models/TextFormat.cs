@@ -1,4 +1,4 @@
-﻿namespace Tavstal.TLibrary.Models.Formats
+﻿namespace Tavstal.TLibrary.Models
 {
     /// <summary>
     /// Format for unturned rich chat output.

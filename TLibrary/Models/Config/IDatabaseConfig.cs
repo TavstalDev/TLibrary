@@ -1,4 +1,4 @@
-﻿namespace Tavstal.TLibrary.Models.Database
+﻿namespace Tavstal.TLibrary.Models.Config
 {
     /// <summary>
     /// Base database settings interface used in plugin configurations
