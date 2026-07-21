@@ -38,40 +38,31 @@ namespace Tavstal.TLibrary.Helpers.Unturned
                 }
             });
         }
-
-        /// <summary>
-        /// Sends a plain text chat message to a specific player without formatting.
-        /// </summary>
-        /// <param name="toPlayer">The player to receive the message.</param>
-        /// <param name="text">The message text.</param>
-        public static void SendPlainChatMessage(SteamPlayer toPlayer, string text)
-        {
-            string icon = "";
-            ServerSendChatMessage(text, icon, null, toPlayer);
-        }
-
+        
         /// <summary>
         /// Sends a formatted command reply message to a specific player.
         /// </summary>
         /// <param name="plugin">The plugin sending the message.</param>
         /// <param name="toPlayer">The target player (SteamPlayer or UnturnedPlayer).</param>
         /// <param name="translation">The translation key to localize.</param>
+        /// <param name="icon">The optional icon of the message.</param>
         /// <param name="args">Optional format arguments for the translation.</param>
-        public static void SendCommandReply(this IPlugin plugin, object toPlayer, string translation, params object[] args)
+        public static void SendCommandReply(this IPlugin plugin, object toPlayer, string translation, string? icon = null, params object[] args)
         {
-            string icon = "";
-            if (toPlayer is SteamPlayer steamPlayer)
+            switch (toPlayer)
             {
-                ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null,
-                    steamPlayer);
+                case SteamPlayer steamPlayer:
+                    ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null,
+                        steamPlayer);
+                    break;
+                case UnturnedPlayer player:
+                    ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null,
+                        player.SteamPlayer());
+                    break;
+                default:
+                    plugin.GetLogger().RichCommand(plugin.Localize(false, translation, args));
+                    break;
             }
-            else if (toPlayer is UnturnedPlayer player)
-            {
-                ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null,
-                    player.SteamPlayer());
-            }
-            else
-                plugin.GetLogger().RichCommand(plugin.Localize(false, translation, args));
         }
 
         /// <summary>
@@ -80,17 +71,32 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="plugin">The plugin sending the message.</param>
         /// <param name="toPlayer">The target player (SteamPlayer or UnturnedPlayer).</param>
         /// <param name="translation">The raw text or format string.</param>
+        /// <param name="icon">The optional icon of the message.</param>
         /// <param name="args">Optional format arguments.</param>
-        public static void SendPlainCommandReply(this IPlugin plugin, object toPlayer, string translation, params object[] args)
+        public static void SendPlainCommandReply(this IPlugin plugin, object toPlayer, string translation, string? icon = null, params object[] args)
         {
-            string icon = "";
-            if (toPlayer is SteamPlayer steamPlayer)
-                ServerSendChatMessage(FormatHelper.FormatTextV2(string.Format(translation, args)), icon, null, steamPlayer);
-            else if (toPlayer is UnturnedPlayer player)
-                ServerSendChatMessage(FormatHelper.FormatTextV2(string.Format(translation, args)), icon, null, player.SteamPlayer());
-            else
-                plugin.GetLogger().RichCommand(string.Format(translation, args));
+            switch (toPlayer)
+            {
+                case SteamPlayer steamPlayer:
+                    ServerSendChatMessage(FormatHelper.FormatTextV2(string.Format(translation, args)), icon, null, steamPlayer);
+                    break;
+                case UnturnedPlayer player:
+                    ServerSendChatMessage(FormatHelper.FormatTextV2(string.Format(translation, args)), icon, null, player.SteamPlayer());
+                    break;
+                default:
+                    plugin.GetLogger().RichCommand(string.Format(translation, args));
+                    break;
+            }
         }
+
+        /// <summary>
+        /// Sends a plain text chat message to a specific player without formatting.
+        /// </summary>
+        /// <param name="toPlayer">The player to receive the message.</param>
+        /// <param name="text">The message text.</param>
+        /// <param name="icon">The optional icon of the message.</param>
+        public static void SendPlainChatMessage(SteamPlayer toPlayer, string text, string? icon = null) =>
+            ServerSendChatMessage(text, icon, null, toPlayer);
 
         /// <summary>
         /// Sends a formatted and localized chat message to a specific player.
@@ -98,12 +104,10 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// <param name="plugin">The plugin sending the message.</param>
         /// <param name="toPlayer">The target player.</param>
         /// <param name="translation">The translation key to localize.</param>
+        /// <param name="icon">The optional icon of the message.</param>
         /// <param name="args">Optional format arguments for the translation.</param>
-        public static void SendChatMessage(this IPlugin plugin, SteamPlayer toPlayer, string translation, params object[] args)
-        {
-            string icon = "";
-           ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, toPlayer);
-        }
+        public static void SendChatMessage(this IPlugin plugin, SteamPlayer toPlayer, string translation, string? icon = null, params object[] args) =>
+            ServerSendChatMessage(FormatHelper.FormatTextV2(plugin.Localize(true, translation, args)), icon, null, toPlayer);
 
 
         /// <summary>
@@ -111,11 +115,9 @@ namespace Tavstal.TLibrary.Helpers.Unturned
         /// </summary>
         /// <param name="plugin">The plugin sending the message.</param>
         /// <param name="translation">The translation key to localize.</param>
+        /// <param name="icon">The optional icon of the message.</param>
         /// <param name="args">Optional format arguments for the translation.</param>
-        public static void SendChatMessage(this IPlugin plugin, string translation, params object[] args)
-        {
-            string icon = "";
+        public static void SendChatMessage(this IPlugin plugin, string translation, string? icon = null, params object[] args) =>
             ServerSendChatMessage(plugin.Localize(true, translation, args), icon);
-        }
     }
 }
