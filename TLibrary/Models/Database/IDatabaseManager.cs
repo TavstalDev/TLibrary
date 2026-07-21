@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using MySqlConnector;
+using Tavstal.TLibrary.Models.Config;
 
 namespace Tavstal.TLibrary.Models.Database
 {
@@ -13,7 +14,7 @@ namespace Tavstal.TLibrary.Models.Database
         /// The configuration of the plugin.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        DatabaseSettingsBase Configuration { get; }
+        DatabaseConfigBase Configuration { get; }
 
         /// <summary>
         /// Whether the database authentication has failed.

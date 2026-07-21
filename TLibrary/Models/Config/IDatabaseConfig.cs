@@ -3,7 +3,7 @@
     /// <summary>
     /// Base database settings interface used in plugin configurations
     /// </summary>
-    public interface IDatabaseSettings
+    public interface IDatabaseConfig
     {
         /// <summary>
         /// Address of the server

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using MySqlConnector;
 using Tavstal.TLibrary.Extensions;
+using Tavstal.TLibrary.Models.Config;
 using Tavstal.TLibrary.Models.Database;
 using Tavstal.TLibrary.Models.Plugin;
 using Tavstal.TLibrary.Threading;
@@ -15,7 +16,7 @@ namespace Tavstal.TLibrary.Managers
     {
         // ReSharper disable once InconsistentNaming
         public IPlugin _plugin { get; }
-        public DatabaseSettingsBase Configuration { get; }
+        public DatabaseConfigBase Configuration { get; }
         public bool IsAuthenticationFailed { get; set; }
 
         /// <summary>
@@ -23,7 +24,7 @@ namespace Tavstal.TLibrary.Managers
         /// </summary>
         /// <param name="plugin">The plugin that owns this database manager.</param>
         /// <param name="configuration">The database connection settings.</param>
-        protected DatabaseManagerBase(IPlugin plugin, DatabaseSettingsBase configuration)
+        protected DatabaseManagerBase(IPlugin plugin, DatabaseConfigBase configuration)
         {
             _plugin = plugin;
             Configuration = configuration;

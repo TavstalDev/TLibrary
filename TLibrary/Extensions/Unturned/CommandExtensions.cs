@@ -26,7 +26,7 @@ namespace Tavstal.TLibrary.Extensions.Unturned
                 {
                     if (caller is UnturnedPlayer)
                     {
-                        command.Plugin.SendCommandReply(caller, "commands_common_error_player_caller");
+                        command.Plugin.SendCommandReply(caller, "commands_common_error_player_caller", command.Plugin.GetConfiguration().GetGeneral().MessageIcon);
                         return false;
                     }
                     break;
@@ -35,7 +35,7 @@ namespace Tavstal.TLibrary.Extensions.Unturned
                 {
                     if (caller is ConsolePlayer)
                     {
-                        command.Plugin.SendCommandReply(caller, "commands_common_error_console_caller");
+                        command.Plugin.SendCommandReply(caller, "commands_common_error_console_caller", command.Plugin.GetConfiguration().GetGeneral().MessageIcon);
                         return false;
                     }
                     break;
@@ -64,7 +64,7 @@ namespace Tavstal.TLibrary.Extensions.Unturned
             
             if (!command.Permissions.Any(caller.HasPermission))
             {
-                command.Plugin.SendCommandReply(caller, "commands_common_error_permission");
+                command.Plugin.SendCommandReply(caller, "commands_common_error_permission", command.Plugin.GetConfiguration().GetGeneral().MessageIcon);
                 return false;
             }
             return true;
@@ -85,12 +85,12 @@ namespace Tavstal.TLibrary.Extensions.Unturned
                 var subCommand = command.SubCommands?.Find(x => x.Name.Equals(subCommandName, StringComparison.OrdinalIgnoreCase) || x.Aliases.Exists(alias => alias.Equals(subCommandName, StringComparison.OrdinalIgnoreCase)));
                 if (subCommand != null)
                 {
-                    command.Plugin.SendCommandReply(caller, translation, command.Name, subCommand.Syntax);
+                    command.Plugin.SendCommandReply(caller, translation, command.Plugin.GetConfiguration().GetGeneral().MessageIcon, command.Name, subCommand.Syntax);
                     return;
                 }
             }
             
-            command.Plugin.SendCommandReply(caller, translation, command.Name, command.Syntax);
+            command.Plugin.SendCommandReply(caller, translation, command.Plugin.GetConfiguration().GetGeneral().MessageIcon, command.Name, command.Syntax);
         }
     }
 }

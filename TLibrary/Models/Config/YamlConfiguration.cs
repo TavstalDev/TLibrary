@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Tavstal.TLibrary.Helpers.General;
-using Tavstal.TLibrary.Models.Logging;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
@@ -18,14 +17,8 @@ namespace Tavstal.TLibrary.Models.Config
         [YamlIgnore]
         public string FileName { get; set; }
         
-        [YamlMember(Order = 0, Description = "Log level for the plugin, default is 'INFO'.\nValues: DEBUG, INFO, WARNING, ERROR, COMMAND")]
-        public ELogLevel LogLevel { get; set; }
-        
-        [YamlMember(Order = 1, Description = "Locale used for the plugin, default is 'en'.")] 
-        public string Locale { get; set; } = "en";
-        
-        [YamlMember(Order = 2, Description = "Should the plugin download locale packs from the server?")]
-        public bool DownloadLocalePacks { get; set; }
+        [YamlMember(Order = 0)]
+        public GeneralConfig General { get; set; } = new GeneralConfig();
         
         protected YamlConfiguration(string filename, string path)
         {
@@ -46,33 +39,9 @@ namespace Tavstal.TLibrary.Models.Config
         
         /// <inheritdoc/>
         public string GetFilePath() => FilePath;
-        
-        /// <inheritdoc/>
-        public ELogLevel GetLogLevel() => LogLevel;
-        
-        /// <inheritdoc/>
-        public void SetLogLevel(ELogLevel logLevel)
-        {
-            LogLevel = logLevel;
-        }
 
         /// <inheritdoc/>
-        public string GetLocale() => Locale;
-
-        /// <inheritdoc/>
-        public void SetLocale(string locale)
-        {
-            Locale = locale;
-        }
-
-        /// <inheritdoc/>
-        public bool GetDownloadLocalePacks() => DownloadLocalePacks;
-
-        /// <inheritdoc/>
-        public void SetDownloadLocalePacks(bool downloadLocalePacks)
-        {
-            DownloadLocalePacks = downloadLocalePacks;
-        }
+        public GeneralConfig GetGeneral() => General;
 
         /// <inheritdoc/>
         public abstract void LoadDefaults();

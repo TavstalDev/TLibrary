@@ -1,4 +1,5 @@
-﻿using Tavstal.TLibrary.Models.Logging;
+﻿using Tavstal.TLibrary.Models.Config;
+using Tavstal.TLibrary.Models.Logging;
 
 namespace Tavstal.TLibrary.Models.Plugin
 {
@@ -24,6 +25,12 @@ namespace Tavstal.TLibrary.Models.Plugin
         /// <returns>The display name of the plugin.</returns>
         string GetPluginName();
 
+        /// <summary>
+        /// Gets the plugin's configuration instance, providing access to settings, locale, and log level.
+        /// </summary>
+        /// <returns>The <see cref="IConfiguration"/> instance for this plugin.</returns>
+        IConfiguration GetConfiguration();
+        
         /// <summary>
         /// Gets the logger instance used by the plugin.
         /// </summary>

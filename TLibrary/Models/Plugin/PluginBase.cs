@@ -155,18 +155,16 @@ namespace Tavstal.TLibrary.Models.Plugin
             Localization = new Dictionary<string, string>(); // Clearing because of /rocket reload caused error
         }
 
-        /// <summary>
-        /// Returns the logger
-        /// </summary>
-        /// <returns>Object of a <see cref="TLogger"/></returns>
+        /// <inheritdoc/>
+        public IConfiguration GetConfiguration() => Config;
+
+        /// <inheritdoc/>
         public TLogger GetLogger() => _logger;
 
-        public ELogLevel GetLogLevel() => Config.GetLogLevel();
+        /// <inheritdoc/>
+        public ELogLevel GetLogLevel() => Config.GetGeneral().LogLevel;
 
-        /// <summary>
-        /// Returns the name of the plugin
-        /// </summary>
-        /// <returns>A <see cref="string"></see> containing the name of the plugin.</returns>
+        /// <inheritdoc/>
         public string GetPluginName() => _pluginName;
 
         /// <summary>
@@ -289,7 +287,7 @@ namespace Tavstal.TLibrary.Models.Plugin
                 Logger.Warning($"The config field '{field.Name}' is missing in '{PluginName}' configuration.");
             }
             
-            TLogger.SetLogLevel(GetPluginName(), Config.GetLogLevel());
+            TLogger.SetLogLevel(GetPluginName(), Config.GetGeneral().LogLevel);
 
             Dictionary<string, string> localLocalization = CommonLocalization;
 
@@ -302,7 +300,7 @@ namespace Tavstal.TLibrary.Models.Plugin
                 PluginExtensions.SaveTranslation(localLocalization, translationsDirectory, "locale.en.json");
             }
 
-            if (Config.GetDownloadLocalePacks() && LanguagePacks.Count > 0)
+            if (Config.GetGeneral().DownloadLocalePacks && LanguagePacks.Count > 0)
                 foreach (var pack in LanguagePacks)
                 {
                     string path = Path.Combine(translationsDirectory, $"locale.{pack.Key}.json");
@@ -326,7 +324,7 @@ namespace Tavstal.TLibrary.Models.Plugin
                 }
                 
             
-            string locale = Config.GetLocale();
+            string locale = Config.GetGeneral().Locale;
             if (File.Exists(Path.Combine(translationsDirectory, $"locale.{locale}.json")))
             {
                 var localLocale = PluginExtensions.ReadTranslation(translationsDirectory, $"locale.{locale}.json");

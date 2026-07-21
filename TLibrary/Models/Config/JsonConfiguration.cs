@@ -2,7 +2,6 @@
 using System.IO;
 using Newtonsoft.Json;
 using Tavstal.TLibrary.Helpers.General;
-using Tavstal.TLibrary.Models.Logging;
 
 namespace Tavstal.TLibrary.Models.Config
 {
@@ -18,13 +17,7 @@ namespace Tavstal.TLibrary.Models.Config
         public string FileName { get; set; } 
         
         [JsonProperty(Order = 0)]
-        public ELogLevel LogLevel { get; set; }
-        
-        [JsonProperty(Order = 1)] 
-        public string Locale { get; set; } = "en";
-        
-        [JsonProperty(Order = 2)]
-        public bool DownloadLocalePacks { get; set; }
+        public GeneralConfig General { get; set; } = new GeneralConfig();
         
         protected JsonConfiguration(string filename, string path)
         {
@@ -47,31 +40,7 @@ namespace Tavstal.TLibrary.Models.Config
         public string GetFilePath() => FilePath;
         
         /// <inheritdoc/>
-        public ELogLevel GetLogLevel() => LogLevel;
-
-        /// <inheritdoc/>
-        public void SetLogLevel(ELogLevel logLevel)
-        {
-            LogLevel = logLevel;
-        }
-
-        /// <inheritdoc/>
-        public string GetLocale() => Locale;
-
-        /// <inheritdoc/>
-        public void SetLocale(string locale)
-        {
-            Locale = locale;
-        }
-
-        /// <inheritdoc/>
-        public bool GetDownloadLocalePacks() => DownloadLocalePacks;
-
-        /// <inheritdoc/>
-        public void SetDownloadLocalePacks(bool downloadLocalePacks)
-        {
-             DownloadLocalePacks = downloadLocalePacks;
-        }
+        public GeneralConfig GetGeneral() => General;
 
         /// <inheritdoc/>
         public abstract void LoadDefaults();

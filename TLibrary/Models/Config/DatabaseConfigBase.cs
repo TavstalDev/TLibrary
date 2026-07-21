@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
+using Tavstal.TLibrary.Models.Database;
 using YamlDotNet.Serialization;
 
-namespace Tavstal.TLibrary.Models.Database
+namespace Tavstal.TLibrary.Models.Config
 {
     /// <inheritdoc/>
-    public abstract class DatabaseSettingsBase : IDatabaseSettings
+    public abstract class DatabaseConfigBase : IDatabaseConfig
     {
         /// <inheritdoc/>
         [JsonProperty(Order = 0), YamlMember(Order = 0, Description = "Database host, default is 'localhost'.")]
@@ -29,8 +30,5 @@ namespace Tavstal.TLibrary.Models.Database
         /// <inheritdoc/>
         [JsonProperty(Order = 5), YamlMember(Order = 5, Description = "Database connection timeout in seconds, default is 120.")]
         public int TimeOut { get; set; } = 120;
-
-        // ReSharper disable once EmptyConstructor
-        protected DatabaseSettingsBase() { }
     }
 }

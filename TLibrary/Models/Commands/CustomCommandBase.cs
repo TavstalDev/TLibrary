@@ -105,14 +105,14 @@ namespace Tavstal.TLibrary.Models.Commands
 
         /// <summary>Synchronous command handler. Override to implement the command logic.</summary>
         /// <param name="caller">The player or console executing the command.</param>
-        /// <param name="command">Arguments passed to the command.</param>
+        /// <param name="args">Arguments passed to the command.</param>
         /// <returns><c>true</c> if the command was handled successfully; <c>false</c> to show usage help.</returns>
-        protected virtual bool HandleExecute(IRocketPlayer caller, string[] command) => false;
+        protected virtual bool HandleExecute(IRocketPlayer caller, string[] args) => false;
 
         /// <summary>Asynchronous command handler. Override to implement the command logic on a background thread.</summary>
         /// <param name="caller">The player or console executing the command.</param>
-        /// <param name="command">Arguments passed to the command.</param>
+        /// <param name="args">Arguments passed to the command.</param>
         /// <returns><c>true</c> if the command was handled successfully; <c>false</c> to show usage help.</returns>
-        protected virtual Task<bool> HandleExecuteAsync(IRocketPlayer caller, string[] command) => Task.FromResult(false);
+        protected virtual Task<bool> HandleExecuteAsync(IRocketPlayer caller, string[] args) => Task.FromResult(false);
     }
 }
