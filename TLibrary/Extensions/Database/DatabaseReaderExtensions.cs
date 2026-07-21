@@ -15,6 +15,12 @@ namespace Tavstal.TLibrary.Extensions.Database
     /// </summary>
     public static class DatabaseReaderExtensions
     {
+        /// <summary>
+        /// Converts the current row of a <see cref="MySqlDataReader"/> to an instance of <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The target type to map the row to.</typeparam>
+        /// <param name="reader">The MySQL data reader containing the row data.</param>
+        /// <returns>An instance of <typeparamref name="T"/> populated with the row values, or <see langword="null"/> if the reader has no rows or an error occurs.</returns>
         public static T? ConvertToObject<T>(this MySqlDataReader reader) where T : class
         {
             try
@@ -77,6 +83,12 @@ namespace Tavstal.TLibrary.Extensions.Database
             }
         }
         
+        /// <summary>
+        /// Converts the current row of a <see cref="DbDataReader"/> to an instance of <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The target type to map the row to.</typeparam>
+        /// <param name="reader">The database data reader containing the row data.</param>
+        /// <returns>An instance of <typeparamref name="T"/> populated with the row values, or <see langword="null"/> if the reader has no rows or an error occurs.</returns>
         public static T? ConvertToObject<T>(this DbDataReader reader) where T : class
         {
             try

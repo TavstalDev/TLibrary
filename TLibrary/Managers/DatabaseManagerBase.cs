@@ -18,6 +18,11 @@ namespace Tavstal.TLibrary.Managers
         public DatabaseSettingsBase Configuration { get; }
         public bool IsAuthenticationFailed { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseManagerBase"/> class.
+        /// </summary>
+        /// <param name="plugin">The plugin that owns this database manager.</param>
+        /// <param name="configuration">The database connection settings.</param>
         protected DatabaseManagerBase(IPlugin plugin, DatabaseSettingsBase configuration)
         {
             _plugin = plugin;
