@@ -10,7 +10,7 @@ namespace Tavstal.TLibrary.Models.Config
         public bool DebugMode { get; set; }
         
         [JsonProperty(Order = 1), YamlMember(Order = 1, Description = "Log level for the plugin, default is 'INFO'.\nValues: DEBUG, INFO, WARNING, ERROR, COMMAND")]
-        public ELogLevel LogLevel { get; set; }
+        public ELogLevel LogLevel { get; set; } =  ELogLevel.INFO;
         
         [JsonProperty(Order = 2), YamlMember(Order = 2, Description = "Locale used for the plugin, default is 'en'.")] 
         public string Locale { get; set; } = "en";
