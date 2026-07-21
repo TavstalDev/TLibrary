@@ -177,9 +177,12 @@ namespace Tavstal.TLibrary.Models.Database
             connection ??= _databaseManager.CreateConnection();
             if (connection == null)
                 return false;
-            bool connectionState = await connection.OpenSafeAsync();
-            if (!connectionState)
+            var connectionState = await connection.OpenSafeAsync();
+            if (connectionState != EDatabaseState.SUCCESS)
+            {
+                _databaseManager.IsAuthenticationFailed = connectionState == EDatabaseState.AUTHENTICATION_FAILED;
                 return false;
+            }
             
             try
             {
@@ -479,9 +482,12 @@ namespace Tavstal.TLibrary.Models.Database
             connection ??= _databaseManager.CreateConnection();
             if (connection == null)
                 return false;
-            bool connectionState = await connection.OpenSafeAsync();
-            if (!connectionState)
+            var connectionState = await connection.OpenSafeAsync();
+            if (connectionState != EDatabaseState.SUCCESS)
+            {
+                _databaseManager.IsAuthenticationFailed = connectionState == EDatabaseState.AUTHENTICATION_FAILED;
                 return false;
+            }
             
             try
             {
