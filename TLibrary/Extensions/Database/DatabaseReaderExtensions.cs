@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MySqlConnector;
 using Tavstal.TLibrary.Helpers.Database;
 using Tavstal.TLibrary.Helpers.General;
+using Tavstal.TLibrary.Models.Database;
 using Tavstal.TLibrary.Models.Database.Attributes;
 
 namespace Tavstal.TLibrary.Extensions.Database
@@ -165,18 +166,18 @@ namespace Tavstal.TLibrary.Extensions.Database
         /// </summary>
         /// <param name="connection">The MySQL connection.</param>
         /// <returns>True if connected, false if it failed.</returns>
-        public static async Task<bool> OpenSafeAsync(this MySqlConnection connection)
+        public static async Task<EDatabaseState> OpenSafeAsync(this MySqlConnection connection)
         {
             if (connection.State == System.Data.ConnectionState.Open)
-                return true;
+                return EDatabaseState.SUCCESS;
 
             if (connection.State == System.Data.ConnectionState.Connecting)
-                return true;
+                return EDatabaseState.SUCCESS;
 
             try
             {
                 await connection.OpenAsync();
-                return true;
+                return EDatabaseState.SUCCESS;
             }
             catch (MySqlException myex)
             {
@@ -187,14 +188,14 @@ namespace Tavstal.TLibrary.Extensions.Database
                     LoggerHelper.LogError($"{myex}");
                     if (connection.State != System.Data.ConnectionState.Closed)
                         await connection.CloseAsync();
-                    return false;
+                    return EDatabaseState.AUTHENTICATION_FAILED;
                 }
 
                 LoggerHelper.LogError($"Mysql error in TLibrary:");
                 LoggerHelper.LogError(myex);
                 if (connection.State != System.Data.ConnectionState.Closed)
                     await connection.CloseAsync();
-                return false;
+                return EDatabaseState.ERROR;
             }
             catch (Exception ex)
             {
@@ -202,7 +203,7 @@ namespace Tavstal.TLibrary.Extensions.Database
                 LoggerHelper.LogError(ex);
                 if (connection.State != System.Data.ConnectionState.Closed)
                     await connection.CloseAsync();
-                return false;
+                return EDatabaseState.ERROR;
             }
         }
 

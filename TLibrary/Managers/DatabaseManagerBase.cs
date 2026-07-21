@@ -15,12 +15,13 @@ namespace Tavstal.TLibrary.Managers
     {
         // ReSharper disable once InconsistentNaming
         public IPlugin _plugin { get; }
-        public DatabaseSettingsBase _configuration { get; }
+        public DatabaseSettingsBase Configuration { get; }
+        public bool IsAuthenticationFailed { get; set; }
 
         protected DatabaseManagerBase(IPlugin plugin, DatabaseSettingsBase configuration)
         {
             _plugin = plugin;
-            _configuration = configuration;
+            Configuration = configuration;
             // Forces Mono's compiler/linker to include the CP1250 codepage
             _ = new I18N.West.CP1250();
             // ReSharper disable once VirtualMemberCallInConstructor
@@ -35,12 +36,12 @@ namespace Tavstal.TLibrary.Managers
         {
             var builder = new MySqlConnectionStringBuilder
             {
-                Server = _configuration.Host,
-                Database = _configuration.DatabaseName,
-                UserID = _configuration.UserName,
-                Password = _configuration.UserPassword,
-                Port = (uint)_configuration.Port,
-                DefaultCommandTimeout = (uint)_configuration.TimeOut,
+                Server = Configuration.Host,
+                Database = Configuration.DatabaseName,
+                UserID = Configuration.UserName,
+                Password = Configuration.UserPassword,
+                Port = (uint)Configuration.Port,
+                DefaultCommandTimeout = (uint)Configuration.TimeOut,
                 CharacterSet = "utf8",
                 Pooling = true, 
                 MinimumPoolSize = 5,
