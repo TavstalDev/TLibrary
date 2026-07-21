@@ -213,7 +213,7 @@ namespace Tavstal.TLibrary.Models.Database
             }
             catch (Exception ex)
             {
-                HandleException(nameof(AddAsync), ex);
+                HandleException(nameof(AddRangeAsync), ex);
                 return false;
             }
             finally
@@ -510,7 +510,7 @@ namespace Tavstal.TLibrary.Models.Database
             }
             catch (Exception ex)
             {
-                HandleException(nameof(DeleteAsync), ex);
+                HandleException(nameof(DeleteRangeAsync), ex);
                 return false;
             }
             finally
