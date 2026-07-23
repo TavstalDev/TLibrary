@@ -9,7 +9,6 @@ namespace Tavstal.TLibrary.Helpers.General
     internal static class LoggerHelper
     {
         private static readonly string Name = "TLibrary";
-        private static readonly bool IsDebug = false;
 
         /// <summary>
         /// Logs a message with a specified color and prefix.
@@ -69,8 +68,9 @@ namespace Tavstal.TLibrary.Helpers.General
         /// <param name="prefix">The prefix to use for the log message.</param>
         public static void LogDebug(object message, ConsoleColor color = ConsoleColor.Magenta, string prefix = "[DEBUG] >")
         {
-            if (IsDebug)
-                Log(message, color, prefix);
+#if DEBUG
+            Log(message, color, prefix);
+#endif
         }
     }
 }
