@@ -649,7 +649,7 @@ namespace Tavstal.TLibrary.Models.Database
             if (ex is OperationCanceledException canceledEx)
                 throw canceledEx;
             
-            LoggerHelper.LogError($"Error in TLibrary while exectuin {methodName}:");
+            LoggerHelper.LogError($"Error in TLibrary while executing {methodName}:");
             LoggerHelper.LogError(ex);
         }
     }
