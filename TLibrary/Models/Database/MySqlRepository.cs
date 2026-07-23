@@ -88,6 +88,7 @@ namespace Tavstal.TLibrary.Models.Database
                 
                 string schemaParams = SqlTypeHelper.GetSchemaCreateParams(_classType);
                 command.CommandText = $"CREATE TABLE IF NOT EXISTS `{_tableName}` ({schemaParams});";
+                LoggerHelper.LogDebug($"SQL {nameof(CheckSchemaAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
                 await command.ExecuteNonQueryAsync();
             }
             catch (Exception ex)
@@ -146,6 +147,7 @@ namespace Tavstal.TLibrary.Models.Database
                 string values =  string.Join(", ", columnValues);
                 command.CommandText = $"INSERT INTO `{_tableName}` ({columns}) VALUES ({values});" +
                                       $"SELECT * FROM `{_tableName}` WHERE `{_idColumnName}` = LAST_INSERT_ID();";
+                LoggerHelper.LogDebug($"SQL {nameof(AddAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
 
                 T? result = null;
                 await using var reader = await command.ExecuteReaderAsync();
@@ -209,6 +211,7 @@ namespace Tavstal.TLibrary.Models.Database
                 }
                 
                 command.CommandText = $"INSERT INTO `{_tableName}` ({string.Join(", ", columnNames)}) VALUES {string.Join(", ", valueGroups)};";
+                LoggerHelper.LogDebug($"SQL {nameof(AddRangeAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
                 return await command.ExecuteNonQueryAsync() > 0;
             }
             catch (Exception ex)
@@ -269,6 +272,7 @@ namespace Tavstal.TLibrary.Models.Database
                 
                 string values =  string.Join(", ", columnValues);
                 command.CommandText = $"UPDATE `{_tableName}` SET {values} WHERE `{_idColumnName}` = @Id;";
+                LoggerHelper.LogDebug($"SQL {nameof(UpdateAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
                 
                 return await command.ExecuteNonQueryAsync() > 0;
             }
@@ -346,6 +350,7 @@ namespace Tavstal.TLibrary.Models.Database
                 string values =  string.Join(", ", columnValues);
                 string queryValues = string.Join(" AND ", queryList);
                 command.CommandText = $"UPDATE `{_tableName}` SET {values} WHERE {queryValues};";
+                LoggerHelper.LogDebug($"SQL {nameof(UpdateAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
                 
                 return await command.ExecuteNonQueryAsync() > 0;
             }
@@ -388,6 +393,7 @@ namespace Tavstal.TLibrary.Models.Database
                 
                 command.Parameters.AddWithValue("@Id", id);
                 command.CommandText = $"DELETE FROM `{_tableName}` WHERE `{_idColumnName}` = @Id;";
+                LoggerHelper.LogDebug($"SQL {nameof(DeleteAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
                 
                 return await command.ExecuteNonQueryAsync() > 0;
             }
@@ -440,9 +446,6 @@ namespace Tavstal.TLibrary.Models.Database
                 int qParamIndex = 0;
                 foreach (var column in _columnMappings.Values)
                 {
-                    if (column == _idColumnName)
-                        continue;
-                    
                     QueryParameter? queryParameter = queryParameters.FirstOrDefault( x=> x.ColumnName == column);
                     if (queryParameter != null)
                     {
@@ -454,6 +457,7 @@ namespace Tavstal.TLibrary.Models.Database
                 
                 string queryValues = string.Join(" AND ", queryList);
                 command.CommandText = $"DELETE FROM `{_tableName}` WHERE {queryValues};";
+                LoggerHelper.LogDebug($"SQL {nameof(DeleteAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
                 
                 return await command.ExecuteNonQueryAsync() > 0;
             }
@@ -505,6 +509,7 @@ namespace Tavstal.TLibrary.Models.Database
                 
                 string inClause = string.Join(", ", paramNames);
                 command.CommandText = $"DELETE FROM `{_tableName}` WHERE `{columnName}` IN ({inClause});";
+                LoggerHelper.LogDebug($"SQL {nameof(DeleteRangeAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
                 
                 return await command.ExecuteNonQueryAsync() > 0;
             }
@@ -547,6 +552,7 @@ namespace Tavstal.TLibrary.Models.Database
                 
                 command.Parameters.AddWithValue("@Id", id);
                 command.CommandText = $"SELECT * FROM `{_tableName}` WHERE `{_idColumnName}` = @Id;";
+                LoggerHelper.LogDebug($"SQL {nameof(GetAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
 
                 await using var reader = await command.ExecuteReaderAsync();
                 T? result = null;
@@ -606,9 +612,6 @@ namespace Tavstal.TLibrary.Models.Database
                 int qParamIndex = 0;
                 foreach (var column in _columnMappings.Values)
                 {
-                    if (column == _idColumnName)
-                        continue;
-                    
                     QueryParameter? queryParameter = queryParameters.FirstOrDefault( x=> x.ColumnName == column);
                     if (queryParameter != null)
                     {
@@ -621,6 +624,7 @@ namespace Tavstal.TLibrary.Models.Database
                 string queryValues = string.Join(" AND ", queryList);
                 
                 command.CommandText = $"SELECT * FROM `{_tableName}` WHERE {queryValues} LIMIT {limit};";
+                LoggerHelper.LogDebug($"SQL {nameof(GetAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
 
                 await using var reader = await command.ExecuteReaderAsync();
                 List<T>? result = null;
