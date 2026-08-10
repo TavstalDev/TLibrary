@@ -162,7 +162,7 @@ namespace Tavstal.TLibrary.Models.Plugin
         public TLogger GetLogger() => _logger;
 
         /// <inheritdoc/>
-        public ELogLevel GetLogLevel() => Config.GetGeneral().LogLevel;
+        public ELogLevel GetLogLevel() => Config?.GetGeneral()?.LogLevel ?? ELogLevel.INFO;
 
         /// <inheritdoc/>
         public string GetPluginName() => _pluginName;

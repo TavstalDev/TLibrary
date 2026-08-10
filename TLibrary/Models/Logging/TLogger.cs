@@ -118,7 +118,7 @@ namespace Tavstal.TLibrary.Models.Logging
             if (exception != null)
             {
                 string exceptionMsg = GetDetailedExceptionMessage(exception);
-                text += Environment.NewLine + $"└── Exception: {exceptionMsg}";
+                text += Environment.NewLine + $"└── Exception: {Environment.NewLine}{exceptionMsg}";
             }
 
             try
@@ -177,7 +177,7 @@ namespace Tavstal.TLibrary.Models.Logging
             {
                 var sb = new StringBuilder();
                 int depth = 0;
-
+                
                 for (var current = ex; current != null; current = current.InnerException)
                 {
                     string indent = new string(' ', depth * 2);
