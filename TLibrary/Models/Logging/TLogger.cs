@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using Tavstal.TLibrary.Extensions.General;
 using Tavstal.TLibrary.Helpers.General;
 using Tavstal.TLibrary.Models.Plugin;
@@ -115,8 +116,11 @@ namespace Tavstal.TLibrary.Models.Logging
                 text = message;
 
             if (exception != null)
-                text += Environment.NewLine + $"└── Exception: {exception}";
-            
+            {
+                string exceptionMsg = GetDetailedExceptionMessage(exception);
+                text += Environment.NewLine + $"└── Exception: {exceptionMsg}";
+            }
+
             try
             {
                 using (StreamWriter streamWriter = File.AppendText(Path.Combine(Rocket.Core.Environment.LogsDirectory,
@@ -165,6 +169,39 @@ namespace Tavstal.TLibrary.Models.Logging
                 ELogLevel.COMMAND => "&3",
                 _ => string.Empty
             };
+        }
+        
+        private static string GetDetailedExceptionMessage(Exception ex)
+        {
+            try
+            {
+                var sb = new StringBuilder();
+                int depth = 0;
+
+                for (var current = ex; current != null; current = current.InnerException)
+                {
+                    string indent = new string(' ', depth * 2);
+                    sb.AppendLine($"{indent}* Type: {current.GetType().FullName}");
+                    sb.AppendLine($"{indent}  Message: {current.Message}");
+
+                    if (current.Data.Count > 0)
+                    {
+                        sb.AppendLine($"{indent}  Data:");
+                        foreach (var key in current.Data.Keys)
+                            sb.AppendLine($"{indent}    - {key}: {current.Data[key]}");
+                    }
+
+                    sb.AppendLine($"{indent}  Stack Trace:{Environment.NewLine}{current.StackTrace}");
+                    depth++;
+                }
+
+                return sb.ToString().TrimEnd();
+            }
+            catch
+            {
+                // Fallback
+                return ex.ToString();
+            }
         }
     }
 }
