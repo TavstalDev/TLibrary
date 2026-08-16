@@ -13,9 +13,10 @@ namespace Tavstal.TLibrary.Models.Database
         /// <summary>
         /// The configuration of the plugin.
         /// </summary>
-        // ReSharper disable once InconsistentNaming
         DatabaseConfigBase Configuration { get; }
 
+        ICacheManager? CacheManager { get; }
+        
         /// <summary>
         /// Whether the database authentication has failed.
         /// </summary>

@@ -19,7 +19,9 @@ namespace Tavstal.TLibrary.Models.Database
     public class MySqlRepository<ID, T> where T : class
     {
         protected readonly string _tableName;
+        public string TableName => _tableName;
         protected readonly string _idColumnName;
+        protected readonly PropertyInfo? _idProperty;
         protected readonly Type _classType;
         protected readonly IDatabaseManager _databaseManager;
         protected readonly Dictionary<PropertyInfo, string> _columnMappings = new Dictionary<PropertyInfo, string>();
@@ -52,7 +54,10 @@ namespace Tavstal.TLibrary.Models.Database
                     if (!string.IsNullOrEmpty(sqlMember.ColumnName))
                         propName = sqlMember.ColumnName!;
                     if (sqlMember.IsPrimaryKey)
+                    {
                         _idColumnName = propName;
+                        _idProperty = prop;
+                    }
                 }
                 
                 _columnMappings[prop] = propName;
@@ -153,6 +158,13 @@ namespace Tavstal.TLibrary.Models.Database
                 await using var reader = await command.ExecuteReaderAsync();
                 if (await reader.ReadAsync())
                     result = reader.ConvertToObject<T>();
+                if (result != null)
+                {
+                    var id = _idProperty?.GetValue(result);
+                    if (id != null)
+                        _databaseManager.CacheManager?.Add(_tableName, id, result);
+                }
+
                 return result;
             }
             catch (Exception ex)
@@ -210,9 +222,26 @@ namespace Tavstal.TLibrary.Models.Database
                     valueGroups.Add($"({string.Join(", ", currentParams)})");
                 }
                 
-                command.CommandText = $"INSERT INTO `{_tableName}` ({string.Join(", ", columnNames)}) VALUES {string.Join(", ", valueGroups)};";
+                command.CommandText = $@"
+                INSERT INTO `{_tableName}` ({string.Join(", ", columnNames)}) 
+                VALUES {string.Join(", ", valueGroups)} 
+                RETURNING *;";
                 LoggerHelper.LogDebug($"SQL {nameof(AddRangeAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
-                return await command.ExecuteNonQueryAsync() > 0;
+
+                await using var reader = await command.ExecuteReaderAsync();
+
+                int count = 0;
+                while (await reader.ReadAsync())
+                {
+                    count++;
+                    var obj = reader.ConvertToObject<T>();
+                    if (obj == null) continue;
+                    var id = _idProperty?.GetValue(obj);
+                    if (id != null)
+                        _databaseManager.CacheManager?.Add(_tableName, id, obj);
+                }
+                
+                return count > 0;
             }
             catch (Exception ex)
             {
@@ -273,8 +302,12 @@ namespace Tavstal.TLibrary.Models.Database
                 string values =  string.Join(", ", columnValues);
                 command.CommandText = $"UPDATE `{_tableName}` SET {values} WHERE `{_idColumnName}` = @Id;";
                 LoggerHelper.LogDebug($"SQL {nameof(UpdateAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
+
+                bool success = await command.ExecuteNonQueryAsync() > 0;
+                if (success && id != null)
+                    _databaseManager.CacheManager?.Update(_tableName, id, entity);
                 
-                return await command.ExecuteNonQueryAsync() > 0;
+                return success;
             }
             catch (Exception ex)
             {
@@ -349,10 +382,23 @@ namespace Tavstal.TLibrary.Models.Database
                 
                 string values =  string.Join(", ", columnValues);
                 string queryValues = string.Join(" AND ", queryList);
-                command.CommandText = $"UPDATE `{_tableName}` SET {values} WHERE {queryValues};";
+                command.CommandText = $"UPDATE `{_tableName}` SET {values} WHERE {queryValues} RETURNING *;";
                 LoggerHelper.LogDebug($"SQL {nameof(UpdateAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
                 
-                return await command.ExecuteNonQueryAsync() > 0;
+                await using var reader = await command.ExecuteReaderAsync();
+
+                int count = 0;
+                while (await reader.ReadAsync())
+                {
+                    count++;
+                    var obj = reader.ConvertToObject<T>();
+                    if (obj == null) continue;
+                    var id = _idProperty?.GetValue(obj);
+                    if (id != null)
+                        _databaseManager.CacheManager?.Update(_tableName, id, obj);
+                }
+                
+                return count > 0;
             }
             catch (Exception ex)
             {
@@ -394,8 +440,12 @@ namespace Tavstal.TLibrary.Models.Database
                 command.Parameters.AddWithValue("@Id", id);
                 command.CommandText = $"DELETE FROM `{_tableName}` WHERE `{_idColumnName}` = @Id;";
                 LoggerHelper.LogDebug($"SQL {nameof(DeleteAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
+
+                bool success = await command.ExecuteNonQueryAsync() > 0;
+                if (success && id != null)
+                    _databaseManager.CacheManager?.Remove(_tableName, id);
                 
-                return await command.ExecuteNonQueryAsync() > 0;
+                return success;
             }
             catch (Exception ex)
             {
@@ -456,10 +506,22 @@ namespace Tavstal.TLibrary.Models.Database
                 }
                 
                 string queryValues = string.Join(" AND ", queryList);
-                command.CommandText = $"DELETE FROM `{_tableName}` WHERE {queryValues};";
+                command.CommandText = $"DELETE FROM `{_tableName}` WHERE {queryValues} RETURNING `{_idColumnName}`;";
                 LoggerHelper.LogDebug($"SQL {nameof(DeleteAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
+
+                await using var reader = await command.ExecuteReaderAsync();
+
+                int count = 0;
+                while (await reader.ReadAsync())
+                {
+                    count++;
+                    var id = reader.GetValue(0);
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+                    if (id != null && id != DBNull.Value)
+                        _databaseManager.CacheManager?.Remove(_tableName, id);
+                }
                 
-                return await command.ExecuteNonQueryAsync() > 0;
+                return count > 0;
             }
             catch (Exception ex)
             {
@@ -508,10 +570,22 @@ namespace Tavstal.TLibrary.Models.Database
                 }
                 
                 string inClause = string.Join(", ", paramNames);
-                command.CommandText = $"DELETE FROM `{_tableName}` WHERE `{columnName}` IN ({inClause});";
+                command.CommandText = $"DELETE FROM `{_tableName}` WHERE `{columnName}` IN ({inClause}) RETURNING `{_idColumnName}`;";
                 LoggerHelper.LogDebug($"SQL {nameof(DeleteRangeAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
                 
-                return await command.ExecuteNonQueryAsync() > 0;
+                await using var reader = await command.ExecuteReaderAsync();
+
+                int count = 0;
+                while (await reader.ReadAsync())
+                {
+                    count++;
+                    var id = reader.GetValue(0);
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+                    if (id != null && id != DBNull.Value)
+                        _databaseManager.CacheManager?.Remove(_tableName, id);
+                }
+                
+                return count > 0;
             }
             catch (Exception ex)
             {

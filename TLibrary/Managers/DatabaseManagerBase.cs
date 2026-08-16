@@ -17,6 +17,7 @@ namespace Tavstal.TLibrary.Managers
         // ReSharper disable once InconsistentNaming
         public IPlugin _plugin { get; }
         public DatabaseConfigBase Configuration { get; }
+        public ICacheManager? CacheManager { get; }
         public bool IsAuthenticationFailed { get; set; }
 
         /// <summary>
@@ -24,10 +25,19 @@ namespace Tavstal.TLibrary.Managers
         /// </summary>
         /// <param name="plugin">The plugin that owns this database manager.</param>
         /// <param name="configuration">The database connection settings.</param>
-        protected DatabaseManagerBase(IPlugin plugin, DatabaseConfigBase configuration)
+        protected DatabaseManagerBase(IPlugin plugin, DatabaseConfigBase configuration) : this(plugin, configuration, null) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseManagerBase"/> class.
+        /// </summary>
+        /// <param name="plugin">The plugin that owns this database manager.</param>
+        /// <param name="configuration">The database connection settings.</param>
+        /// <param name="cacheManager">The optional database cache manager.</param>
+        protected DatabaseManagerBase(IPlugin plugin, DatabaseConfigBase configuration, ICacheManager? cacheManager)
         {
             _plugin = plugin;
             Configuration = configuration;
+            CacheManager = cacheManager;
             // Forces Mono's compiler/linker to include the CP1250 codepage
             _ = new I18N.West.CP1250();
             // ReSharper disable once VirtualMemberCallInConstructor
