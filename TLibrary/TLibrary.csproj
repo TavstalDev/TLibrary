@@ -113,5 +113,9 @@
       <HintPath>..\assets\libraries\YamlDotNet.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="StackExchange.Redis">
+      <HintPath>..\assets\libraries\StackExchange.Redis.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
 </Project>
