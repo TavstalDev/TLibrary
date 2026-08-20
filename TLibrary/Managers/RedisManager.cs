@@ -66,11 +66,5 @@ namespace Tavstal.TLibrary.Managers
                     await _db.KeyDeleteAsync(key);
             }
         }
-
-        private async Task<ConnectionMultiplexer> CreateConnectionAsync()
-        {
-            var muxer = await ConnectionMultiplexer.ConnectAsync($"{_config.Host}:{_config.Port},ssl={_config.UseSsl},user={_config.UserName},password={_config.UserPassword}");
-            return muxer;
-        }
     }
 }
