@@ -1,38 +1,76 @@
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using StackExchange.Redis;
+using Tavstal.TLibrary.Models.Config;
 using Tavstal.TLibrary.Models.Database;
 
 namespace Tavstal.TLibrary.Managers
 {
     public class RedisManager : ICacheManager
     {
-        // TODO
-        public void Add(string table, object key, object value)
+        private readonly IRedisConfig _config;
+        private readonly ConnectionMultiplexer _redis;
+        private readonly IDatabase _db;
+        
+        public RedisManager(IRedisConfig config)
         {
-            throw new System.NotImplementedException();
+            _config = config;
+            _redis = ConnectionMultiplexer.Connect($"{_config.Host}:{_config.Port},ssl={_config.UseSsl},user={_config.UserName},password={_config.UserPassword}");
+            _db = _redis.GetDatabase();
         }
 
-        public void Update(string table, object key, object newValue)
+        private string GetRedisKey(string table, object key) => $"{_config.Prefix}:{table}:{key}";
+
+        public async Task AddAsync(string table, object key, object value)
         {
-            throw new System.NotImplementedException();
+            var redisKey = GetRedisKey(table, key);
+            var jsonValue = JsonConvert.SerializeObject(value);
+            await _db.StringSetAsync(redisKey, jsonValue);
         }
 
-        public void RemoveTable(string table)
+        public async Task UpdateAsync(string table, object key, object newValue) =>
+            await AddAsync(table, key, newValue);
+
+        public async Task RemoveAsync(string table, object key)
         {
-            throw new System.NotImplementedException();
+            var redisKey = GetRedisKey(table, key);
+            await _db.KeyDeleteAsync(redisKey);
         }
 
-        public void Remove(string table, object key)
+        public async Task<T?> GetAsync<T>(string table, object key) where T : class
         {
-            throw new System.NotImplementedException();
+            var redisKey = GetRedisKey(table, key);
+            var jsonValue = await _db.StringGetAsync(redisKey);
+        
+            if (jsonValue.IsNullOrEmpty)
+                return null;
+            return JsonConvert.DeserializeObject<T>(jsonValue!);
         }
 
-        public void Clear()
+        public async Task RemoveTableAsync(string table)
         {
-            throw new System.NotImplementedException();
+            foreach (var endpoint in _redis.GetEndPoints())
+            {
+                var server = _redis.GetServer(endpoint);
+                foreach (var key in server.Keys(pattern: $"{_config.Prefix}:{table}:*"))
+                    await _db.KeyDeleteAsync(key);
+            }
         }
 
-        public T? Get<T>(string table, object key) where T : class
+        public async Task ClearAsync()
         {
-            throw new System.NotImplementedException();
+            foreach (var endpoint in _redis.GetEndPoints())
+            {
+                var server = _redis.GetServer(endpoint);
+                foreach (var key in server.Keys(pattern: $"{_config.Prefix}:*"))
+                    await _db.KeyDeleteAsync(key);
+            }
+        }
+
+        private async Task<ConnectionMultiplexer> CreateConnectionAsync()
+        {
+            var muxer = await ConnectionMultiplexer.ConnectAsync($"{_config.Host}:{_config.Port},ssl={_config.UseSsl},user={_config.UserName},password={_config.UserPassword}");
+            return muxer;
         }
     }
 }
