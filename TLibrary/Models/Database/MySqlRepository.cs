@@ -161,8 +161,8 @@ namespace Tavstal.TLibrary.Models.Database
                 if (result != null)
                 {
                     var id = _idProperty?.GetValue(result);
-                    if (id != null)
-                        _databaseManager.CacheManager?.Add(_tableName, id, result);
+                    if (id != null && _databaseManager.CacheManager != null)
+                        await _databaseManager.CacheManager.AddAsync(_tableName, id, result);
                 }
 
                 return result;
@@ -237,8 +237,8 @@ namespace Tavstal.TLibrary.Models.Database
                     var obj = reader.ConvertToObject<T>();
                     if (obj == null) continue;
                     var id = _idProperty?.GetValue(obj);
-                    if (id != null)
-                        _databaseManager.CacheManager?.Add(_tableName, id, obj);
+                    if (id != null && _databaseManager.CacheManager != null)
+                        await _databaseManager.CacheManager.AddAsync(_tableName, id, obj);
                 }
                 
                 return count > 0;
@@ -304,8 +304,8 @@ namespace Tavstal.TLibrary.Models.Database
                 LoggerHelper.LogDebug($"SQL {nameof(UpdateAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
 
                 bool success = await command.ExecuteNonQueryAsync() > 0;
-                if (success && id != null)
-                    _databaseManager.CacheManager?.Update(_tableName, id, entity);
+                if (success && id != null && _databaseManager.CacheManager != null)
+                    await _databaseManager.CacheManager.UpdateAsync(_tableName, id, entity);
                 
                 return success;
             }
@@ -394,8 +394,8 @@ namespace Tavstal.TLibrary.Models.Database
                     var obj = reader.ConvertToObject<T>();
                     if (obj == null) continue;
                     var id = _idProperty?.GetValue(obj);
-                    if (id != null)
-                        _databaseManager.CacheManager?.Update(_tableName, id, obj);
+                    if (id != null && _databaseManager.CacheManager != null)
+                        await _databaseManager.CacheManager.UpdateAsync(_tableName, id, obj);
                 }
                 
                 return count > 0;
@@ -442,8 +442,8 @@ namespace Tavstal.TLibrary.Models.Database
                 LoggerHelper.LogDebug($"SQL {nameof(DeleteAsync)} QUERY FOR {_classType.Name}: {command.CommandText}");
 
                 bool success = await command.ExecuteNonQueryAsync() > 0;
-                if (success && id != null)
-                    _databaseManager.CacheManager?.Remove(_tableName, id);
+                if (success && id != null && _databaseManager.CacheManager != null)
+                    await _databaseManager.CacheManager.RemoveAsync(_tableName, id);
                 
                 return success;
             }
@@ -517,8 +517,8 @@ namespace Tavstal.TLibrary.Models.Database
                     count++;
                     var id = reader.GetValue(0);
                     // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-                    if (id != null && id != DBNull.Value)
-                        _databaseManager.CacheManager?.Remove(_tableName, id);
+                    if (id != null && id != DBNull.Value && _databaseManager.CacheManager != null)
+                        await _databaseManager.CacheManager.RemoveAsync(_tableName, id);
                 }
                 
                 return count > 0;
@@ -581,8 +581,8 @@ namespace Tavstal.TLibrary.Models.Database
                     count++;
                     var id = reader.GetValue(0);
                     // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-                    if (id != null && id != DBNull.Value)
-                        _databaseManager.CacheManager?.Remove(_tableName, id);
+                    if (id != null && id != DBNull.Value && _databaseManager.CacheManager != null)
+                        await _databaseManager.CacheManager.RemoveAsync(_tableName, id);
                 }
                 
                 return count > 0;
@@ -607,6 +607,13 @@ namespace Tavstal.TLibrary.Models.Database
         /// <returns>The matching entity, or <see langword="null"/> if not found or the operation failed.</returns>
         public async Task<T?> GetAsync(ID id, MySqlConnection? connection = null, MySqlTransaction? transaction = null)
         {
+            if (_databaseManager.CacheManager != null && id != null)
+            {
+                var cache = await _databaseManager.CacheManager.GetAsync<T>(_tableName, id);
+                if (cache != null)
+                    return cache;
+            }
+
             bool isLocalConnection = connection == null;
             connection ??= _databaseManager.CreateConnection();
             if (connection == null)
@@ -665,6 +672,17 @@ namespace Tavstal.TLibrary.Models.Database
         /// <returns>A list of matching entities, or <see langword="null"/> if none found or the operation failed.</returns>
         public async Task<List<T>?> GetAsync(MySqlConnection? connection, MySqlTransaction? transaction, int limit = 1000, params QueryParameter[] queryParameters)
         {
+            if (_databaseManager.CacheManager != null)
+            {
+                string cacheKey = "query:";
+                foreach (var queryParameter in queryParameters)
+                    cacheKey += $"{queryParameter.ColumnName}-{queryParameter.Operator}-{queryParameter.Value};";
+                    
+                var cache = await _databaseManager.CacheManager.GetAsync<List<T>>(_tableName, cacheKey);
+                if (cache != null)
+                    return cache;
+            }
+            
             bool isLocalConnection = connection == null;
             connection ??= _databaseManager.CreateConnection();
             if (connection == null || queryParameters.Length == 0)
