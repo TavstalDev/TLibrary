@@ -35,5 +35,7 @@
         /// <br/>how long the connection should wait for a response from the server before disconnecting
         /// </summary>
         int TimeOut { get; set; }
+        
+        RedisConfigBase Redis { get; set; }
     }
 }

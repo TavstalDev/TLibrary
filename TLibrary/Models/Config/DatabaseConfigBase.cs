@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Tavstal.TLibrary.Models.Database;
 using YamlDotNet.Serialization;
 
 namespace Tavstal.TLibrary.Models.Config
@@ -30,5 +29,9 @@ namespace Tavstal.TLibrary.Models.Config
         /// <inheritdoc/>
         [JsonProperty(Order = 5), YamlMember(Order = 5, Description = "Database connection timeout in seconds, default is 120.")]
         public int TimeOut { get; set; } = 120;
+        
+        /// <inheritdoc/>
+        [JsonProperty(Order = 100), YamlMember(Order = 100, Description = "Redis configuration.")]
+        public RedisConfigBase Redis { get; set; } = new RedisConfigBase();
     }
 }
