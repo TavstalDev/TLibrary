@@ -25,6 +25,7 @@ namespace Tavstal.TLibrary.Models.Database
         protected readonly Type _classType;
         protected readonly IDatabaseManager _databaseManager;
         protected readonly Dictionary<PropertyInfo, string> _columnMappings = new Dictionary<PropertyInfo, string>();
+        protected readonly List<string> _cachedQuarries = new List<string>();
         
         /// <summary>
         /// Initializes a new instance of the <see cref="MySqlRepository{ID, T}"/> class.
@@ -162,7 +163,12 @@ namespace Tavstal.TLibrary.Models.Database
                 {
                     var id = _idProperty?.GetValue(result);
                     if (id != null && _databaseManager.CacheManager != null)
+                    {
                         await _databaseManager.CacheManager.AddAsync(_tableName, id, result);
+                        foreach (var key in _cachedQuarries)
+                            await _databaseManager.CacheManager.RemoveAsync(_tableName, key);
+                        _cachedQuarries.Clear();
+                    }
                 }
 
                 return result;
@@ -241,7 +247,15 @@ namespace Tavstal.TLibrary.Models.Database
                         await _databaseManager.CacheManager.AddAsync(_tableName, id, obj);
                 }
                 
-                return count > 0;
+                bool success = count > 0;
+                if (success && _databaseManager.CacheManager != null)
+                {
+                    foreach (var key in _cachedQuarries)
+                        await _databaseManager.CacheManager.RemoveAsync(_tableName, key);
+                    _cachedQuarries.Clear();
+                }
+                
+                return success;
             }
             catch (Exception ex)
             {
@@ -305,8 +319,13 @@ namespace Tavstal.TLibrary.Models.Database
 
                 bool success = await command.ExecuteNonQueryAsync() > 0;
                 if (success && id != null && _databaseManager.CacheManager != null)
+                {
                     await _databaseManager.CacheManager.UpdateAsync(_tableName, id, entity);
-                
+                    foreach (var key in _cachedQuarries)
+                        await _databaseManager.CacheManager.RemoveAsync(_tableName, key);
+                    _cachedQuarries.Clear();
+                }
+
                 return success;
             }
             catch (Exception ex)
@@ -398,7 +417,15 @@ namespace Tavstal.TLibrary.Models.Database
                         await _databaseManager.CacheManager.UpdateAsync(_tableName, id, obj);
                 }
                 
-                return count > 0;
+                bool success = count > 0;
+                if (success && _databaseManager.CacheManager != null)
+                {
+                    foreach (var key in _cachedQuarries)
+                        await _databaseManager.CacheManager.RemoveAsync(_tableName, key);
+                    _cachedQuarries.Clear();
+                }
+                
+                return  success;
             }
             catch (Exception ex)
             {
@@ -443,7 +470,12 @@ namespace Tavstal.TLibrary.Models.Database
 
                 bool success = await command.ExecuteNonQueryAsync() > 0;
                 if (success && id != null && _databaseManager.CacheManager != null)
+                {
                     await _databaseManager.CacheManager.RemoveAsync(_tableName, id);
+                    foreach (var key in _cachedQuarries)
+                        await _databaseManager.CacheManager.RemoveAsync(_tableName, key);
+                    _cachedQuarries.Clear();
+                }
                 
                 return success;
             }
@@ -521,7 +553,15 @@ namespace Tavstal.TLibrary.Models.Database
                         await _databaseManager.CacheManager.RemoveAsync(_tableName, id);
                 }
                 
-                return count > 0;
+                bool success = count > 0;
+                if (success && _databaseManager.CacheManager != null)
+                {
+                    foreach (var key in _cachedQuarries)
+                        await _databaseManager.CacheManager.RemoveAsync(_tableName, key);
+                    _cachedQuarries.Clear();
+                }
+                
+                return success;
             }
             catch (Exception ex)
             {
@@ -585,7 +625,15 @@ namespace Tavstal.TLibrary.Models.Database
                         await _databaseManager.CacheManager.RemoveAsync(_tableName, id);
                 }
                 
-                return count > 0;
+                bool success = count > 0;
+                if (success && _databaseManager.CacheManager != null)
+                {
+                    foreach (var key in _cachedQuarries)
+                        await _databaseManager.CacheManager.RemoveAsync(_tableName, key);
+                    _cachedQuarries.Clear();
+                }
+                
+                return success;
             }
             catch (Exception ex)
             {
@@ -639,6 +687,17 @@ namespace Tavstal.TLibrary.Models.Database
                 T? result = null;
                 if (await reader.ReadAsync())
                     result = reader.ConvertToObject<T>();
+                
+                /*
+                 * NOTE:
+                 *
+                 * Do not add to _cachedQuarries because when the database modified by the plugin,
+                 * it automatically handles that specific row and every write operation clears all non-primary key based
+                   quarries from the cache, because there is no easy way to monitor which one should be removed and which one should be kept.
+                 */
+                if (result != null && _databaseManager.CacheManager != null && id != null)
+                    await _databaseManager.CacheManager.AddAsync(_tableName, id, result);
+                
                 return result;
             }
             catch (Exception ex)
@@ -672,9 +731,10 @@ namespace Tavstal.TLibrary.Models.Database
         /// <returns>A list of matching entities, or <see langword="null"/> if none found or the operation failed.</returns>
         public async Task<List<T>?> GetAsync(MySqlConnection? connection, MySqlTransaction? transaction, int limit = 1000, params QueryParameter[] queryParameters)
         {
+            string cacheKey = string.Empty;
             if (_databaseManager.CacheManager != null)
             {
-                string cacheKey = "query:";
+                cacheKey = "query:";
                 foreach (var queryParameter in queryParameters)
                     cacheKey += $"{queryParameter.ColumnName}-{queryParameter.Operator}-{queryParameter.Value};";
                     
@@ -727,6 +787,13 @@ namespace Tavstal.TLibrary.Models.Database
                     if (obj == null) continue;
                     result.Add(obj);
                 }
+
+                if (result != null && _databaseManager.CacheManager != null)
+                {
+                    await _databaseManager.CacheManager.AddAsync(_tableName, cacheKey, result);
+                    _cachedQuarries.Add(cacheKey);
+                }
+                
                 return result;
             }
             catch (Exception ex)
